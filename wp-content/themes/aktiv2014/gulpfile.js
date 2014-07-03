@@ -29,7 +29,7 @@ gulp.task('styles', function () {
 gulp.task('diststyles', function () {
     return gulp.src('app/styles/main.scss')
         .pipe($.sass({
-            includePaths: ['bower_components/foundation/scss']
+            includePaths: ['app/bower_components/foundation/scss']
         }))
         .pipe($.autoprefixer('last 1 version'))
         .pipe($.csso())
