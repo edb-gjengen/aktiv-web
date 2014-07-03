@@ -1,28 +1,95 @@
+@import 'normalize';
+
+//$primary-color: #ff0;
+//$secondary-color: #0f0;
+
+@import "foundation/components/grid";
+@import "foundation/components/block-grid";
+@import "foundation/components/visibility";
+@import "foundation/components/type";
+
 body {
     background: #fafafa;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #444;
+    font-family: "Open Sans", sans-serif;
+    color: #000;
 }
+#site-header {
+    padding-top: rem-calc(16);
+    padding-bottom: rem-calc(16);
+    background-color: #111;
 
-.hero-unit {
-    margin: 50px auto 0 auto;
-    width: 300px;
-    font-size: 18px;
-    font-weight: 200;
-    line-height: 30px;
-    background-color: #eee;
-    border-radius: 6px;
-    padding: 60px;
-    h1 {
-        font-size: 60px;
+    #header-container {
+        @include grid-row();
+        position: relative;
+    }
+}
+.site-title {
+    float: left;
+    padding-left: rem-calc(16);
+}
+#menu {
+    float: right;
+    padding-right: rem-calc(50);
+
+    .menu-toggle {
+        display: none;
+        position: absolute;
+        right: rem-calc(16);
+    }
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
         line-height: 1;
-        letter-spacing: -1px;
+        li {
+            display: block;
+            float: left;
+            padding-right: rem-calc(20);
+
+            &:last-child {
+                padding-right: 0;
+            }
+        }
     }
 }
 
-.browsehappy {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
+#content {
+    @include grid-row();
+    margin-top: rem-calc(16);
+    .introduction {
+        padding-left: rem-calc(16);
+    }
+}
+.love {
+    color: #faafba;
+}
+.credits-wrap {
+    @include grid-row();
+
+    .credits {
+        margin-top: 25px;
+        margin-bottom: 25px;
+        @include grid-column(12);
+        text-align: center;
+        color: #666;
+        font-size: rem-calc(12);
+    }
+}
+/* Single */
+#content {
+    .page-title,
+    .page,
+    .post {
+        padding-left: rem-calc(16);
+    }
+}
+.entry-meta {
+    margin-bottom: rem-calc(10);
+}
+
+/* Overrides */
+.vcard {
+    margin: 0;
+    border: 0;
+    padding: 0;
 }

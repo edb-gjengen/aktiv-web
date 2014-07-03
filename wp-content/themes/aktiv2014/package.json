@@ -23,7 +23,10 @@
     "gulp-useref": "^0.4.2",
     "jshint-stylish": "^0.2.0",
     "opn": "^0.1.1",
-    "wiredep": "^1.4.3"
+    "wiredep": "^1.4.3",
+    "gulp-plumber": "~0.6.3",
+    "gulp-sass": "~0.7.2",
+    "gulp-util": "~2.2.19"
   },
   "engines": {
     "node": ">=0.10.0"

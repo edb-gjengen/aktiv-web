@@ -2,6 +2,7 @@
 <div id="content">
 <h1 class="page-title"><?php wp_title("", true); ?></h1>
 
+LOL2
 <?php if( have_posts() ) : while( have_posts() ) : the_post(); ?>
     
     <article <?php neuf_post_class(); ?>>
@@ -27,7 +28,5 @@
 <?php endwhile; endif; ?>
 
 </div> <!-- #content -->
-
-<?php get_template_part( 'sidebar' ); ?>
 
 <?php get_footer(); ?>

@@ -9,10 +9,8 @@
 <?php get_template_part( 'cover' ); ?>
 
 <div id="content">
-    <div class="introduction">
-        <?php the_post(); the_content(); ?>
-    </div>
-    
+    <div class="introduction"><?php the_post(); ?></div>
+    <?php the_content(); ?>
     <?php get_template_part( 'program' , 'upcoming' ); ?>
     <?php get_template_part( 'digest' ); ?>
 
