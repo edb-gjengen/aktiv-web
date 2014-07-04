@@ -41,6 +41,7 @@ gulp.task('scripts', function () {
     return gulp.src('app/scripts/**/*.js')
         .pipe($.jshint())
         .pipe($.jshint.reporter(require('jshint-stylish')))
+        .pipe(gulp.dest('dist/scripts'))
         .pipe($.size());
 });
 
@@ -95,17 +96,24 @@ gulp.task('serve', ['styles'], function () {
 gulp.task('wiredep', function () {
     var wiredep = require('wiredep').stream;
 
-    gulp.src('app/styles/*.scss')
+    gulp.src('header.php')
         .pipe(wiredep({
-            directory: 'app/bower_components'
+            directory: 'app/bower_components',
+            fileTypes: {
+                html: {
+                    block: /(([ \t]*)<!--\s*bower:*(\S*)\s*-->)(\n|\r|.)*?(<!--\s*endbower\s*-->)/gi,
+                    detect: {
+                        js: /<script.*src=['"](.+)['"]>/gi,
+                        css: /<link.*href=['"](.+)['"]/gi
+                    },
+                    replace: { // Note: overriding the filePath here
+                        js: '<script src="/wp-content/themes/aktiv2014/{{filePath}}"></script>',
+                        css: '<link rel="stylesheet" href="{{filePath}}" />'
+                    }
+                }
+            }
         }))
-        .pipe(gulp.dest('app/styles'));
-
-    gulp.src('*.php')
-        .pipe(wiredep({
-            directory: 'app/bower_components'
-        }))
-        .pipe(gulp.dest('app'));
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('watch', ['serve'], function () {

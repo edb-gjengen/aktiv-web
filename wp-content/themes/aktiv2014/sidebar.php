@@ -1,4 +1,4 @@
 <div id="primary" class="sidebar">
-    <?php // TODO widget area ?>
+    <?php if ( dynamic_sidebar('Home right sidebar') ) : else : endif; ?>
 </div> <!-- #primary.sidebar -->
 

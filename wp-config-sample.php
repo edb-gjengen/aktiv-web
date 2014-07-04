@@ -1,82 +1,82 @@
 <?php
 /**
- * The base configurations of the WordPress.
+ * Grunnkonfigurasjonen til WordPress.
  *
- * This file has the following configurations: MySQL settings, Table Prefix,
- * Secret Keys, WordPress Language, and ABSPATH. You can find more information
- * by visiting {@link http://codex.wordpress.org/Editing_wp-config.php Editing
- * wp-config.php} Codex page. You can get the MySQL settings from your web host.
- *
- * This file is used by the wp-config.php creation script during the
- * installation. You don't have to use the web site, you can just copy this file
- * to "wp-config.php" and fill in the values.
+ * Denne filen inneholder følgende konfigurasjoner: MySQL-innstillinger, tabellprefiks,
+ * hemmelige nøkler, WordPress-språk og ABSPATH. Du kan finne mer informasjon
+ * ved å besøke {@link http://codex.wordpress.org/Editing_wp-config.php Editing
+ * wp-config.php} Codex-siden. Du kan få MySQL-innstillingene fra din nettjener.
+ * 
+ * Denne filen brukes av koden som lager wp-config.php i løpet av
+ * installasjonen. Du trenger ikke å bruke nettstedet til å gjøre det, du trenger bare
+ * å kopiere denne filen til "wp-config.php" og fylle inn verdiene.
  *
  * @package WordPress
  */
 
-// ** MySQL settings - You can get this info from your web host ** //
-/** The name of the database for WordPress */
+// ** MySQL-innstillinger - Dette får du fra din nettjener ** //
+/** Navnet på WordPress-databasen */
 define('DB_NAME', 'database_name_here');
 
-/** MySQL database username */
+/** MySQL-databasens brukernavn */
 define('DB_USER', 'username_here');
 
-/** MySQL database password */
+/** MySQL-databasens passord */
 define('DB_PASSWORD', 'password_here');
 
-/** MySQL hostname */
+/** MySQL-tjener */
 define('DB_HOST', 'localhost');
 
-/** Database Charset to use in creating database tables. */
+/** Tegnsettet som skal brukes i databasen for å lage tabeller. */
 define('DB_CHARSET', 'utf8');
 
-/** The Database Collate type. Don't change this if in doubt. */
+/** Databasens "Collate"-type. La denne være hvis du er i tvil. */
 define('DB_COLLATE', '');
 
 /**#@+
- * Authentication Unique Keys and Salts.
+ * Autentiseringsnøkler og salter.
  *
- * Change these to different unique phrases!
- * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
- * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ * Endre disse til unike nøkler!
+ * Du kan generere nøkler med {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * Du kan når som helst endre disse nøklene for å gjøre aktive cookies ugyldige. Dette vil tvinge alle brukere å logge inn igjen.
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         'put your unique phrase here');
-define('SECURE_AUTH_KEY',  'put your unique phrase here');
-define('LOGGED_IN_KEY',    'put your unique phrase here');
-define('NONCE_KEY',        'put your unique phrase here');
-define('AUTH_SALT',        'put your unique phrase here');
-define('SECURE_AUTH_SALT', 'put your unique phrase here');
-define('LOGGED_IN_SALT',   'put your unique phrase here');
-define('NONCE_SALT',       'put your unique phrase here');
+define('AUTH_KEY',         'angi din unike nøkkel her');
+define('SECURE_AUTH_KEY',  'angi din unike nøkkel her');
+define('LOGGED_IN_KEY',    'angi din unike nøkkel her');
+define('NONCE_KEY',        'angi din unike nøkkel her');
+define('AUTH_SALT',        'angi din unike nøkkel her');
+define('SECURE_AUTH_SALT', 'angi din unike nøkkel her');
+define('LOGGED_IN_SALT',   'angi din unike nøkkel her');
+define('NONCE_SALT',       'angi din unike nøkkel her');
 
 /**#@-*/
 
 /**
- * WordPress Database Table prefix.
+ * WordPress-databasens tabellprefiks.
  *
- * You can have multiple installations in one database if you give each a unique
- * prefix. Only numbers, letters, and underscores please!
+ * Du kan ha flere installasjoner i en databasehvis du gir dem hver deres unike
+ * prefiks. Kun tall, bokstaver og understrek (_), takk!
  */
 $table_prefix  = 'wp_';
 
 /**
- * WordPress Localized Language, defaults to English.
+ * WordPress-språk, forhåndsinnstilt til norsk (bokmål).
  *
- * Change this to localize WordPress. A corresponding MO file for the chosen
- * language must be installed to wp-content/languages. For example, install
- * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
- * language support.
+ * Du kan endre denne linjen for å bruke WordPress på et annet språk. En tilsvarende MO-fil for
+ * det valgte språket må installeres i wp-content/languages. For eksempel, installer
+ * de.mo i wp-content/languages og sett WPLANG til 'de' for å aktivere språkstøtte
+ * på tysk.
  */
-define('WPLANG', '');
+define('WPLANG', 'nb_NO');
 
 /**
- * For developers: WordPress debugging mode.
+ * For utviklere: WordPress-feilsøkingstilstand.
  *
- * Change this to true to enable the display of notices during development.
- * It is strongly recommended that plugin and theme developers use WP_DEBUG
- * in their development environments.
+ * Sett denne til "true" for å aktivere visning av meldinger under utvikling.
+ * Det er sterkt anbefalt at innstikks- og tema-utviklere bruker WP_DEBUG
+ * i deres utviklermiljøer.
  */
 define('WP_DEBUG', false);
 

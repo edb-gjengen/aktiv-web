@@ -370,4 +370,15 @@ function neuf_get_term_name() {
 	return $term->name;
 }
 
+/* Widgets */
+function neuf_widgets_init() {
+
+	register_sidebar( array(
+		'name' => 'Home right sidebar',
+		'id' => 'main_sidebar',
+		'before_widget' => '<div class="widget">',
+		'after_widget' => '</div>',
+	) );
+}
+add_action( 'widgets_init', 'neuf_widgets_init' );
 ?>

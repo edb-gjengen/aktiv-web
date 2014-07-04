@@ -12,6 +12,16 @@
     <link href="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/styles/main.css" rel="stylesheet" type="text/css" />
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,700,800,600' rel='stylesheet' type='text/css'>
     <?php wp_head(); ?>
+
+    <!-- bower:js -->
+    <script src="/wp-content/themes/aktiv2014/app/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/wp-content/themes/aktiv2014/app/bower_components/modernizr/modernizr.js"></script>
+    <script src="/wp-content/themes/aktiv2014/app/bower_components/fastclick/lib/fastclick.js"></script>
+    <script src="/wp-content/themes/aktiv2014/app/bower_components/jquery.cookie/jquery.cookie.js"></script>
+    <script src="/wp-content/themes/aktiv2014/app/bower_components/jquery-placeholder/jquery.placeholder.js"></script>
+    <script src="/wp-content/themes/aktiv2014/app/bower_components/foundation/js/foundation.js"></script>
+    <script src="/wp-content/themes/aktiv2014/app/bower_components/moment/moment.js"></script>
+    <!-- endbower -->
     <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/main.js"></script>
 
     <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
