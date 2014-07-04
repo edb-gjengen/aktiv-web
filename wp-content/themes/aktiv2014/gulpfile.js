@@ -37,6 +37,15 @@ gulp.task('diststyles', function () {
         .pipe($.size());
 });
 
+gulp.task('vendorscripts', function () {
+    var wiredep = require('wiredep')();
+    
+    return gulp.src(wiredep.js)
+        .pipe($.concat('vendor.js'))
+        .pipe(gulp.dest('dist/scripts'))
+        .pipe($.size());
+});
+
 gulp.task('scripts', function () {
     return gulp.src('app/scripts/**/*.js')
         .pipe($.jshint())
@@ -82,7 +91,7 @@ gulp.task('clean', function () {
     return gulp.src(['.tmp', 'dist'], { read: false }).pipe($.clean());
 });
 
-gulp.task('build', ['distscripts', 'diststyles', 'images', 'fonts', 'extras']);
+gulp.task('build', ['vendorscripts','distscripts', 'diststyles', 'images', 'fonts', 'extras']);
 
 gulp.task('default', ['clean'], function () {
     gulp.start('build');
@@ -90,30 +99,6 @@ gulp.task('default', ['clean'], function () {
 
 gulp.task('serve', ['styles'], function () {
     require('opn')('http://aktiv.dev');
-});
-
-// inject bower components
-gulp.task('wiredep', function () {
-    var wiredep = require('wiredep').stream;
-
-    gulp.src('header.php')
-        .pipe(wiredep({
-            directory: 'app/bower_components',
-            fileTypes: {
-                html: {
-                    block: /(([ \t]*)<!--\s*bower:*(\S*)\s*-->)(\n|\r|.)*?(<!--\s*endbower\s*-->)/gi,
-                    detect: {
-                        js: /<script.*src=['"](.+)['"]>/gi,
-                        css: /<link.*href=['"](.+)['"]/gi
-                    },
-                    replace: { // Note: overriding the filePath here
-                        js: '<script src="/wp-content/themes/aktiv2014/{{filePath}}"></script>',
-                        css: '<link rel="stylesheet" href="{{filePath}}" />'
-                    }
-                }
-            }
-        }))
-        .pipe(gulp.dest('.'));
 });
 
 gulp.task('watch', ['serve'], function () {
@@ -133,5 +118,5 @@ gulp.task('watch', ['serve'], function () {
     gulp.watch('app/styles/**/*.scss', ['styles']);
     gulp.watch('app/scripts/**/*.js', ['scripts']);
     gulp.watch('app/images/**/*', ['images']);
-    gulp.watch('bower.json', ['wiredep']);
+    gulp.watch('bower.json', ['vendorscripts']);
 });
