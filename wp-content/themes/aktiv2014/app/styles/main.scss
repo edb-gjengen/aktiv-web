@@ -170,12 +170,18 @@ body {
 }
 /* Login */
 .page-login {
+    #content {
+        padding-left: 0;
+        padding-right: 0;
+        width: auto;
+        float: none;
+    }
     .introduction {
         @include grid-column(12);
-        @extend .card;
     }
     .login-form {
         @include grid-column(12);
+        @extend .card;
         
         .login-remember {
             display: inline-block;

@@ -6,7 +6,9 @@
 
 <?php get_header(); ?>
 
-<div id="content" class="page-login">
+<div class="container page-login">
+
+<div id="content">
     <div class="introduction">
         <h3>Logg inn for å fortsette</h3>
         <?php the_post(); the_content(); ?>
@@ -28,5 +30,7 @@
     </div>
 
 </div> <!-- #content -->
+
+</div> <!-- .container -->
 
 <?php get_footer(); ?>
