@@ -11,8 +11,10 @@
 <div class="container front-page">
 
 <div id="content">
-    <div class="introduction">
+    <div class="introduction" style="display: none;">
         <?php the_post(); the_content(); ?>
+        <a href="#dismiss-introduction" data-toggle-introduction class="dismiss" title="Lukk">&times;</a>
+        <a href="#dismiss-introduction" data-toggle-introduction class="button dismiss-button" title="Lukk">Oki doki!</a>
     </div>
 
     <div class="events-today-wrap">

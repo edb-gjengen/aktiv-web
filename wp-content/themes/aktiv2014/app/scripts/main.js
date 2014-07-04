@@ -60,4 +60,14 @@ jQuery(document).ready(function() {
         menu.toggleClass('visible');
     });
 
+    $('[data-toggle-introduction]').on('click', function() {
+        $(this).parent().fadeOut(600);
+        $.cookie('introduction-dismissed', '1');
+    });
+    if( $.cookie('introduction-dismissed') !== '1' ) {
+        $('.introduction').show();
+        $('.introduction').addClass('fadein');
+    }
+
+
 });

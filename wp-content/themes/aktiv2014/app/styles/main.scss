@@ -1,10 +1,19 @@
 @import 'normalize';
 
-//$primary-color: #ff0;
-//$secondary-color: #0f0;
-//
+/* Colors */
+$body-bg: #fafafa;
+$body-font-color: #000;
+$body-font-family: "Open Sans", sans-serif;
+$header-font-color: #000;
+$primary-color: darken(#E99835, 5%);
+$secondary-color: #008CBA;
+
+$label-bg-color: #FF1F00;
+$site-header-bg-color: #FDF9F2;
+
 @import "foundation/components/global";
 
+/* Misc */
 $table-head-padding: rem-calc(10 16 9);
 $table-row-padding: rem-calc(12 16);
 
@@ -19,9 +28,6 @@ $table-row-padding: rem-calc(12 16);
 
 /* General styles */
 body {
-    background: #fafafa;
-    font-family: "Open Sans", sans-serif;
-    color: #000;
 
     h1, h2, h3, h4, h5, h6 {
         font-weight: 800;
@@ -32,7 +38,7 @@ body {
 #site-header {
     padding-top: rem-calc(16);
     padding-bottom: rem-calc(16);
-    background-color: #FDF9F2;
+    background-color: $site-header-bg-color;
     box-shadow: rgba(0,0,0,0.3) 0px 1px 2px 0px;
 
     #header-container {
@@ -82,24 +88,11 @@ body {
 
     margin-top: rem-calc(16);
 }
-.love {
-    color: #faafba;
-}
-.credits-wrap {
-    @include grid-row();
 
-    .credits {
-        margin-top: 25px;
-        margin-bottom: 25px;
-        @include grid-column(12);
-        text-align: center;
-        color: #666;
-        font-size: rem-calc(12);
-    }
-}
 /* Front page */
 .front-page {
     .introduction {
+        position: relative;
         @extend .card;
     }
     #content {
@@ -163,7 +156,7 @@ body {
         @include label(
             $padding: 0.5em 0.7em,
             $text-size: rem-calc(14),
-            $bg:#2ba6cb,
+            $bg: $label-bg-color,
             $radius:4px
         );
     }
@@ -210,6 +203,8 @@ body {
 input[type=submit]{
     @extend .button;
 }
+
+/* Sidebar */
 .sidebar {
     @include grid-column(12);
 
@@ -265,6 +260,7 @@ input[type=submit]{
     }
 }
 
+/* Reusable styles */
 .card {
     padding-top: rem-calc(10);
     padding-bottom: rem-calc(10);
@@ -279,14 +275,42 @@ input[type=submit]{
 .card-z2 {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
+.love {
+    color: #faafba;
+}
+.credits-wrap {
+    @include grid-row();
+
+    .credits {
+        margin-top: 25px;
+        margin-bottom: 25px;
+        @include grid-column(12);
+        text-align: center;
+        color: #666;
+        font-size: rem-calc(12);
+    }
+}
 
 /* Animations */
 .fadein {
-    animation: fadein 1.5s;
+    animation: fadein 1.5s 1;
 }
 @keyframes fadein {
     from { opacity: 0; top: -10px; }
     to { opacity: 1; top: 0px; }
+}
+.dismiss {
+    position: absolute;
+    display: block;
+    top: 0px;
+    right: 0px;
+    font-size: rem-calc(30);
+    color: #ccc;
+    padding: 7px;
+}
+.dismiss-button {
+    padding: 0.8em 1.2em;
+    @extend .radius;
 }
 
 /* Overrides */
