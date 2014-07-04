@@ -20,12 +20,18 @@
 
     <?php the_post_thumbnail(); ?>
 
-    <?php if( is_single() || is_page() ): ?>
+    <?php if( is_single() || is_page() || is_home() ): ?>
         <div class="entry-content"><?php the_content(); ?></div> <!-- .entry-content -->
-        <?php comments_template(); ?>
     <?php else: ?>
         <div class="entry-content"><?php the_excerpt(); ?></div> <!-- .entry-content -->
     <?php endif; ?>
+
+    <?php if( is_single() ): ?>
+        <?php comments_template(); ?>
+    <?php elseif( !is_page() ): ?>
+        <span class="comments-link"><?php comments_popup_link(); ?></span>
+    <?php endif; ?>
+
 
     </div>
     </article> <!-- .post -->
