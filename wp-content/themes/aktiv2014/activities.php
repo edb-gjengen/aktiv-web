@@ -16,8 +16,7 @@ if( $posts->have_posts() ) : while( $posts->have_posts() ) : $posts->the_post();
         <div class="entry-meta byline"><span class="meta-prep meta-prep-author">av </span><span class="author vcard"><?php the_author_link(); ?></span>, <span class="entry-date"><?php the_time( get_option( 'date_format' ) ." ". get_option( 'time_format' ) ); ?></span></div>
         <?php the_post_thumbnail(); ?>
         <div class="entry-content"><?php the_content(); ?></div> <!-- .entry-content -->
-        
-
+        <span class="comments-link"><?php comments_popup_link(); ?></span>
     </div>
     </article> <!-- .post -->
 

@@ -22,6 +22,7 @@
 
     <?php if( is_single() || is_page() ): ?>
         <div class="entry-content"><?php the_content(); ?></div> <!-- .entry-content -->
+        <?php comments_template(); ?>
     <?php else: ?>
         <div class="entry-content"><?php the_excerpt(); ?></div> <!-- .entry-content -->
     <?php endif; ?>
