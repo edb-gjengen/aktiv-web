@@ -189,6 +189,9 @@ body {
             position: relative;
             top: 2px;
         }
+        input[type=submit] {
+            @extend .radius;
+        }
         p {
             margin: 0;
         }
