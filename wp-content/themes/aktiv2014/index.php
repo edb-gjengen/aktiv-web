@@ -9,9 +9,11 @@
     <article <?php neuf_post_class(); ?>>
     <div class="text-body">
     <?php if( !is_single() && !is_page() ): ?>
-        <h3 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a><div class="entry-category"><?php the_category(); ?></div> <!-- .entry-category --></h3>
-    <?php else: ?>
-        <div class="entry-category"><?php the_category(); ?></div> <!-- .entry-category -->
+        <h3 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+    <?php endif; ?>
+
+    <?php if( !is_page() ): ?>
+        <div class="entry-category"><?php the_category(); ?></div>
     <?php endif; ?>
 
     <?php if(  !is_page() ): ?>
