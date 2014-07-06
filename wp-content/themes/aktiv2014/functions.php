@@ -381,4 +381,26 @@ function neuf_widgets_init() {
 	) );
 }
 add_action( 'widgets_init', 'neuf_widgets_init' );
+
+/**
+ * Redirect user after successful login.
+ *
+ * @param string $redirect_to URL to redirect to.
+ * @param string $request URL the user is coming from.
+ * @param object $user Logged user's data.
+ * @return string
+ */
+function neuf_login_redirect( $redirect_to, $request, $user ) {
+	//is there a user to check?
+	global $user;
+	if ( isset($user) ) {
+        // Redirect to homepage with ?loggedin to skip cache
+        return home_url()."?loggedin";
+	} else {
+		return $redirect_to;
+	}
+}
+
+add_filter( 'login_redirect', 'neuf_login_redirect', 10, 3 );
+
 ?>
