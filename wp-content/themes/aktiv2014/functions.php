@@ -394,13 +394,18 @@ function neuf_login_redirect( $redirect_to, $request, $user ) {
 	//is there a user to check?
 	global $user;
 	if ( isset($user) ) {
-        // Redirect to homepage with ?loggedin to skip cache
-        return home_url()."?loggedin";
+        // Redirect to homepage
+        return home_url()."?yourin";
 	} else {
 		return $redirect_to;
 	}
 }
-
 add_filter( 'login_redirect', 'neuf_login_redirect', 10, 3 );
+
+/* No admin bar for mortals */
+function neuf_show_admin_bar($content) {
+	return ( current_user_can( 'administrator' ) ) ? $content : false;
+}
+add_filter( 'show_admin_bar' , 'neuf_show_admin_bar');
 
 ?>
