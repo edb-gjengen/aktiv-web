@@ -6,6 +6,6 @@
         'menu_class' => 'main-menu') ); ?>
 
     <!-- TODO: User menu (logout, more) -->
-    <?php if ( is_user_logged_in() ) { ?><ul><li><a href="<?php echo wp_logout_url(); ?>">Logg ut</a></li></ul><?php } ?>
+    <?php if ( is_user_logged_in() ) { ?><ul><li><a href="<?php echo wp_logout_url("/"); ?>">Logg ut</a></li></ul><?php } ?>
 
 </nav> <!-- #menu -->
