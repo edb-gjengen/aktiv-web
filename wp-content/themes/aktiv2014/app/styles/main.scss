@@ -62,7 +62,7 @@ $menu-padding: rem-calc(18);
 
     .menu-toggle {
         position: absolute;
-        right: rem-calc(4);
+        right: rem-calc(16);
         top: rem-calc(14);
 
         @media #{$large-up} {

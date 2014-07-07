@@ -5,7 +5,6 @@
         'container' => 'false',
         'menu_class' => 'main-menu') ); ?>
 
-    <!-- TODO: User menu (logout, more) -->
     <?php if ( is_user_logged_in() ):
         $user = wp_get_current_user();
         $default = "mm";
