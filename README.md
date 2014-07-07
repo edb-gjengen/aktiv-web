@@ -5,7 +5,11 @@
 # TODO
 
  - [ ] member search
+ - [x] user menu
+ - [ ] calendar plugin (responsive calendar)
+ - [ ] link to calendars (add to own calendar)
  - [ ] custom colors for popular categories 
  - [ ] more UX/graphical design
  - [ ] relative dates and times
- - [ ] dismissable introduction text ($.cookie)
+ - [ ] profile-cards
+ - [x] dismissable introduction text ($.cookie)

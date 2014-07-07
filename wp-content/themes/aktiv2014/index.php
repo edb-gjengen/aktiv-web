@@ -42,7 +42,10 @@
 
 </div> <!-- #content -->
 
-<?php get_template_part( 'sidebar' ); ?>
+<?php if( !is_page() ) {
+    get_template_part( 'sidebar' );
+    // TODO Level 2 navigation
+} ?>
 
 </div> <!-- .container-->
 

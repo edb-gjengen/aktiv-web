@@ -1,6 +1,8 @@
 <?php get_header(); ?>
 
-<div id="content" 
+<div class="container">
+
+<div id="content">
 
     <article <?php neuf_post_class(); ?>>
 
@@ -13,6 +15,8 @@
     </article> <!-- .post -->
 
 </div> <!-- #content -->
+
+</div> <!-- .container -->
 
 <?php get_footer(); ?>
 
