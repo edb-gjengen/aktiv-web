@@ -6,7 +6,7 @@
 
 <?php if( have_posts() ) : while( have_posts() ) : the_post(); ?>
     
-    <article <?php neuf_post_class(); ?>>
+    <article <?php post_class(); ?>>
     <div class="text-body">
     <?php if( !is_single() && !is_page() ): ?>
         <h3 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>

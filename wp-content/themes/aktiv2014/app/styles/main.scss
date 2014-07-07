@@ -149,6 +149,11 @@ $menu-padding: rem-calc(18);
         }
 
         .user-menu {
+            @extend .radius;
+            text-align: right;
+            position: relative;
+            z-index: 1;
+
             @media #{$large-up} {
                 display: none;
                 background-color: white;
@@ -156,27 +161,24 @@ $menu-padding: rem-calc(18);
                 padding: 0 rem-calc(16);
                 font-size: rem-calc(14);
                 margin-top: rem-calc(5);
+                //@extend .card-z1;
+                box-shadow: rgba(0,0,0,0.14902) 0px 1px 0px 0px, rgba(0,0,0,0.09804) 0px 1px 2px 0px;
             }
 
-            //@extend .card-z1;
-            box-shadow: rgba(0,0,0,0.14902) 0px 1px 0px 0px, rgba(0,0,0,0.09804) 0px 1px 2px 0px;
-            @extend .radius;
-            text-align: right;
-            position: relative;
-            z-index: 1;
-
             li a {
-                padding-top: rem-calc(18);
-                padding-bottom: rem-calc(18);
+                padding-top: $menu-padding;
+                padding-bottom: $menu-padding;
             }
         }
         &:hover .user-menu {
             display: block;
         }
         .icon-down {
+            display: none;
+            @media #{$large-up} { display: inline-block; }
+
             font-size: rem-calc(12);
             font-style: normal;
-            display: inline-block;
             padding-left: rem-calc(6);
             transform: rotate(90deg);
             top: -5px;

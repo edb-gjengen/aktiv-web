@@ -55,29 +55,6 @@ function neuf_handle_upload_prefilter( $file ) {
 // Commenting out for testing purposes
 add_filter( 'wp_handle_upload_prefilter' , 'neuf_handle_upload_prefilter' );
 
-/**
- * Adds more semantic classes to WP's post_class.
- *
- * Adds these classes:
- * i) a class with a page-wide post count. The first post on this page is named .p1, the second p2 and so forth.
- * ii) a class 'alt' to every other post.
- */
-function neuf_post_class( $classes = '' ) {
-	global $neuf_pagewide_post_count;
-
-	if ( $classes )
-		$classes = array ( $classes );
-
-	$classes[] = 'p' . ++$neuf_pagewide_post_count;
-
-	if ( 0 == $neuf_pagewide_post_count % 2 )
-		$classes[] = 'alt';
-
-	$classes =  join( ' ' , $classes );
-
-	post_class( $classes );
-}
-
 /* Gets nicely the regular and member price nicely formated */
 function neuf_get_price( $neuf_event ) {
 		$price_regular = get_post_meta( $neuf_event->ID , '_neuf_events_price_regular' , true );
