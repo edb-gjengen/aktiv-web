@@ -15,7 +15,6 @@
     </div>
 
     <div class="login-form">
-        <h3>Logg inn</h3>
     <?php
     $args = array(
         'form_id' => 'loginform-custom',

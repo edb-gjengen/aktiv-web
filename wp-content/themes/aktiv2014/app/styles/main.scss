@@ -272,10 +272,8 @@ $menu-padding: rem-calc(18);
 /* Login */
 .page-login {
     #content {
-        padding-left: 0;
-        padding-right: 0;
-        width: auto;
-        float: none;
+        width: 100%;
+        float: left;
     }
     .introduction {
         @include grid-column(12);
@@ -299,6 +297,7 @@ $menu-padding: rem-calc(18);
         }
         input[type=submit] {
             @extend .radius;
+            margin-bottom: 0;
         }
         p {
             margin: 0;
@@ -313,6 +312,23 @@ $menu-padding: rem-calc(18);
 }
 input[type=submit]{
     @extend .button;
+}
+
+/* User search */
+.page-user-search {
+    #content {
+        width: 100%;
+        float: left;
+    }
+    .search-form {
+        @include grid-column(12);
+        @extend .card;
+    }
+    .search-about {
+        @include grid-column(12);
+        @extend .card;
+        margin-top: rem-calc(32);
+    }
 }
 
 /* Sidebar */
