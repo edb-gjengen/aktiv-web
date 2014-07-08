@@ -15,7 +15,7 @@
     $grav_url = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $user->user_email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
     ?>
     <div class="user-menu-wrap">
-        <a href="#" class="profile-badge"><img src="<?php echo $grav_url; ?> " class="profile-picture" /><span class="profile-inner"><?php echo $user->user_firstname." ".$user->user_lastname; ?> <i class="icon-down">&#x25B6;</i></span></a>
+        <a href="#" class="profile-badge"><img src="<?php echo $grav_url; ?> " class="profile-picture" /><span class="profile-inner"><?php echo $user->display_name; ?> <i class="icon-down">&#x25B6;</i></span></a>
         <ul class="user-menu">
             <li><a href="<?php echo "/profil/" ?>">Profil</a></li>
             <li><a href="<?php echo wp_logout_url("/"); ?>">Logg ut</a></li>
