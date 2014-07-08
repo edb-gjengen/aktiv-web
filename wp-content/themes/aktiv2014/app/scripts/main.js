@@ -53,10 +53,18 @@ jQuery(document).ready(function() {
     );
 
     /* Menu toggle */
-    $('#menu [data-toggle-menu]').on('click', function(e) {
+    $('#menu .menu-toggle').on('click', function(e) {
         e.preventDefault();
         // add open css class
-        var menu = $('#menu .main-menu, #menu .user-menu-wrap, #menu .user-menu');
+        var menu = $('#menu .main-menu, #menu .user-menu-wrap');
+        menu.toggleClass('visible');
+    });
+
+    /* User Menu toggle */
+    $('#menu a.profile-badge').on('click', function(e) {
+        e.preventDefault();
+        // add open css class
+        var menu = $('#menu .user-menu');
         menu.toggleClass('visible');
     });
 
