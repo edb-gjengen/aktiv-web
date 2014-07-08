@@ -56,7 +56,7 @@ jQuery(document).ready(function() {
     $('#menu [data-toggle-menu]').on('click', function(e) {
         e.preventDefault();
         // add open css class
-        var menu = $('#menu .main-menu, #menu .user-menu-wrap');
+        var menu = $('#menu .main-menu, #menu .user-menu-wrap, #menu .user-menu');
         menu.toggleClass('visible');
     });
 

@@ -9,13 +9,16 @@ $primary-color: darken(#E99835, 5%);
 $secondary-color: #008CBA;
 
 $label-bg-color: #FF1F00;
-$site-header-bg-color: #FDF9F2;
+$site-header-bg-color: #333;
 
 @import "foundation/components/global";
 
 /* Misc */
 $table-head-padding: rem-calc(10 16 9);
 $table-row-padding: rem-calc(12 16);
+
+$row-width: rem-calc(1250);
+$column-gutter: rem-calc(30);
 
 @import "foundation/components/grid";
 @import "foundation/components/block-grid";
@@ -51,35 +54,20 @@ $menu-padding: rem-calc(18);
             display: block;
             padding-top: $menu-padding;
             padding-bottom: $menu-padding;
+            color: white;
+            &:hover {
+                color: darken(white, 10%);
+            }
         }
     }
 }
 #menu {
-
     @include grid-column(9);
-    text-transform: uppercase;
-    font-weight: 600;
 
-    .menu-toggle {
-        position: absolute;
-        right: rem-calc(16);
-        top: rem-calc(14);
-
-        @media #{$large-up} {
-            display: none;
-        }
-
-        svg {
-            width: 32px;
-            height: 24px;
-        }
-
-        g {
-            fill: $primary-color;
-        }
-
-        &:hover g {
-            fill: darken($primary-color, 5%);
+    a {
+        color: white;
+        &:hover {
+            color: darken(white, 10%);
         }
     }
     ul {
@@ -125,17 +113,21 @@ $menu-padding: rem-calc(18);
             position: absolute;
             top: 0;
             right: rem-calc(16);
-            margin-top: rem-calc(5);
+            margin-top: rem-calc(6);
+
+            &:hover .profile-badge {
+                background-color: darken(white, 3%);
+            }
         }
 
         .profile-badge {
             display: block;
-            height: 40px;
+            height: rem-calc(40);
             text-align: right;
 
             @media #{$large-up} {
                 background-color: #fff;
-                border-radius: 50px;
+                border-radius: rem-calc(50);
                 //@extend .card-z1;
                 box-shadow: rgba(0,0,0,0.14902) 0px 1px 0px 0px, rgba(0,0,0,0.09804) 0px 1px 2px 0px;
             }
@@ -158,20 +150,28 @@ $menu-padding: rem-calc(18);
                 display: none;
                 background-color: white;
                 overflow: hidden;
-                padding: 0 rem-calc(16);
                 font-size: rem-calc(14);
-                margin-top: rem-calc(5);
+                margin-top: rem-calc(7);
                 //@extend .card-z1;
                 box-shadow: rgba(0,0,0,0.14902) 0px 1px 0px 0px, rgba(0,0,0,0.09804) 0px 1px 2px 0px;
+
+                a {
+                    color: #333;
+                    &:hover {
+                        background-color: darken(white, 3%);
+                    }
+                }
             }
 
             li a {
                 padding-top: $menu-padding;
                 padding-bottom: $menu-padding;
+
+                @media #{$large-up} {
+                    padding-left: rem-calc(16);
+                    padding-right: rem-calc(16);
+                }
             }
-        }
-        &:hover .user-menu {
-            display: block;
         }
         .icon-down {
             display: none;
@@ -188,7 +188,33 @@ $menu-padding: rem-calc(18);
             display: inline-block;
             padding-left: rem-calc(10);
 
-            @media #{$large-up} { padding: 0 rem-calc(10); }
+
+            @media #{$large-up} {
+                padding: 0 rem-calc(10);
+                color: #333;
+            }
+        }
+    }
+    .menu-toggle {
+        position: absolute;
+        right: rem-calc(16);
+        top: rem-calc(14);
+
+        @media #{$large-up} {
+            display: none;
+        }
+
+        svg {
+            width: 32px;
+            height: 24px;
+        }
+
+        g {
+            fill: white;
+        }
+
+        &:hover g {
+            fill: darken(white, 10%);
         }
     }
 }
@@ -281,6 +307,8 @@ $menu-padding: rem-calc(18);
     .login-form {
         @include grid-column(12);
         @extend .card;
+
+        @media #{$medium-up} { max-width: 400px; }
         
         .login-remember {
             display: inline-block;
@@ -333,27 +361,46 @@ input[type=submit]{
 
 /* Sidebar */
 .sidebar {
-    @include grid-column(12);
+    @include grid-column(12, $collapse:true);
 
     @media #{$large-up} {
         @include grid-column(4);
+        font-weight: 300;
     }
-    font-weight: 300;
+    font-weight: 500;
     padding-top: rem-calc(16);
 
+    h2 {
+        padding-left: rem-calc(16);
+        padding-right: rem-calc(16);
+        @media #{$large-up} {
+            padding-left: rem-calc(0);
+            padding-right: rem-calc(0);
+        }
+    }
     h2,
     h2 a.rsswidget {
-        font-size: rem-calc(22);
-        font-weight: 700;
+        font-size: rem-calc(20);
+        font-weight: 600;
         margin-bottom: 0;
+    }
+    h2 a.rsswidget {
+        font-weight: normal;
     }
     ul {
         margin-bottom: rem-calc(16);
     }
     .searchform {
-        margin-bottom: rem-calc(50);
+
+        padding-left: rem-calc(16);
+        padding-right: rem-calc(16);
+        @media #{$large-up} {
+            padding-left: rem-calc(0);
+            padding-right: rem-calc(0);
+        }
+
         input[type=text] {
-            width: auto;
+            width: 75%;
             margin: 0;
             display: block;
             float: left;
@@ -369,6 +416,7 @@ input[type=submit]{
             border: none;
             display: block;
             float: left;
+            width: 25%;
         }
     }
     .widgettitle {
@@ -382,8 +430,35 @@ input[type=submit]{
     }
     a.rsswidget,
     .rss-date,
-    li.recentcomments {
+    li.recentcomments a {
         font-size: rem-calc(14);
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        @media #{$large-up} {
+            list-style: disc outside none;
+
+        }
+        li {
+            display: block;
+            padding: rem-calc(16);
+
+            &:nth-child(even) {
+                background-color: #f5f5f5;
+                @media #{$large-up} {
+                    background-color: transparent;
+                }
+            }
+
+            @media #{$large-up} {
+                display: list-item;
+                padding: 0;
+                margin-left: rem-calc(20);
+            }
+        }
     }
 }
 
