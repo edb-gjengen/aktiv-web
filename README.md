@@ -4,7 +4,6 @@
 
 # TODO
 
- - [ ] member search
  - [ ] calendar plugin (responsive calendar)
  - [ ] link to calendars (add to own calendar)
  - [ ] custom colors for popular categories 

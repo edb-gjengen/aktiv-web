@@ -13,7 +13,10 @@
         <h1 class="page-title"><?php wp_title("", true); ?></h1>
         <form method="get">
             <input type="text" id="id_user_query" class="search-field" name="q" placeholder="Søk på navn, epost, telefonnummer, brukernavn, medlemsnummer eller kortnummer" />
-        <div class="search-results"></div>
+        <div class="search-results">
+            <div class="meta"></div>
+            <div class="search-result-list"></div>
+        </div>
         </form>
     </div>
 

@@ -1,6 +1,9 @@
 'use strict';
-/*global moment, jQuery, document */
+/*global moment, jQuery, document, _ */
 var program_endpoint = 'https://studentersamfundet.no/api/events/get_upcoming/';
+var inside_url = 'https://inside.studentersamfundet.no';
+var user_search_endpoint = inside_url + '/api/user.php';
+//var user_search_endpoint = 'http://inside.dev/api/user.php';
 var query_params = {
     //meta_key: '_neuf_events_starttime',
     //meta_value: moment().add('days', 1).format('X'),
@@ -76,6 +79,30 @@ jQuery(document).ready(function() {
         $('.introduction').show();
         $('.introduction').addClass('fadein');
     }
+
+    /* Search */
+    $('.search-field').focus();
+    var header_template = '<table><thead><tr><th>Navn</th><th>Brukernavn</th><th>Epost</th><th>Telefon</th></tr></thead>';
+    $('.search-field').on('keyup', _.debounce(function(e) {
+        if(e.target.value.length > 2) {
+            $.getJSON(user_search_endpoint, {q: e.target.value}, function(data) {
+                if(data.meta.num_results === 0) {
+                    $('.search-result-list').html('Ingen treff.');
+                    $('.search-results .meta').html('');
+                    return;
+                }
+                var list = '<tbody><% _.each(results, function(u) { %>' +
+                    '<tr><td><a href="'+ inside_url +'/?page=display-user&userid=<%= u.id %>"><%= u.firstname %> <%= u.lastname %></a></td><td><%= u.username %></td><td><a href="mailto:<%= u.email %>"><%= u.email %></a></td><td><a href="tlf:<%= u.number %>"><%= u.number %></a></td></li> <% }); %></tbody></table>';
+                var html = header_template + _.template(list, data);
+                $('.search-result-list').html(html);
+
+                var search_meta = 'Antall treff: <%= meta.num_results %>';
+                $('.search-results .meta').html(_.template(search_meta, data));
+            });
+        } else {
+            console.log('too short');
+        }
+    }, 300));
 
 
 });

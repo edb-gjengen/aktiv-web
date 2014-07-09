@@ -351,11 +351,20 @@ input[type=submit]{
     .search-form {
         @include grid-column(12);
         @extend .card;
+
+        table {
+            width: 100%;
+        }
     }
     .search-about {
         @include grid-column(12);
         @extend .card;
         margin-top: rem-calc(32);
+    }
+    .meta {
+        margin-bottom: rem-calc(16);
+        font-style: italic;
+        text-align: right;
     }
 }
 
