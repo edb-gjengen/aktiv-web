@@ -14,6 +14,8 @@
     <?php wp_head(); ?>
 
     <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/vendor.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.js"></script>
+
     <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/main.js"></script>
 
     <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
