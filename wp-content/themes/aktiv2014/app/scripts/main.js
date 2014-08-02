@@ -2,8 +2,7 @@
 /*global moment, jQuery, document, _ */
 var program_endpoint = 'https://studentersamfundet.no/api/events/get_upcoming/';
 var inside_url = 'https://inside.studentersamfundet.no';
-var user_search_endpoint = inside_url + '/api/user.php';
-//var user_search_endpoint = 'http://inside.dev/api/user.php';
+var user_search_endpoint = '/inside-api/';
 var query_params = {
     //meta_key: '_neuf_events_starttime',
     //meta_value: moment().add('days', 1).format('X'),
@@ -91,7 +90,8 @@ jQuery(document).ready(function() {
     });
     $('.search-field').on('keyup keypress', _.debounce(function(e) {
         if(e.target.value.length > 2) {
-            $.getJSON(user_search_endpoint, {q: e.target.value}, function(data) {
+            $.getJSON(user_search_endpoint, {q: e.target.value, _wpnonce: $('meta[name=x-inside-api-nonce').attr('content')}, function(data) {
+                console.log(data);
                 if(data.meta.num_results === 0) {
                     $('.search-result-list').html('Ingen treff.');
                     $('.search-results .meta').html('');
