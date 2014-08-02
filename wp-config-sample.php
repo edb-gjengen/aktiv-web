@@ -80,7 +80,7 @@ define('WPLANG', 'nb_NO');
  */
 define('WP_DEBUG', false);
 
-define('NEUF_INSIDE_API_KEY', '');
+define('INSIDE_API_KEY', '');
 
 /* That's all, stop editing! Happy blogging. */
 
