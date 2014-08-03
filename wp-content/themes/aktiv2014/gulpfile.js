@@ -13,6 +13,12 @@ var onError = function (err) {
     gutil.log( gutil.colors.red(err));
 };
 
+//gulp.task('components', function() {
+//    return gulp.src(['app/bower_components/chosen-bower/chosen.css'])
+//        .pipe($.rename('_chosen.scss'))
+//        .pipe(gulp.dest('app/styles'));
+//});
+
 gulp.task('styles', function () {
     return gulp.src('app/styles/main.scss')
         //.pipe($.plumber(onError))

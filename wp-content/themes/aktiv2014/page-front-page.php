@@ -17,9 +17,10 @@
     </div>
 
     <div class="events-today-wrap">
-        <h1>Dagens program</h1>
+        <h1>Kommende program</h1>
         <div class="events-today">
             <table class="program-list"><!-- JS magic --></table>
+            <div class="text-right"><a href="https://studentersamfundet.no/program/">Vis programmet på s.no</a></div>
         </div>
     </div>
 

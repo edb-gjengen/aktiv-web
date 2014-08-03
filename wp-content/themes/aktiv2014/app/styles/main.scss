@@ -1,4 +1,5 @@
 @import 'normalize';
+@import 'chosen';
 
 /* Colors */
 $body-bg: #fafafa;
@@ -365,6 +366,14 @@ input[type=submit]{
         margin-bottom: rem-calc(16);
         font-style: italic;
         text-align: right;
+    }
+    .filters {
+        .groups {
+            @include grid-column(4, $collapse:true);
+        }
+        .roles {
+            @include grid-column(8);
+        }
     }
 }
 

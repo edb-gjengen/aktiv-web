@@ -1,7 +1,8 @@
 'use strict';
-/*global moment, jQuery, document, _ */
+/*global moment, jQuery, document, _, $ */
 var program_endpoint = 'https://studentersamfundet.no/api/events/get_upcoming/';
 var inside_url = 'https://inside.studentersamfundet.no';
+var inside_groups_url = inside_url + '/api/groups.php';
 var user_search_endpoint = '/inside-api/';
 var query_params = {
     //meta_key: '_neuf_events_starttime',
@@ -36,6 +37,28 @@ function format_posts(posts) {
 
     return html;
 }
+function format_results(data) {
+    var header_template = '<table><thead><tr><th>Navn</th><th>Brukernavn</th><th>Epost</th><th>Telefon</th><th>Medlem</th><th>Grupper</th></tr></thead>';
+    if(data.error) {
+        console.log(data.error);
+        $('.search-result-list').html('');
+        $('.search-results .meta').html('');
+        return;
+    }
+    if(data.meta.num_results === 0) {
+        $('.search-result-list').html('Ingen treff.');
+        $('.search-results .meta').html('');
+        return;
+    }
+
+    var list = '<tbody><% _.each(results, function(u) { %>' +
+        '<tr><td><a href="'+ inside_url +'/?page=display-user&userid=<%= u.id %>"><%= u.firstname %> <%= u.lastname %></a></td><td><%= u.username %></td><td><a href="mailto:<%= u.email %>"><%= u.email %></a></td><td><a href="tlf:<%= u.number %>"><%= u.number %></a></td><td><% if(u.is_member != 0) { %>Ja<% } else { %>Nei<% } %></td><td class="groups"><%= u.groups %></td></li> <% }); %></tbody></table>';
+    var html = header_template + _.template(list, data);
+    $('.search-result-list').html(html);
+
+    var search_meta = 'Antall treff: <%= meta.num_results %>';
+    $('.search-results .meta').html(_.template(search_meta, data));
+}
 
 jQuery(document).ready(function() {
     moment.lang('nb');
@@ -46,7 +69,6 @@ jQuery(document).ready(function() {
         query_params,
         function(data) {
             if(data && data.events) {
-                //console.log(data);
                 // render template
                 var html = format_posts(data.events);
                 $(entrypoint).html(html);
@@ -80,36 +102,49 @@ jQuery(document).ready(function() {
     }
 
     /* Search */
-    $('.search-field').focus();
-    var header_template = '<table><thead><tr><th>Navn</th><th>Brukernavn</th><th>Epost</th><th>Telefon</th><th>Medlem</th><th>Grupper</th></tr></thead>';
-    $('.search-field').on('keyup keypress', function(e) {
-        // No <enter>
-        if (e.keyCode === 10 || e.keyCode === 13)  {
-            e.preventDefault();
-        }
-    });
-    $('.search-field').on('keyup keypress', _.debounce(function(e) {
-        if(e.target.value.length > 2) {
-            $.getJSON(user_search_endpoint, {q: e.target.value, _wpnonce: $('meta[name=x-inside-api-nonce').attr('content')}, function(data) {
-                console.log(data);
-                if(data.meta.num_results === 0) {
-                    $('.search-result-list').html('Ingen treff.');
-                    $('.search-results .meta').html('');
-                    return;
-                }
-                //console.log(data);
-                var list = '<tbody><% _.each(results, function(u) { %>' +
-                    '<tr><td><a href="'+ inside_url +'/?page=display-user&userid=<%= u.id %>"><%= u.firstname %> <%= u.lastname %></a></td><td><%= u.username %></td><td><a href="mailto:<%= u.email %>"><%= u.email %></a></td><td><a href="tlf:<%= u.number %>"><%= u.number %></a></td><td><% if(u.is_member != 0) { %>Ja<% } else { %>Nei<% } %></td><td class="groups"><%= u.groups %></td></li> <% }); %></tbody></table>';
-                var html = header_template + _.template(list, data);
-                $('.search-result-list').html(html);
+    if( $('.search-form').length ) {
+        $.getJSON(inside_groups_url, function(data) {
+            // create select fields
+            var list = '<select class="groups-select" data-placeholder="Velg en gruppe..."><option value=""></option><% _.each(results, function(g) { %>' +
+                '<option value="<%=g.group_id %>"><%= g.group_name %></option>' +
+                '<% }); %></select>';
 
-                var search_meta = 'Antall treff: <%= meta.num_results %>';
-                $('.search-results .meta').html(_.template(search_meta, data));
+            var html = _.template(list, data);
+            $('.groups-select-wrap').html(html);
+            // run chosen
+            $('.groups-select').chosen({
+                no_results_text: 'Isjda, ingen treff!',
+                allow_single_deselect: true
+            }).change(function(e) {
+                
+                $.getJSON(
+                    user_search_endpoint,
+                    {
+                        q: $('.search-field').val(),
+                        filter_groups: e.target.value,
+                        _wpnonce: $('meta[name=x-inside-api-nonce').attr('content')
+                    },
+                    format_results
+                );
             });
-        } else {
-            $('.search-result-list').html('Skriv minst 3 tegn.');
-            $('.search-results .meta').html('');
-        }
-    }, 300));
-
+        });
+        $('.search-field').focus();
+        $('.search-field').on('keyup keypress', function(e) {
+            // No <enter>
+            if (e.keyCode === 10 || e.keyCode === 13)  {
+                e.preventDefault();
+            }
+        });
+        $('.search-field').on('keyup keypress', _.debounce(function(e) {
+            $.getJSON(
+                user_search_endpoint,
+                {
+                    q: e.target.value,
+                    filter_groups: $('.groups-select').val(),
+                    _wpnonce: $('meta[name=x-inside-api-nonce').attr('content')
+                },
+                format_results
+            );
+        }, 300));
+    }
 });
