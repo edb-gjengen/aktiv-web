@@ -26,6 +26,7 @@ $column-gutter: rem-calc(30);
 @import "foundation/components/visibility";
 @import "foundation/components/type";
 @import "foundation/components/buttons";
+@import "foundation/components/button-groups";
 @import "foundation/components/forms";
 @import "foundation/components/labels";
 @import "foundation/components/tables";
@@ -56,6 +57,7 @@ $menu-padding: rem-calc(18);
             padding-top: $menu-padding;
             padding-bottom: $menu-padding;
             color: white;
+            line-height: 1;
             &:hover {
                 color: darken(white, 10%);
             }
@@ -125,6 +127,7 @@ $menu-padding: rem-calc(18);
             display: block;
             height: rem-calc(40);
             text-align: right;
+            padding: 4px;
 
             @media #{$large-up} {
                 background-color: #fff;
@@ -136,8 +139,6 @@ $menu-padding: rem-calc(18);
             img {
                 max-height: 100%;
                 border-radius: 50%;
-                padding: rem-calc(4);
-                padding-right: 0;
             }
         }
 
@@ -373,6 +374,14 @@ input[type=submit]{
         }
         .roles {
             @include grid-column(8);
+            ul {
+                li {
+                    margin-left: 4px;
+                    &:first-child {
+                        margin-left: 0;
+                    }
+                }
+            }
         }
     }
 }
@@ -542,4 +551,15 @@ input[type=submit]{
 
 .visible {
     display: block !important;
+}
+.button-alt {
+    @include button($padding: rem-calc(7), $bg: #eee, $radius: rem-calc(5));
+    border: 1px solid transparent;
+    &:hover {
+        background-color: #ccc;
+    }
+}
+.active {
+    background-color: $secondary-color;
+    color: white;
 }

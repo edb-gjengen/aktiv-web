@@ -59,6 +59,19 @@ function format_results(data) {
     $('.search-results .meta').html(_.template(search_meta, data));
 }
 
+function do_search() {
+    // TODO: add params from toggle
+    $.getJSON(
+        user_search_endpoint,
+        {
+            q: $('.search-field').val(),
+            filter_groups: $('.groups-select').val(),
+            _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
+        },
+        format_results
+    );
+}
+
 jQuery(document).ready(function() {
     moment.lang('nb');
 
@@ -121,17 +134,8 @@ jQuery(document).ready(function() {
             $('.groups-select').chosen({
                 no_results_text: 'Uffda, ingen treff!',
                 allow_single_deselect: true
-            }).change(function(e) {
-                
-                $.getJSON(
-                    user_search_endpoint,
-                    {
-                        q: $('.search-field').val(),
-                        filter_groups: e.target.value,
-                        _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
-                    },
-                    format_results
-                );
+            }).change(function() {
+                do_search();
             });
         });
         $('.search-field').focus();
@@ -141,16 +145,15 @@ jQuery(document).ready(function() {
                 e.preventDefault();
             }
         });
-        $('.search-field').on('keyup keypress', _.debounce(function(e) {
-            $.getJSON(
-                user_search_endpoint,
-                {
-                    q: e.target.value,
-                    filter_groups: $('.groups-select').val(),
-                    _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
-                },
-                format_results
-            );
+        $('.search-field').on('keyup keypress', _.debounce(function() {
+            do_search();
         }, 300));
+
+        /* Toggles */
+        $('.roles a').on('click', function(e) {
+            e.preventDefault();
+            $(this).toggleClass('active');
+            do_search();
+        });
     }
 });

@@ -15,16 +15,16 @@
             <input type="text" id="id_user_query" class="search-field" name="q" placeholder="Søk på navn, epost, telefonnummer, brukernavn, medlemsnummer eller kortnummer" />
             <div class="filters">
                 <div class="groups">
-                    <label>Grupper:</label>
+                    <label>Filtrér på forening (gruppe):</label>
                     <div class="groups-select-wrap"></div>
                 </div>
                 <div class="roles">
-                    <label>Roller:</label>
-                    <div class="button-group">
-                        <button class="tiny">Styremedlem</button>
-                        <button class="tiny">Aktiv</button>
-                        <button class="tiny">Gyldig medlemskap</button>
-                    </div>
+                    <label>Filtrér på rolle:</label>
+                    <ul class="button-group">
+                        <li><a href="#" class="button-alt">Styremedlem</a></li>
+                        <li><a href="#" class="button-alt">Aktiv</a></li>
+                        <li><a href="#" class="button-alt">Gyldig medlemskap</a></li>
+                    </ul>
                 </div>
             </div>
         <div class="search-results">
