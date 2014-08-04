@@ -45,7 +45,7 @@ function format_results(data) {
         return;
     }
     if(data.meta.num_results === 0) {
-        $('.search-result-list').html('Ingen treff.');
+        $('.search-result-list').html('Uffda, ingen treff.');
         $('.search-results .meta').html('');
         return;
     }
@@ -119,7 +119,7 @@ jQuery(document).ready(function() {
             $('.groups-select-wrap').html(html);
             // run chosen
             $('.groups-select').chosen({
-                no_results_text: 'Isjda, ingen treff!',
+                no_results_text: 'Uffda, ingen treff!',
                 allow_single_deselect: true
             }).change(function(e) {
                 
@@ -128,7 +128,7 @@ jQuery(document).ready(function() {
                     {
                         q: $('.search-field').val(),
                         filter_groups: e.target.value,
-                        _wpnonce: $('meta[name=x-inside-api-nonce').attr('content')
+                        _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
                     },
                     format_results
                 );
@@ -147,7 +147,7 @@ jQuery(document).ready(function() {
                 {
                     q: e.target.value,
                     filter_groups: $('.groups-select').val(),
-                    _wpnonce: $('meta[name=x-inside-api-nonce').attr('content')
+                    _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
                 },
                 format_results
             );
