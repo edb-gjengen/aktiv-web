@@ -10599,7 +10599,7 @@ window.Modernizr = (function( window, document, undefined ) {
 /**
  * @preserve FastClick: polyfill to remove click delays on browsers with touch UIs.
  *
- * @version 1.0.2
+ * @version 1.0.3
  * @codingstandard ftlabs-jsv2
  * @copyright The Financial Times Limited [All Rights Reserved]
  * @license MIT License (see LICENSE.txt)
@@ -10795,6 +10795,12 @@ var deviceIsIOS4 = deviceIsIOS && (/OS 4_\d(_\d)?/).test(navigator.userAgent);
  */
 var deviceIsIOSWithBadTarget = deviceIsIOS && (/OS ([6-9]|\d{2})_\d/).test(navigator.userAgent);
 
+/**
+ * BlackBerry requires exceptions.
+ *
+ * @type boolean
+ */
+var deviceIsBlackBerry10 = navigator.userAgent.indexOf('BB10') > 0;
 
 /**
  * Determine whether a given element requires a native click.
@@ -10999,7 +11005,10 @@ FastClick.prototype.onTouchStart = function(event) {
 			// with the same identifier as the touch event that previously triggered the click that triggered the alert.
 			// Sadly, there is an issue on iOS 4 that causes some normal touch events to have the same identifier as an
 			// immediately preceeding touch event (issue #52), so this fix is unavailable on that platform.
-			if (touch.identifier === this.lastTouchIdentifier) {
+			// Issue 120: touch.identifier is 0 when Chrome dev tools 'Emulate touch events' is set with an iOS device UA string,
+			// which causes all touch events to be ignored. As this block only applies to iOS, and iOS identifiers are always long,
+			// random integers, it's safe to to continue if the identifier is 0 here.
+			if (touch.identifier && touch.identifier === this.lastTouchIdentifier) {
 				event.preventDefault();
 				return false;
 			}
@@ -11321,6 +11330,7 @@ FastClick.notNeeded = function(layer) {
 	'use strict';
 	var metaViewport;
 	var chromeVersion;
+	var blackberryVersion;
 
 	// Devices that don't support touch don't need FastClick
 	if (typeof window.ontouchstart === 'undefined') {
@@ -11349,6 +11359,27 @@ FastClick.notNeeded = function(layer) {
 		// Chrome desktop doesn't need FastClick (issue #15)
 		} else {
 			return true;
+		}
+	}
+
+	if (deviceIsBlackBerry10) {
+		blackberryVersion = navigator.userAgent.match(/Version\/([0-9]*)\.([0-9]*)/);
+
+		// BlackBerry 10.3+ does not require Fastclick library.
+		// https://github.com/ftlabs/fastclick/issues/251
+		if (blackberryVersion[1] >= 10 && blackberryVersion[2] >= 3) {
+			metaViewport = document.querySelector('meta[name=viewport]');
+
+			if (metaViewport) {
+				// user-scalable=no eliminates click delay.
+				if (metaViewport.content.indexOf('user-scalable=no') !== -1) {
+					return true;
+				}
+				// width=device-width (or less than device-width) eliminates click delay.
+				if (document.documentElement.scrollWidth <= window.outerWidth) {
+					return true;
+				}
+			}
 		}
 	}
 
@@ -11971,7 +12002,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   window.Foundation = {
     name : 'Foundation',
 
-    version : '5.3.0',
+    version : '5.3.1',
 
     media_queries : {
       small : S('.foundation-mq-small').css('font-family').replace(/^[\/\\'"]+|(;\s?})+|[\/\\'"]+$/g, ''),
@@ -12311,7 +12342,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.abide = {
     name : 'abide',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       live_validate : true,
@@ -12404,23 +12435,21 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     validate : function (els, e, is_ajax) {
       var validations = this.parse_patterns(els),
           validation_count = validations.length,
-          form = this.S(els[0]).closest('[data-' + this.attr_name(true) + ']'),
-          settings = form.data(this.attr_name(true) + '-init') || {},
+          form = this.S(els[0]).closest('form'),
           submit_event = /submit/.test(e.type);
 
-      form.trigger('validated').trigger('validated.fndtn.abide');
       // Has to count up to make sure the focus gets applied to the top error
       for (var i=0; i < validation_count; i++) {
         if (!validations[i] && (submit_event || is_ajax)) {
-          if (settings.focus_on_invalid) els[i].focus();
-          form.trigger('invalid').trigger('invalid.fndtn.abide');
-          this.S(els[i]).closest('[data-' + this.attr_name(true) + ']').attr(this.invalid_attr, '');
+          if (this.settings.focus_on_invalid) els[i].focus();
+          form.trigger('invalid');
+          this.S(els[i]).closest('form').attr(this.invalid_attr, '');
           return false;
         }
       }
 
       if (submit_event || is_ajax) {
-        form.trigger('valid').trigger('valid.fndtn.abide');
+        form.trigger('valid');
       }
 
       form.removeAttr(this.invalid_attr);
@@ -12450,7 +12479,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       if (this.settings.patterns.hasOwnProperty(pattern) && pattern.length > 0) {
         return [el, this.settings.patterns[pattern], required];
       } else if (pattern.length > 0) {
-        return [el, new RegExp('^'+pattern+'$'), required];
+        return [el, new RegExp(pattern), required];
       }
 
       if (this.settings.patterns.hasOwnProperty(type)) {
@@ -12467,7 +12496,6 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           validations = [],
           form = this.S(el_patterns[0][0]).closest('[data-' + this.attr_name(true) + ']'),
           settings = form.data(this.attr_name(true) + '-init') || {};
-
       while (i--) {
         var el = el_patterns[i][0],
             required = el_patterns[i][2],
@@ -12494,36 +12522,34 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           validations.push(this.valid_radio(el, required));
         } else if (is_checkbox && required) {
           validations.push(this.valid_checkbox(el, required));
-        } else if (validator) {
-          valid = this.settings.validators[validator].apply(this, [el, required, parent])
-          validations.push(valid);
-
-          if (valid) {
-            this.S(el).removeAttr(this.invalid_attr);
-            parent.removeClass('error');
-          } else {
-            this.S(el).attr(this.invalid_attr, '');
-            parent.addClass('error');
-          }
-
         } else {
+          
+          if (validator) {
+            valid = this.settings.validators[validator].apply(this, [el, required, parent]);
+            validations.push(valid);
+          }
 
           if (el_patterns[i][1].test(value) && valid_length ||
             !required && el.value.length < 1 || $(el).attr('disabled')) {
+            validations.push(true);
+          } else {
+            validations.push(false);
+          }
+
+          validations = [validations.every(function(valid){return valid;})];
+
+          if(validations[0]){
             this.S(el).removeAttr(this.invalid_attr);
             parent.removeClass('error');
-            if (label.length > 0 && settings.error_labels) label.removeClass('error');
-
-            validations.push(true);
+            if (label.length > 0 && this.settings.error_labels) label.removeClass('error');
             $(el).triggerHandler('valid');
           } else {
-            this.S(el).attr(this.invalid_attr, '');
             parent.addClass('error');
-            if (label.length > 0 && settings.error_labels) label.addClass('error');
-
-            validations.push(false);
+            this.S(el).attr(this.invalid_attr, '');
+            if (label.length > 0 && this.settings.error_labels) label.addClass('error');
             $(el).triggerHandler('invalid');
           }
+
         }
       }
 
@@ -12611,7 +12637,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.accordion = {
     name : 'accordion',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       active_class: 'active',
@@ -12631,12 +12657,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       .off('.fndtn.accordion')
       .on('click.fndtn.accordion', '[' + this.attr_name() + '] > dd > a', function (e) {
         var accordion = S(this).closest('[' + self.attr_name() + ']'),
-            target = S('#' + this.href.split('#')[1]),
-            siblings = S('dd > .content', accordion),
-            aunts = $('dd', accordion),
             groupSelector = self.attr_name() + '=' + accordion.attr(self.attr_name()),
             settings = accordion.data(self.attr_name(true) + '-init'),
-            active_content = S('dd > .content.' + settings.active_class, accordion);
+            target = S('#' + this.href.split('#')[1]),
+            aunts = $('> dd', accordion),
+            siblings = aunts.children('.content'),
+            active_content = siblings.filter('.' + settings.active_class);
         e.preventDefault();
 
         if (accordion.attr(self.attr_name())) {
@@ -12677,7 +12703,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.alert = {
     name : 'alert',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       callback: function (){}
@@ -12721,7 +12747,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.clearing = {
     name : 'clearing',
 
-    version: '5.3.0',
+    version: '5.3.3',
 
     settings : {
       templates : {
@@ -12737,6 +12763,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       // Default to the entire li element.
       open_selectors : '',
+
+      // Image will be skipped in carousel.
+      skip_selector : '',
 
       touch_label : '',
 
@@ -12913,6 +12942,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           label = self.S('.clearing-touch-label', container),
           error = false;
 
+      // Event to disable scrolling on touch devices when Clearing is activated
+      $('body').on('touchmove',function(e){
+        e.preventDefault();
+      });
+
       image.error(function () {
         error = true;
       });
@@ -12983,6 +13017,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         visible_image.hide();
         visible_image.trigger('closed.fndtn.clearing');        
       }
+
+      // Event to re-enable scrolling on touch devices
+      $('body').off('touchmove');
 
       return false;
     },
@@ -13150,6 +13187,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       var current = this.S('.visible', $ul),
           target = current[direction]();
 
+      // Check for skip selector.
+      if (this.settings.skip_selector && target.find(this.settings.skip_selector).length != 0) {
+        target = target[direction]();
+      }
+
       if (target.length) {
         this.S('img', target)
           .trigger('click', [current, target]).trigger('click.fndtn.clearing', [current, target])
@@ -13264,7 +13306,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.dropdown = {
     name : 'dropdown',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       active_class: 'open',
@@ -13332,7 +13374,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         .on('click.fndtn.dropdown', function (e) {
           var parent = S(e.target).closest('[' + self.attr_name() + '-content]');
 
-          if (S(e.target).data(self.data_attr()) || S(e.target).parent().data(self.data_attr())) {
+          if (S(e.target).closest('[' + self.attr_name() + ']').length > 0) {
             return;
           }
           if (!(S(e.target).data('revealId')) && 
@@ -13578,7 +13620,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.equalizer = {
     name : 'equalizer',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       use_tallest: true,
@@ -13653,7 +13695,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.interchange = {
     name : 'interchange',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     cache : {},
 
@@ -14000,7 +14042,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.joyride = {
     name : 'joyride',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     defaults : {
       expose                   : false,     // turn on or off the expose feature
@@ -14013,6 +14055,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       start_timer_on_click     : true,      // true or false - true requires clicking the first button start the timer
       start_offset             : 0,         // the index of the tooltip you want to start on (index of the li)
       next_button              : true,      // true or false to control whether a next button is used
+      prev_button              : true,      // true or false to control whether a prev button is used
       tip_animation            : 'fade',    // 'pop' or 'fade' in each tip
       pause_after              : [],        // array of indexes where to pause the tour after
       exposed                  : [],        // array of expose elements
@@ -14035,14 +14078,15 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       pre_ride_callback      : function (){},    // A method to call before the tour starts (passed index, tip, and cloned exposed element)
       post_expose_callback   : function (){},    // A method to call after an element has been exposed
       template : { // HTML segments for tip layout
-        link    : '<a href="#close" class="joyride-close-tip">&times;</a>',
-        timer   : '<div class="joyride-timer-indicator-wrap"><span class="joyride-timer-indicator"></span></div>',
-        tip     : '<div class="joyride-tip-guide"><span class="joyride-nub"></span></div>',
-        wrapper : '<div class="joyride-content-wrapper"></div>',
-        button  : '<a href="#" class="small button joyride-next-tip"></a>',
-        modal   : '<div class="joyride-modal-bg"></div>',
-        expose  : '<div class="joyride-expose-wrapper"></div>',
-        expose_cover: '<div class="joyride-expose-cover"></div>'
+        link          : '<a href="#close" class="joyride-close-tip">&times;</a>',
+        timer         : '<div class="joyride-timer-indicator-wrap"><span class="joyride-timer-indicator"></span></div>',
+        tip           : '<div class="joyride-tip-guide"><span class="joyride-nub"></span></div>',
+        wrapper       : '<div class="joyride-content-wrapper"></div>',
+        button        : '<a href="#" class="small button joyride-next-tip"></a>',
+        prev_button   : '<a href="#" class="small button joyride-prev-tip"></a>',
+        modal         : '<div class="joyride-modal-bg"></div>',
+        expose        : '<div class="joyride-expose-wrapper"></div>',
+        expose_cover  : '<div class="joyride-expose-cover"></div>'
       },
       expose_add_class : '' // One or more space-separated class names to be added to exposed element
     },
@@ -14073,6 +14117,22 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           } else {
             this.hide();
             this.show();
+          }
+
+        }.bind(this))
+        .on('click.fndtn.joyride', '.joyride-prev-tip', function (e) {
+          e.preventDefault();
+
+          if (this.settings.$li.prev().length < 1) {
+            // Do nothing if there are no prev element
+          } else if (this.settings.timer > 0) {
+            clearTimeout(this.settings.automate);
+            this.hide();
+            this.show(null, true);
+            this.startTimer();
+          } else {
+            this.hide();
+            this.show(null, true);
           }
 
         }.bind(this))
@@ -14167,6 +14227,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       $blank = $(this.settings.template.tip).addClass(opts.tip_class);
       content = $.trim($(opts.li).html()) +
+        this.prev_button_text(opts.prev_button_text, opts.index) +
         this.button_text(opts.button_text) +
         this.settings.template.link +
         this.timer_instance(opts.index);
@@ -14190,7 +14251,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     },
 
     button_text : function (txt) {
-      if (this.settings.next_button) {
+      if (this.settings.tip_settings.next_button) {
         txt = $.trim(txt) || 'Next';
         txt = $(this.settings.template.button).append(txt)[0].outerHTML;
       } else {
@@ -14199,21 +14260,40 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       return txt;
     },
 
+    prev_button_text : function (txt, idx) {
+      if (this.settings.tip_settings.prev_button) {
+        txt = $.trim(txt) || 'Previous';
+
+        // Add the disabled class to the button if it's the first element
+        if (idx == 0)
+          txt = $(this.settings.template.prev_button).append(txt).addClass('disabled')[0].outerHTML;
+        else
+          txt = $(this.settings.template.prev_button).append(txt)[0].outerHTML;
+      } else {
+        txt = '';
+      }
+      return txt;
+    },
+
     create : function (opts) {
-      var buttonText = opts.$li.attr(this.add_namespace('data-button')) 
+      this.settings.tip_settings = $.extend({}, this.settings, this.data_options(opts.$li));
+      var buttonText = opts.$li.attr(this.add_namespace('data-button'))
         || opts.$li.attr(this.add_namespace('data-text')),
+          prevButtonText = opts.$li.attr(this.add_namespace('data-button-prev'))
+        || opts.$li.attr(this.add_namespace('data-prev-text')),
         tipClass = opts.$li.attr('class'),
         $tip_content = $(this.tip_template({
           tip_class : tipClass,
           index : opts.index,
           button_text : buttonText,
+          prev_button_text : prevButtonText,
           li : opts.$li
         }));
 
       $(this.settings.tip_container).append($tip_content);
     },
 
-    show : function (init) {
+    show : function (init, is_prev) {
       var $timer = null;
 
       // are we paused?
@@ -14224,7 +14304,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         if (this.settings.paused) {
           this.settings.paused = false;
         } else {
-          this.set_li(init);
+          this.set_li(init, is_prev);
         }
 
         this.settings.attempts = 0;
@@ -14347,13 +14427,16 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         this.settings.$current_tip);
     },
 
-    set_li : function (init) {
+    set_li : function (init, is_prev) {
       if (init) {
         this.settings.$li = this.settings.$tip_content.eq(this.settings.start_offset);
         this.set_next_tip();
         this.settings.$current_tip = this.settings.$next_tip;
       } else {
-        this.settings.$li = this.settings.$li.next();
+        if (is_prev)
+          this.settings.$li = this.settings.$li.prev();
+        else
+          this.settings.$li = this.settings.$li.next();
         this.set_next_tip();
       }
 
@@ -14419,7 +14502,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       if (!/body/i.test(this.settings.$target.selector)) {
       	  var topAdjustment = this.settings.tip_settings.tipAdjustmentY ? parseInt(this.settings.tip_settings.tipAdjustmentY) : 0,
 			        leftAdjustment = this.settings.tip_settings.tipAdjustmentX ? parseInt(this.settings.tip_settings.tipAdjustmentX) : 0;
-          
+
           if (this.bottom()) {
             if (this.rtl) {
               this.settings.$next_tip.css({
@@ -14845,7 +14928,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs['magellan-expedition'] = {
     name : 'magellan-expedition',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       active_class: 'active',
@@ -14879,10 +14962,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           
           if (target.length === 0) {
             target = $('#'+hash);
+            
           }
 
+
           // Account for expedition height if fixed position
-          var scroll_top = target.offset().top - settings.destination_threshold;
+          var scroll_top = target.offset().top - settings.destination_threshold + 1;
           scroll_top = scroll_top - expedition.outerHeight();
 
           $('html, body').stop().animate({
@@ -14914,10 +14999,15 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         var expedition = $(this),
             settings = expedition.data('magellan-expedition-init'),
             styles = expedition.attr('styles'), // save styles
-            top_offset;
+            top_offset, fixed_top;
 
         expedition.attr('style', '');
         top_offset = expedition.offset().top + settings.threshold;
+
+        //set fixed-top by attribute
+        fixed_top = parseInt(expedition.data('magellan-fixed-top'));
+        if(!isNaN(fixed_top))
+            self.settings.fixed_top = fixed_top;
 
         expedition.data(self.data_attr('magellan-top-offset'), top_offset);
         expedition.attr('style', styles);
@@ -14931,9 +15021,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       $('[' + this.attr_name() + '=fixed]', self.scope).each(function() {
         var expedition = $(this),
             settings = expedition.data('magellan-expedition-init'),
+            styles = expedition.attr('style'), // save styles
             top_offset = expedition.data('magellan-top-offset');
 
-        if (window_top_offset >= top_offset) {
+        //scroll to the top distance
+        if (window_top_offset+self.settings.fixed_top >= top_offset) {
           // Placeholder allows height calculations to be consistent even when
           // appearing to switch between fixed/non-fixed placement
           var placeholder = expedition.prev('[' + self.add_namespace('data-magellan-expedition-clone') + ']');
@@ -14946,7 +15038,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           expedition.css({position:'fixed', top: settings.fixed_top});
         } else {
           expedition.prev('[' + self.add_namespace('data-magellan-expedition-clone') + ']').remove();
-          expedition.attr('style','').removeClass('fixed');
+          expedition.attr('style',styles).css('position','').css('top','').removeClass('fixed');
         }
       });
     },
@@ -14984,7 +15076,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         var name = $(this).data(self.data_attr('magellan-arrival')),
             dest = $('[' + self.add_namespace('data-magellan-destination') + '=' + name + ']');
         if (dest.length > 0) {
-          var top_offset = dest.offset().top - settings.destination_threshold - expedition.outerHeight();
+          var top_offset = Math.floor(dest.offset().top - settings.destination_threshold - expedition.outerHeight());
           return {
             destination : dest,
             arrival : $(this),
@@ -15026,11 +15118,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.offcanvas = {
     name : 'offcanvas',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       open_method: 'move',
-      close_on_click: true
+      close_on_click: false
     },
 
     init : function (scope, method, options) {
@@ -15171,7 +15263,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     };
 
     self.update_active_link = function(index) {
-      var link = $('a[data-orbit-link="'+self.slides().eq(index).attr('data-orbit-slide')+'"]');
+      var link = $('[data-orbit-link="'+self.slides().eq(index).attr('data-orbit-slide')+'"]');
       link.siblings().removeClass(settings.bullets_active_class);
       link.addClass(settings.bullets_active_class);
     };
@@ -15180,7 +15272,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       slides_container.wrap('<div class="'+settings.container_class+'"></div>');
       container = slides_container.parent();
       slides_container.addClass(settings.slides_container_class);
-      
+
       if (settings.stack_on_small) {
         container.addClass(settings.stack_on_small_class);
       }
@@ -15232,7 +15324,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         if (!settings.circular) return false;
         next_idx = slides.length - 1;
       }
-      
+
       var current = $(slides.get(idx));
       var next = $(slides.get(next_idx));
 
@@ -15243,7 +15335,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       slides_container.trigger('before-slide-change.fndtn.orbit');
       settings.before_slide_change();
       self.update_active_link(next_idx);
-      
+
       var callback = function() {
         var unlock = function() {
           idx = next_idx;
@@ -15264,7 +15356,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       var start_animation = function() {
         if (dir === 'next') {animate.next(current, next, callback);}
-        if (dir === 'prev') {animate.prev(current, next, callback);}        
+        if (dir === 'prev') {animate.prev(current, next, callback);}
       };
 
       if (next.height() > slides_container.height() && settings.variable_height) {
@@ -15273,13 +15365,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         start_animation();
       }
     };
-    
+
     self.next = function(e) {
       e.stopImmediatePropagation();
       e.preventDefault();
       self._goto(idx + 1);
     };
-    
+
     self.prev = function(e) {
       e.stopImmediatePropagation();
       e.preventDefault();
@@ -15295,7 +15387,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       }
     };
 
-    self.link_bullet = function(e) {    
+    self.link_bullet = function(e) {
       var index = $(this).attr('data-orbit-slide');
       if ((typeof index === 'string') && (index = $.trim(index)) != "") {
         if(isNaN(parseInt(index)))
@@ -15314,7 +15406,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     self.timer_callback = function() {
       self._goto(idx + 1, true);
     }
-    
+
     self.compute_dimensions = function() {
       var current = $(self.slides().get(idx));
       var h = current.height();
@@ -15328,8 +15420,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     self.create_timer = function() {
       var t = new Timer(
-        container.find('.'+settings.timer_container_class), 
-        settings, 
+        container.find('.'+settings.timer_container_class),
+        settings,
         self.timer_callback
       );
       return t;
@@ -15343,7 +15435,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       var t = container.find('.'+settings.timer_container_class);
       if (t.hasClass(settings.timer_paused_class)) {
         if (typeof timer === 'undefined') {timer = self.create_timer();}
-        timer.start();     
+        timer.start();
       }
       else {
         if (typeof timer === 'object') {timer.stop();}
@@ -15353,12 +15445,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     self.init = function() {
       self.build_markup();
       if (settings.timer) {
-        timer = self.create_timer(); 
+        timer = self.create_timer();
         Foundation.utils.image_loaded(this.slides().children('img'), timer.start);
       }
       animate = new FadeAnimation(settings, slides_container);
-      if (settings.animation === 'slide') 
-        animate = new SlideAnimation(settings, slides_container);        
+      if (settings.animation === 'slide')
+        animate = new SlideAnimation(settings, slides_container);
 
       container.on('click', '.'+settings.next_class, self.next);
       container.on('click', '.'+settings.prev_class, self.prev);
@@ -15417,7 +15509,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           timer.start();
         }
       });
-      
+
       $(document).on('click', '[data-orbit-link]', self.link_custom);
       $(window).on('load resize', self.compute_dimensions);
       Foundation.utils.image_loaded(this.slides().children('img'), self.compute_dimensions);
@@ -15436,7 +15528,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     var self = this,
         duration = settings.timer_speed,
         progress = el.find('.'+settings.timer_progress_class),
-        start, 
+        start,
         timeout,
         left = -1;
 
@@ -15479,7 +15571,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       el.trigger('timer-stopped.fndtn.orbit');
     };
   };
-  
+
   var SlideAnimation = function(settings, container) {
     var duration = settings.animation_speed;
     var is_rtl = ($('html[dir=rtl]').length === 1);
@@ -15533,7 +15625,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.orbit = {
     name: 'orbit',
 
-    version: '5.3.0',
+    version: '5.3.1',
 
     settings: {
       animation: 'slide',
@@ -15578,7 +15670,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     events : function (instance) {
       var orbit_instance = new Orbit(this.S(instance), this.S(instance).data('orbit-init'));
-      this.S(instance).data(self.name + '-instance', orbit_instance);
+      this.S(instance).data(this.name + '-instance', orbit_instance);
     },
 
     reflow : function () {
@@ -15599,15 +15691,16 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     }
   };
 
-    
+
 }(jQuery, window, window.document));
+
 ;(function ($, window, document, undefined) {
   'use strict';
 
   Foundation.libs.reveal = {
     name : 'reveal',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     locked : false,
 
@@ -15651,7 +15744,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         .off('.reveal')
         .on('click.fndtn.reveal', '[' + this.add_namespace('data-reveal-id') + ']:not([disabled])', function (e) {
           e.preventDefault();
-
+        
           if (!self.locked) {
             var element = S(this),
                 ajax = element.data(self.data_attr('reveal-ajax'));
@@ -15669,7 +15762,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         });
 
       S(document)
-        .on('touchend.fndtn.reveal click.fndtn.reveal', this.close_targets(), function (e) {
+        .on('click.fndtn.reveal', this.close_targets(), function (e) {
 
           e.preventDefault();
 
@@ -15720,7 +15813,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       // PATCH #1: fixing multiple keyup event trigger from single key press
       self.S('body').off('keyup.fndtn.reveal').on('keyup.fndtn.reveal', function ( event ) {
         var open_modal = self.S('[' + self.attr_name() + '].open'),
-            settings = open_modal.data(self.attr_name(true) + '-init');
+            settings = open_modal.data(self.attr_name(true) + '-init') || self.settings ;
         // PATCH #2: making sure that the close event can be called only while unlocked,
         //           so that multiple keyup.fndtn.reveal events don't prevent clean closing of the reveal window.
         if ( settings && event.which === 27  && settings.close_on_esc && !self.locked) { // 27 is the keycode for the Escape key
@@ -15736,6 +15829,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       this.S('body').off('keyup.fndtn.reveal');
       return true;
     },
+
 
     open : function (target, ajax_settings) {
       var self = this,
@@ -15756,6 +15850,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       var settings = modal.data(self.attr_name(true) + '-init');
       settings = settings || this.settings;
+
+
+      if (modal.hasClass('open') && target.attr('data-reveal-id') == modal.attr('id')) {
+        return self.close(modal);
+      }
 
       if (!modal.hasClass('open')) {
         var open_modal = self.S('[' + self.attr_name() + '].open');
@@ -15976,7 +16075,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       if (iframe.length > 0) {
         iframe.attr('data-src', iframe[0].src);
-        iframe.attr('src', 'about:blank');
+        iframe.attr('src', iframe.attr('src'));
         video.hide();
       }
     },
@@ -16045,7 +16144,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.slider = {
     name : 'slider',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings: {
       start: 0,
@@ -16081,10 +16180,15 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           if (!!self.cache.active) {
             e.preventDefault();
             if ($.data(self.cache.active[0], 'settings').vertical) {
-              self.calculate_position(self.cache.active, e.pageY || 
-                                                         e.originalEvent.clientY || 
-                                                         e.originalEvent.touches[0].clientY || 
-                                                         e.currentPoint.y);
+              var scroll_offset = 0;
+              if (!e.pageY) {
+                scroll_offset = window.scrollY;
+              }
+              self.calculate_position(self.cache.active, (e.pageY || 
+                                                          e.originalEvent.clientY || 
+                                                          e.originalEvent.touches[0].clientY || 
+                                                          e.currentPoint.y) 
+                                                          + scroll_offset);
             } else {
               self.calculate_position(self.cache.active, e.pageX || 
                                                          e.originalEvent.clientX || 
@@ -16272,7 +16376,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.tab = {
     name : 'tab',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       active_class: 'active',
@@ -16440,7 +16544,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.tooltip = {
     name : 'tooltip',
 
-    version : '5.3.0',
+    version : '5.3.3',
 
     settings : {
       additional_inheritable_classes : [],
@@ -16716,7 +16820,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       $tip.fadeOut(150, function() {
         $tip.find('.tap-to-close').remove();
-        $tip.off('click.fndtn.tooltip.tapclose touchstart.fndtn.tooltip.tapclose MSPointerDown.fndtn.tapclose');
+        $tip.off('click.fndtn.tooltip.tapclose MSPointerDown.fndtn.tapclose');
         $target.removeClass('open');
       });
     },
@@ -16739,13 +16843,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.topbar = {
     name : 'topbar',
 
-    version: '5.3.0',
+    version: '5.3.3',
 
     settings : {
       index : 0,
       sticky_class : 'sticky',
       custom_back_text: true,
       back_text: 'Back',
+      mobile_show_parent_link: true,
       is_hover: true,
       scrolltop : true, // jump to top when sticky nav menu toggle is clicked
       sticky_on : 'all'
@@ -16967,7 +17072,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         self.resize.call(self);
       }, 50)).trigger('resize').trigger('resize.fndtn.topbar');
 
-      S('body').off('.topbar').on('click.fndtn.topbar touchstart.fndtn.topbar', function (e) {
+      S('body').off('.topbar').on('click.fndtn.topbar', function (e) {
         var parent = S(e.target).closest('li').closest('li.hover');
 
         if (parent.length > 0) {
@@ -17083,9 +17188,15 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             url = $link.attr('href'),
             $titleLi;
 
+
         if (!$dropdown.find('.title.back').length) {
-          $titleLi = $('<li class="title back js-generated"><h5><a href="javascript:void(0)"></a></h5></li>');
-  
+
+          if (settings.mobile_show_parent_link == true && url) {
+            $titleLi = $('<li class="title back js-generated"><h5><a href="javascript:void(0)"></a></h5></li><li class="parent-link show-for-small"><a class="parent-link js-generated" href="' + url + '">' + $link.html() +'</a></li>');
+          } else {
+            $titleLi = $('<li class="title back js-generated"><h5><a href="javascript:void(0)"></a></h5>');
+          }
+          
           // Copy link to subnav
           if (settings.custom_back_text == true) {
             $('h5>a', $titleLi).html(settings.back_text);
