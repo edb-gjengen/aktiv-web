@@ -10,7 +10,6 @@ var query_params = {
     //meta_compare: '<='
     count: 10
 };
-var entrypoint = '.program-list';
 
 function format_posts(posts) {
     var html = '';
@@ -64,17 +63,6 @@ jQuery(document).ready(function() {
     moment.lang('nb');
 
     var $ = jQuery;
-    $.getJSON(
-        program_endpoint+'?callback=?',
-        query_params,
-        function(data) {
-            if(data && data.events) {
-                // render template
-                var html = format_posts(data.events);
-                $(entrypoint).html(html);
-            }
-        }
-    );
 
     /* Menu toggle */
     $('#menu .menu-toggle').on('click', function(e) {
@@ -101,7 +89,25 @@ jQuery(document).ready(function() {
         $('.introduction').addClass('fadein');
     }
 
-    /* Search */
+    /* Program */
+    var program_entrypoint = '.program-list';
+    if( $(program_entrypoint).length ) {
+        /* */
+        $.getJSON(
+            program_endpoint+'?callback=?',
+            query_params,
+            function(data) {
+                if(data && data.events) {
+                    // render template
+                    var html = format_posts(data.events);
+                    $(program_entrypoint).html(html);
+                }
+            }
+        );
+    }
+
+
+    /* Search page */
     if( $('.search-form').length ) {
         $.getJSON(inside_groups_url, function(data) {
             // create select fields
