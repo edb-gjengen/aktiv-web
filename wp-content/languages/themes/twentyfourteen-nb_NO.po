@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Twenty Fourteen package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2014-04-07 15:34:54+0000\n"
+"PO-Revision-Date: 2014-07-22 09:46:59+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -91,7 +91,7 @@ msgstr "Stikkord"
 
 #: inc/featured-content.php:436
 msgid "Don&rsquo;t display tag on front end."
-msgstr "Ikke vis slagord på forsiden."
+msgstr "Ikke vis dette stikkordet på fremsidene."
 
 msgid "In 2014, our default theme lets you create a responsive magazine website with a sleek, modern design. Feature your favorite homepage content in either a grid or a slider. Use the three widget areas to customize your website, and change your content's layout with a full-width page template and a contributor page to show off your authors. Creating a magazine website with WordPress has never been easier."
 msgstr "I 2014 gjør vårt standardtema deg i stand til å lage et responsivt magasinnettsted med et moderne design. Fremhev ditt favorittinnhold i et rutenett eller en slider. Bruk de tre widgetområdene for å tilpasse nettstedet og endre layouten med fullbreddeformat og bidragsytersider for å fremheve dine ulike forfattere. Å lage et magasinnettsted med WordPress har aldri vært enklere."

@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Administration package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2014-04-16 13:08:40+0000\n"
+"PO-Revision-Date: 2014-07-22 09:45:21+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -651,7 +651,7 @@ msgstr "Legg til nytt"
 
 #: wp-admin/themes.php:227 wp-admin/themes.php:304 wp-admin/themes.php:334
 msgid "Update Available"
-msgstr "Oppdater tilgjengelige"
+msgstr "Oppdatering tilgjengelig"
 
 #: wp-admin/themes.php:314
 msgid "Close overlay"
@@ -6493,11 +6493,11 @@ msgstr "Siste"
 
 #: wp-admin/includes/update.php:433
 msgid "An automated WordPress update has failed to complete - <a href=\"%s\">please attempt the update again now</a>."
-msgstr "En automatisert WordPress-oppdatering feilet—<a href=\"%s\">vennligst prøv igjen nå</a>."
+msgstr "En automatisk WordPress-oppdatering feilet—<a href=\"%s\">vennligst prøv igjen nå</a>."
 
 #: wp-admin/includes/update.php:435
 msgid "An automated WordPress update has failed to complete! Please notify the site administrator."
-msgstr "En automatisert WordPress-oppdatering feilet! Vennligst si ifra til nettstedets administrator."
+msgstr "En automatisk WordPress-oppdatering feilet! Vennligst si ifra til nettstedets administrator."
 
 #: wp-admin/includes/upgrade.php:66
 msgid "<strong><em>Note that password</em></strong> carefully! It is a <em>random</em> password that was generated just for you."
