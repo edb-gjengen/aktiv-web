@@ -183,8 +183,9 @@ $menu-padding: rem-calc(18);
             font-style: normal;
             padding-left: rem-calc(6);
             transform: rotate(90deg);
-            top: -5px;
+            top: -3px;
             position: relative;
+            color: #ccc;
         }
         .profile-inner {
             display: inline-block;
@@ -553,4 +554,9 @@ input[type=submit]{
 .active {
     background-color: $secondary-color;
     color: white;
+
+    &:hover {
+        color: white;
+        background-color: darken($secondary-color, 10%);
+    }
 }

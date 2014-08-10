@@ -81,6 +81,7 @@ define('WPLANG', 'nb_NO');
 define('WP_DEBUG', false);
 
 define('INSIDE_API_KEY', '');
+define('INSIDE_URL', 'https://inside.studentersamfundet.no/api/');
 
 /* That's all, stop editing! Happy blogging. */
 

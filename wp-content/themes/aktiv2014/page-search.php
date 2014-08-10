@@ -12,18 +12,18 @@
     <div class="search-form">
         <h1 class="page-title"><?php wp_title("", true); ?></h1>
         <form method="get">
-            <input type="text" id="id_user_query" class="search-field" name="q" placeholder="Søk på navn, epost, telefonnummer, brukernavn, medlemsnummer eller kortnummer" />
+            <input type="text" id="id_user_query" class="search-field" name="q" placeholder="Søk på navn, epost, eller brukernavn" />
             <div class="filters">
                 <div class="groups">
-                    <label>Filtrér på forening (gruppe):</label>
+                    <label>Søk på gruppe (forening):</label>
                     <div class="groups-select-wrap"></div>
                 </div>
                 <div class="roles">
-                    <label>Filtrér på rolle:</label>
+                    <label>Filtrér på...</label>
                     <ul class="button-group">
-                        <li><a href="#" class="button-alt">Styremedlem</a></li>
-                        <li><a href="#" class="button-alt">Aktiv</a></li>
-                        <li><a href="#" class="button-alt">Gyldig medlemskap</a></li>
+                        <!--<li><a href="#" class="button-alt">Styremedlem</a></li>
+                        <li><a href="#" class="button-alt">Aktiv</a></li>-->
+                        <li><a href="#" class="button-alt" data-search-filter="has_valid_membership">Gyldig medlemskap</a></li>
                     </ul>
                 </div>
             </div>

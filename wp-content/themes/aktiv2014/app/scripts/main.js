@@ -56,12 +56,20 @@ function format_results(data) {
 
 function do_search() {
     // TODO: add params from toggle
+    var validMembershipToggle = $('.filters [data-search-filter="has_valid_membership"]');
+    var groupString = '';
+    var groupSelect = $('.groups-select').val();
+    if( groupSelect !== null) {
+        groupString = groupSelect.join();
+    }
+
     $.getJSON(
         user_search_endpoint,
         {
             q: $('.search-field').val(),
-            filter_groups: $('.groups-select').val(),
-            _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
+            filter_groups: groupString,
+            _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content'),
+            has_valid_membership: validMembershipToggle.hasClass('active').toString()
         },
         format_results
     );
@@ -119,7 +127,7 @@ jQuery(document).ready(function() {
     if( $('.search-form').length ) {
         $.getJSON(inside_groups_url, function(data) {
             // create select fields
-            var list = '<select class="groups-select" data-placeholder="Velg en gruppe..."><option value=""></option><% _.each(results, function(g) { %>' +
+            var list = '<select multiple class="groups-select" data-placeholder="Velg en gruppe..."><option value=""></option><% _.each(results, function(g) { %>' +
                 '<option value="<%=g.group_id %>"><%= g.group_name %></option>' +
                 '<% }); %></select>';
 
