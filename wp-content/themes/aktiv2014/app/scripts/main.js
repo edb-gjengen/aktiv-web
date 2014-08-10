@@ -71,8 +71,10 @@ function do_search() {
     var params = {
         q: $('.search-field').val(),
         filter_groups: groupString,
-        has_valid_membership: validMembershipToggle.hasClass('active').toString()
     };
+    if(validMembershipToggle.hasClass('active')) {
+        params.has_valid_membership = true;
+    }
     var querystring = $.param(params);
     window.History.pushState(null, null, '?'+querystring);
 
