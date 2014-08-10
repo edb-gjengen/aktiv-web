@@ -1,6 +1,6 @@
 'use strict';
 /*global moment, jQuery, document, _, $ */
-var program_endpoint = 'https://studentersamfundet.no/api/events/get_upcoming/';
+var program_endpoint = 'https://studentersamfundet.no/api/events/get_today/';
 var inside_url = 'https://inside.studentersamfundet.no';
 var inside_groups_url = inside_url + '/api/groups.php';
 var user_search_endpoint = '/inside-api/';
@@ -8,7 +8,7 @@ var query_params = {
     //meta_key: '_neuf_events_starttime',
     //meta_value: moment().add('days', 1).format('X'),
     //meta_compare: '<='
-    count: 10
+    //count: 10
 };
 
 function format_posts(posts) {
@@ -17,21 +17,16 @@ function format_posts(posts) {
     //var stylesheet_dir = jQuery('meta[name=x-stylesheet-directory]').attr('content');
 
     if(posts.length === 0) {
-        return '';
+        return 'Idag er det stille på huset :-/';
     }
 
-    html += '<thead><tr class="fadein"><th width="53%">Arrangement</th><th>Sted</th><th>Tid</th></tr></thead>';
     for(i=0; i< posts.length; i++) {
         var post = posts[i];
-        html += '<tr class="fadein">';
-        //if(post.thumbnail_images) {
-        //    html += '<img src="'+ post.thumbnail_images['four-column-promo'].url +'" /><br/>';
-        //} else {
-        //    html += '<img src="'+ stylesheet_dir +'/img/placeholder.gif" /><br/>';
-        //}
-        html += '<td class="entry-title"><a href="'+ post.url +'">'+ post.title +'</a></td>';
-        html += '<td class="entry-venue">'+ post.custom_fields._neuf_events_venue +'</td>';
-        html += '<td class="entry-starttime">'+ moment.unix(post.custom_fields._neuf_events_starttime).utc().format('DD. MMMM YYYY, HH.mm') +'</td></tr>';
+        html += '<li class="fadein">';
+        html += '<span class="entry-starttime">'+ moment.unix(post.custom_fields._neuf_events_starttime).utc().format('HH.mm') +'</span>: ';
+        html += '<a href="'+ post.url +'">'+ post.title +'</a>';
+        html += ' <span class="entry-venue">'+ post.custom_fields._neuf_events_venue +'</span>';
+        html += '</li>';
     }
 
     return html;

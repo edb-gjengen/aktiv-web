@@ -247,16 +247,8 @@ $menu-padding: rem-calc(18);
         }
     }
 }
-.events-today {
-    .program-list {
-        width: 100%;
-        border-color: #eee;
-        @extend .card-z1;
-    }
-}
 
 /* Single */
-
 .text-body {
     @extend .card;
     padding-left: rem-calc(16);
@@ -408,7 +400,6 @@ input[type=submit]{
     h2,
     h2 a.rsswidget {
         font-size: rem-calc(20);
-        font-weight: 600;
         margin-bottom: 0;
     }
     h2 a.rsswidget {

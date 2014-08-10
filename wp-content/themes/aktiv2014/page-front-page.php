@@ -16,14 +16,6 @@
         <a href="#dismiss-introduction" data-toggle-introduction class="button dismiss-button" title="Lukk">Oki doki!</a>
     </div>
 
-    <div class="events-today-wrap">
-        <h1>Kommende program</h1>
-        <div class="events-today">
-            <table class="program-list"><!-- JS magic --></table>
-            <div class="text-right"><a href="https://studentersamfundet.no/program/">Vis programmet på s.no</a></div>
-        </div>
-    </div>
-
     <div class="activities-wrap">
     <?php get_template_part( 'activities' ); ?>
     </div>
