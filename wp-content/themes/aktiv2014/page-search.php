@@ -12,7 +12,7 @@
     <div class="search-form">
         <h1 class="page-title"><?php wp_title("", true); ?></h1>
         <form method="get">
-            <input type="text" id="id_user_query" class="search-field" name="q" placeholder="Søk på navn, epost, eller brukernavn" />
+            <input type="text" id="id_user_query" class="search-field" name="q" placeholder="Søk på navn, epost, eller brukernavn" autofocus />
             <div class="filters">
                 <div class="groups">
                     <label>Søk på gruppe (forening):</label>

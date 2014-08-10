@@ -1,5 +1,5 @@
 'use strict';
-/*global moment, jQuery, document, _, $ */
+/*global moment, jQuery, document, _, $, window */
 var program_endpoint = 'https://studentersamfundet.no/api/events/get_today/';
 var inside_url = 'https://inside.studentersamfundet.no';
 var inside_groups_url = inside_url + '/api/groups.php';
@@ -10,6 +10,13 @@ var query_params = {
     //meta_compare: '<='
     //count: 10
 };
+
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
+        results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
 
 function format_posts(posts) {
     var html = '';
@@ -32,7 +39,7 @@ function format_posts(posts) {
     return html;
 }
 function format_results(data) {
-    var header_template = '<table><thead><tr><th>Navn</th><th>Brukernavn</th><th>Epost</th><th>Telefon</th><th>Medlem</th><th>Grupper</th></tr></thead>';
+    var header_template = '<table><thead><tr><th>Navn</th><th>Brukernavn</th><th>Epost</th><th>Telefon</th><th>Har medlemskap</th><th>Grupper</th></tr></thead>';
     if(data.error) {
         console.log(data.error);
         $('.search-result-list').html('');
@@ -55,24 +62,69 @@ function format_results(data) {
 }
 
 function do_search() {
-    // TODO: add params from toggle
     var validMembershipToggle = $('.filters [data-search-filter="has_valid_membership"]');
     var groupString = '';
     var groupSelect = $('.groups-select').val();
     if( groupSelect !== null) {
         groupString = groupSelect.join();
     }
+    var params = {
+        q: $('.search-field').val(),
+        filter_groups: groupString,
+        has_valid_membership: validMembershipToggle.hasClass('active').toString()
+    };
+    var querystring = $.param(params);
+    window.History.pushState(null, null, '?'+querystring);
 
+    params._wpnonce = $('meta[name=x-inside-api-nonce]').attr('content');
     $.getJSON(
         user_search_endpoint,
-        {
-            q: $('.search-field').val(),
-            filter_groups: groupString,
-            _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content'),
-            has_valid_membership: validMembershipToggle.hasClass('active').toString()
-        },
+        params,
         format_results
     );
+}
+
+function load_initial_values() {
+    var param_set = false;
+    var q = getParameterByName('q');
+    if(q && q.length > 0) {
+        $('.search-field').val(q);
+        param_set = true;
+    }
+
+    var hvm = getParameterByName('has_valid_membership');
+    if(hvm && hvm === 'true') {
+        $('.filters [data-search-filter="has_valid_membership"]').addClass('active');
+        param_set = true;
+    }
+
+    var fg = getParameterByName('filter_groups');
+    var groups = [];
+    if(fg && fg.length > 0) {
+        if( fg.indexOf(',') !== -1 ) {
+            // has comma
+            groups = fg.split(',');
+        } else {
+            groups = [fg];
+        }
+        // is every group numeric?
+        var has_invalid_group = false;
+        var i=0;
+        for(i=0; i<groups.length; i++) {
+            var g = groups[i];
+            if( !$.isNumeric(g) ) {
+                has_invalid_group = true;
+            }
+        }
+        if(!has_invalid_group) {
+            param_set = true;
+            $('.groups-select').val(groups);
+            $('.groups-select').trigger('chosen:updated');
+        }
+    }
+    if(param_set) {
+        do_search();
+    }
 }
 
 jQuery(document).ready(function() {
@@ -140,8 +192,10 @@ jQuery(document).ready(function() {
             }).change(function() {
                 do_search();
             });
+
+            /* Load intial values from url query */
+            load_initial_values();
         });
-        $('.search-field').focus();
         $('.search-field').on('keyup keypress', function(e) {
             // No <enter>
             if (e.keyCode === 10 || e.keyCode === 13)  {

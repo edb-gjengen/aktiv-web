@@ -7,7 +7,13 @@
     "foundation": "~5.3.0",
     "moment": "~2.7.0",
     "underscore": "~1.6.0",
-    "chosen-bower": "~1.1.0"
+    "chosen-bower": "~1.1.0",
+    "history.js": "~1.8.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "overrides": {
+      "history.js": {
+          "main": "./scripts/bundled/html4+html5/native.history.js"
+      }
+  }
 }
