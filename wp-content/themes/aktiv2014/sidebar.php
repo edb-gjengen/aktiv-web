@@ -4,7 +4,7 @@
         <h2>Dagens program</h2>
         <div class="events-today">
             <ul class="program-list"><!-- JS magic --></ul>
-            <div class="text-right"><a href="https://studentersamfundet.no/program/">Vis hele programmet</a></div>
+            <a href="https://studentersamfundet.no/program/">Vis hele programmet</a>
         </div>
     </div>
 

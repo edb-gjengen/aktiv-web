@@ -10,9 +10,7 @@
 
     // User menu
     $user = wp_get_current_user();
-    $default = "mm";
-    $size = 50;
-    $grav_url = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $user->user_email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
+    $grav_url = get_grav_url($user);
     ?>
     <div class="user-menu-wrap">
         <a href="#" class="profile-badge"><img src="<?php echo $grav_url; ?> " class="profile-picture" /><span class="profile-inner"><?php echo $user->display_name; ?> <i class="icon-down">&#x25B6;</i></span></a>

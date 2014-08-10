@@ -385,4 +385,12 @@ function neuf_show_admin_bar($content) {
 }
 add_filter( 'show_admin_bar' , 'neuf_show_admin_bar');
 
+function get_grav_url($user) {
+    $default = "mm";
+    $size = 50;
+    $grav_url = "https://www.gravatar.com/avatar/" . md5( strtolower( trim( $user->user_email ) ) ) . "?d=" . urlencode( $default ) . "&s=" . $size;
+
+    return $grav_url;
+}
+
 ?>
