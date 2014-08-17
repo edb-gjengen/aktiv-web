@@ -53,7 +53,15 @@ function format_results(data) {
     }
 
     var list = '<tbody><% _.each(results, function(u) { %>' +
-        '<tr><td><a href="'+ inside_url +'/?page=display-user&userid=<%= u.id %>"><%= u.firstname %> <%= u.lastname %></a></td><td><%= u.username %></td><td><a href="mailto:<%= u.email %>"><%= u.email %></a></td><td><a href="tlf:<%= u.number %>"><%= u.number %></a></td><td><% if(u.is_member != 0) { %>Ja<% } else { %>Nei<% } %></td><td class="groups"><%= u.groups %></td></li> <% }); %></tbody></table>';
+        '<tr>' +
+        '<td><a href="'+ inside_url +'/?page=display-user&userid=<%= u.id %>"><%= u.firstname %> <%= u.lastname %></a></td>' +
+        '<td><%= u.username %></td>' +
+        '<td><a href="mailto:<%= u.email %>"><%= u.email %></a></td>' +
+        '<td><a href="tlf:<%= u.number %>"><%= u.number %></a></td>' +
+        '<td><% if(u.is_member != 0) { %>Ja<% } else { %>Nei<% } %></td>' +
+        '<td class="groups"><% _.each(u.groups, function(g, i) { %><%= g.name %><% if(u.groups.length !== i +1){ %>, <% } %><% }); %></td>'+
+        '</tr> <% }); %>' +
+        '</tbody></table>';
     var html = header_template + _.template(list, data);
     $('.search-result-list').html(html);
 
@@ -214,5 +222,34 @@ jQuery(document).ready(function() {
             $(this).toggleClass('active');
             do_search();
         });
+    }
+    if( $('.profile').length ) {
+        var params = {
+            q: $('meta[name=x-username]').attr('content'),
+            exact: true,
+            _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
+        };
+
+        $.getJSON(
+            user_search_endpoint,
+            params,
+            function(data) {
+                if(data.results.length === 1) {
+                    var u = data.results[0];
+                    console.log(u);
+                    var group_html = '';
+                    for(var i=0;i<u.groups.length; i++) {
+                        group_html += '<li>' + u.groups[i].name + '</li>';
+                    }
+                    $('.group-list').html(group_html);
+                    var is_member_field = $('.is-member');
+                    if(u.is_member === '1') {
+                        is_member_field.html('Gyldig medlemskap.');
+                    } else {
+                        is_member_field.html('Du har ikke et gyldig medlemskap. Du kan forny medlemskapet ditt via SMS, via <a href="http://snapporder.com">SnappOrder</a> eller via nettbutikken i <a href="https://inside.studentersamfundet.no">Inside</a>.');
+                    }
+                }
+            });
+
     }
 });

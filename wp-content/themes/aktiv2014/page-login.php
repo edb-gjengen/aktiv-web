@@ -26,6 +26,7 @@
     );
     wp_login_form( $args );
     ?>
+    <a href="https://brukerinfo.neuf.no/accounts/password/reset">Problemer med å logge inn?</a>
     </div>
 
 </div> <!-- #content -->

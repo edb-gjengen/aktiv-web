@@ -6,6 +6,7 @@
     <meta name="robots" content="index,follow" />
     <meta name="x-stylesheet-directory" content="<?php bloginfo( 'stylesheet_directory' ); ?>" />
     <meta name="x-inside-api-nonce" content="<?php echo wp_create_nonce( 'inside-api' ); ?>" />
+    <meta name="x-username" content="<?php $user = wp_get_current_user(); echo $user->user_login; ?>" />
     <?php neuf_doctitle(); ?>
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="alternate" type="application/rss+xml" href="<?php bloginfo('url'); ?>/feed/" title="Aktiv-nyheter" />
