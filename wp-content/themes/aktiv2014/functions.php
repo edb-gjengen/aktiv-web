@@ -392,5 +392,9 @@ function get_grav_url($user) {
 
     return $grav_url;
 }
-
+/* Load dash icons */
+add_action( 'wp_enqueue_scripts', 'neuf_load_dashicons' );
+function neuf_load_dashicons() {
+    wp_enqueue_style( 'dashicons' );
+}
 ?>

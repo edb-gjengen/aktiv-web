@@ -82,6 +82,8 @@ define('WP_DEBUG', false);
 
 define('INSIDE_API_KEY', '');
 define('INSIDE_URL', 'https://inside.studentersamfundet.no/api/');
+define('EMAIL_API_KEY', '');
+define('EMAIL_URL', 'http://sircon.studentersamfundet.no/');
 
 /* That's all, stop editing! Happy blogging. */
 

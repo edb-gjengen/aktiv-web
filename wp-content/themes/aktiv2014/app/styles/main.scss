@@ -426,6 +426,13 @@ input[type=submit]{
     h5 {
         margin-top: rem-calc(8);
     }
+    .label-email-type {
+        margin-left: 2px;
+        @include label($bg:#eee, $padding: 4px 4px 5px, $radius:2px);
+        &.mailman {
+            color: darken($secondary-color, 10%);
+        }
+    }
 }
 
 /* Sidebar */

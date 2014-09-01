@@ -14,9 +14,9 @@ $user = wp_get_current_user();
     <div class="inner">
         <h5><?php echo $user->display_name; ?></h5>
         <ul>
-            <li><strong>Epost:</strong> <?php echo $user->user_email; ?></li>
+            <li><strong>Epost</strong>: <span class="user-email"><?php echo $user->user_email; ?></span></li>
             <li><strong>Medlemskapsstatus</strong>: <span class="is-member"></span></li>
-            <li><strong>Rolle på aktiv.neuf.no:</strong> <?php echo $user->roles[0]; ?></li>
+            <li><strong>Rolle på aktiv.neuf.no</strong>: <?php echo $user->roles[0]; ?></li>
         </ul>
         <p>
             <em>Endre navn, epost, med mer via <a href="https://inside.studentersamfundet.no">Inside</a></em>.
@@ -32,6 +32,12 @@ $user = wp_get_current_user();
     <div class="inner">
         <h5>Gruppemedlemskap</h5>
         <ul class="group-list">
+        </ul>
+        <h5>Epostlistemedlemskap</h5>
+        <ul class="email-list">
+        </ul>
+        <strong>Arvede epostlistemedlemskap</strong>
+        <ul class="email-list-inherited">
         </ul>
     </div>
 </div>

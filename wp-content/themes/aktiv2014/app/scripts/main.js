@@ -4,6 +4,7 @@ var program_endpoint = 'https://studentersamfundet.no/api/events/get_today/';
 var inside_url = 'https://inside.studentersamfundet.no';
 var inside_groups_url = inside_url + '/api/groups.php';
 var user_search_endpoint = '/inside-api/';
+var email_search_endpoint = '/email-api/';
 var query_params = {
     //meta_key: '_neuf_events_starttime',
     //meta_value: moment().add('days', 1).format('X'),
@@ -223,7 +224,10 @@ jQuery(document).ready(function() {
             do_search();
         });
     }
+
+    /* Profile page */
     if( $('.profile').length ) {
+        /* Load groups and memberships */
         var params = {
             q: $('meta[name=x-username]').attr('content'),
             exact: true,
@@ -234,7 +238,7 @@ jQuery(document).ready(function() {
             user_search_endpoint,
             params,
             function(data) {
-                if(data.results.length === 1) {
+                if( data.hasOwnProperty('results') && data.results.length === 1) {
                     var u = data.results[0];
                     console.log(u);
                     var group_html = '';
@@ -249,7 +253,26 @@ jQuery(document).ready(function() {
                         is_member_field.html('Du har ikke et gyldig medlemskap. Du kan forny medlemskapet ditt via SMS, via <a href="http://snapporder.com">SnappOrder</a> eller via nettbutikken i <a href="https://inside.studentersamfundet.no">Inside</a>.');
                     }
                 }
-            });
-
+            }
+        );
+        /* Load email aliases */
+        params.q = $('.profile-details .user-email').text();
+        params.inherited = true;
+        $.getJSON(
+            email_search_endpoint,
+            params,
+            function(data) {
+                var list = '<% _.each(results, function(r) { %>' +
+                    '<li><%= r.name %> <a href="<%= r.admin_url %>" class="email-<%= r.type %>" title="<%= r.type %>"><span class="dashicons dashicons-<% if( r.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"></span></a></li>' +
+                    '<% }); %>';
+                var html = _.template(list, data);
+                $('.account-details .email-list').html(html);
+                if( params.inherited ) {
+                    data.results = data.inherited_results; // reuse template
+                    html = _.template(list, data);
+                    $('.account-details .email-list-inherited').html(html);
+                }
+            }
+        );
     }
 });
