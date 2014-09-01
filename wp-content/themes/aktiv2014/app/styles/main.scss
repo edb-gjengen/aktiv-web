@@ -49,6 +49,7 @@ $menu-padding: rem-calc(18);
     #header-container {
         @include grid-row();
         position: relative;
+        z-index: 1;
     }
     .site-title {
         @include grid-column(3);
