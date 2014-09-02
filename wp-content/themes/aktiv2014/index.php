@@ -40,7 +40,7 @@
         <?php comments_template(); ?>
     <?php elseif( !is_page() ): ?>
         <div class="actions-container">
-            <a class="button radius read-more" href="<?php get_permalink( get_the_ID() ) ?>'">Les hele innlegget</a>
+            <a class="button radius read-more" href="<?php echo get_permalink( get_the_ID() ); ?>">Les hele innlegget</a>
             <span class="comments-link"><?php comments_popup_link(); ?></span>
         </div>
     <?php endif; ?>

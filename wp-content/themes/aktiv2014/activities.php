@@ -28,7 +28,7 @@ if( $posts->have_posts() ) : while( $posts->have_posts() ) : $posts->the_post();
         <a href="<?php the_permalink(); ?>"><?php the_post_thumbnail('feed'); ?></a>
         <div class="entry-content excerpt"><?php the_excerpt(); ?></div> <!-- .entry-content -->
         <div class="actions-container">
-            <a class="button radius read-more" href="<?php get_permalink( get_the_ID() ) ?>'">Les hele innlegget</a>
+            <a class="button radius read-more" href="<?php echo get_permalink( get_the_ID() ); ?>">Les hele innlegget</a>
             <span class="comments-link"><?php comments_popup_link(); ?></span>
         </div>
     </div>
