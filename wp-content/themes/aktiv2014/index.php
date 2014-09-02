@@ -8,8 +8,9 @@
 <?php if( have_posts() ) : while( have_posts() ) : the_post();
     $post_category = "";
     if( count(get_the_category()) >= 1 ) {
-        $post_category =  get_the_category()[0]->name;
-        $post_category = "<span class=\"label-category\"><span class=\"dashicons dashicons-tag\"></span>$post_category</span>";
+        $cat = get_the_category();
+        $cat = $cat[0];
+        $post_category = '<a href="'. get_category_link($cat->term_id) .'" class="label-category"><span class="dashicons dashicons-tag"></span>'. $cat->name .'</a>';
     } ?>
     
     <article <?php post_class(); ?>>

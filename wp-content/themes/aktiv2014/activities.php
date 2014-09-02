@@ -11,7 +11,8 @@ $posts = new WP_Query( $args );
 if( $posts->have_posts() ) : while( $posts->have_posts() ) : $posts->the_post();
     $post_category = "";
     if( count(get_the_category()) >= 1 ) {
-        $cat = get_the_category()[0];
+        $cat = get_the_category();
+        $cat = $cat[0];
         $post_category = '<a href="'. get_category_link($cat->term_id) .'" class="label-category"><span class="dashicons dashicons-tag"></span>'. $cat->name .'</a>';
     }
     ?>
