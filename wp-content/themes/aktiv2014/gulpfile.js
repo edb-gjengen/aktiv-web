@@ -25,9 +25,10 @@ gulp.task('styles', function () {
         //.pipe($.plumber(onError))
         .pipe($.sass({
             includePaths: ['app/bower_components/foundation/scss'],
-            errLogToConsole: true
+            errLogToConsole: true,
+            sourceComments: 'map'
         }))
-        .pipe($.autoprefixer('last 1 version'))
+        //.pipe($.autoprefixer('last 1 version'))
         .pipe($.plumber.stop())
         .pipe(gulp.dest('dist/styles'))
         .pipe($.size());

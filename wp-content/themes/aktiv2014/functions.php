@@ -5,10 +5,8 @@ add_theme_support( 'automatic-feed-links' );
 
 $content_width = 770;
 
-add_image_size( 'cover-photo' , 1440, 480, true );
-add_image_size( 'six-column-promo' , 570 , 322 , true );
-add_image_size( 'six-column-slim' , 570 , 161 , true );
-
+add_image_size( 'cover-photo' , 1440, 810, true );
+add_image_size( 'feed' , 770, 433, true, 'center', 'top' );
 /**
  * Register navigation menus.
  */
@@ -397,4 +395,11 @@ add_action( 'wp_enqueue_scripts', 'neuf_load_dashicons' );
 function neuf_load_dashicons() {
     wp_enqueue_style( 'dashicons' );
 }
+
+/* Read more link */
+function neuf_excerpt_more( $more ) {
+	return '...';
+}
+add_filter( 'excerpt_more', 'neuf_excerpt_more' );
+
 ?>

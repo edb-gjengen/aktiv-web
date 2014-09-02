@@ -2,36 +2,46 @@
 <div class="container">
 
 <div id="content">
-<h1 class="page-title"><?php wp_title("", true); ?></h1>
-
-<?php if( have_posts() ) : while( have_posts() ) : the_post(); ?>
+<?php if( !is_single() ): ?>
+    <h1 class="page-title"><?php wp_title("", true); ?></h1>
+<?php endif; ?>
+<?php if( have_posts() ) : while( have_posts() ) : the_post();
+    $post_category = "";
+    if( count(get_the_category()) >= 1 ) {
+        $post_category =  get_the_category()[0]->name;
+        $post_category = "<span class=\"label-category\"><span class=\"dashicons dashicons-tag\"></span>$post_category</span>";
+    } ?>
     
     <article <?php post_class(); ?>>
     <div class="text-body">
-    <?php if( !is_single() && !is_page() ): ?>
+    <?php if( !is_page() ): ?>
         <h3 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
     <?php endif; ?>
 
-    <?php if( !is_page() ): ?>
-        <div class="entry-category"><?php the_category(); ?></div>
-    <?php endif; ?>
 
     <?php if(  !is_page() ): ?>
         <div class="entry-meta byline"><span class="meta-prep meta-prep-author">av </span><span class="author vcard"><?php the_author_link(); ?></span>, <span class="entry-date"><?php the_time( get_option( 'date_format' ) ." ". get_option( 'time_format' ) ); ?></span></div>
     <?php endif; ?>
 
-    <?php the_post_thumbnail(); ?>
+    <?php if( !is_page() ): ?>
+        <span class="entry-category"><?php echo $post_category; ?></span>
+    <?php endif; ?>
+
+    <a href="<?php the_permalink(); ?>"><?php the_post_thumbnail('feed'); ?></a>
 
     <?php if( is_single() || is_page() || is_home() ): ?>
         <div class="entry-content"><?php the_content(); ?></div> <!-- .entry-content -->
     <?php else: ?>
-        <div class="entry-content"><?php the_excerpt(); ?></div> <!-- .entry-content -->
+        <div class="entry-content excerpt"><?php the_excerpt(); ?></div> <!-- .entry-content -->
     <?php endif; ?>
 
     <?php if( is_single() ): ?>
         <?php comments_template(); ?>
     <?php elseif( !is_page() ): ?>
-        <span class="comments-link"><?php comments_popup_link(); ?></span>
+        <div class="actions-container">
+            <a class="button radius read-more" href="<?php get_permalink( get_the_ID() ) ?>'">Les hele innlegget</a>
+            <span class="comments-link"><?php comments_popup_link(); ?></span>
+        </div>
     <?php endif; ?>
 
 
