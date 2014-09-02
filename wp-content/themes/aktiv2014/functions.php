@@ -402,4 +402,59 @@ function neuf_excerpt_more( $more ) {
 }
 add_filter( 'excerpt_more', 'neuf_excerpt_more' );
 
+/* Save user meta options */
+function neuf_save_user_meta() {
+	global $wpdb;
+
+	$user_id = (int) $_POST['user_id']; // TODO: sanitize
+	$meta_key = $_POST['meta_key']; // TODO: sanitize
+	$meta_value = $_POST['meta_value']; // TODO: sanitize
+	$unique = (bool) $_POST['unique'];
+
+	if( !get_userdata($user_id) ) {
+		die(json_encode(array('error' => 'Invalid user_id'.$_POST['user_id'])));
+	}
+	if( !is_user_logged_in() ) {
+		die(json_encode(array('error' => 'Log in first')));
+	}
+
+	if( !wp_verify_nonce( $_POST['_wpnonce'], 'user-meta' ) ) {
+		die(json_encode(array('error' => 'Invalid nonce')));
+	}
+
+	$meta_id = add_user_meta($user_id, $meta_key, $meta_value, $unique);
+
+	if( !$meta_id ) {
+		die(json_encode(array('result' => 'User meta NOT updated!')));
+	}
+	else{
+		die(json_encode(array('result' => 'User meta updated.')));
+	}
+}
+/* Save user meta options */
+function neuf_get_user_meta() {
+	global $wpdb;
+
+	$user_id = (int) $_POST['user_id']; // TODO: sanitize
+	$meta_key = $_POST['meta_key']; // TODO: sanitize
+	$single = (bool) $_POST['single']; // TODO: sanitize
+
+	if( !get_userdata($user_id) ) {
+		die(json_encode(array('error' => 'Invalid user_id'.$_POST['user_id'])));
+	}
+	if( !is_user_logged_in() ) {
+		die(json_encode(array('error' => 'Log in first')));
+	}
+
+	if( !wp_verify_nonce( $_POST['_wpnonce'], 'user-meta' ) ) {
+		die(json_encode(array('error' => 'Invalid nonce')));
+	}
+
+	$meta_value = get_user_meta($user_id, $meta_key, $single);
+	die(json_encode(array('result' => $meta_value)));
+
+}
+
+add_action( 'wp_ajax_neuf_save_user_meta', 'neuf_save_user_meta' );
+add_action( 'wp_ajax_neuf_get_user_meta', 'neuf_get_user_meta' );
 ?>

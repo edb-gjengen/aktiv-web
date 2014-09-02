@@ -137,6 +137,40 @@ function load_initial_values() {
         do_search();
     }
 }
+function save_user_meta(key, value) {
+    console.log(key, value);
+    var url = $('meta[name=x-siteurl]').attr('content') + '/wp-admin/admin-ajax.php';
+    var params = {
+        action: 'neuf_save_user_meta',
+        meta_key: key,
+        meta_value: value,
+        unique: true,
+        user_id: $('meta[name=x-user-id]').attr('content'),
+        _wpnonce: $('meta[name=x-user-meta-nonce]').attr('content')
+    };
+    $.post(url, params, function() {
+        localStorage.setItem(key, value);
+    });
+ }
+ function get_user_meta(key, callback) {
+    // TODO you are here
+    try {
+        var value = localStorage.getItem(key);
+        callback({result:value});
+        return;
+    } catch(err) {
+        console.log('no '+ key);
+    }
+    var url = $('meta[name=x-siteurl]').attr('content') + '/wp-admin/admin-ajax.php';
+    var params = {
+        action: 'neuf_get_user_meta',
+        meta_key: key,
+        single: true,
+        user_id: $('meta[name=x-user-id]').attr('content'),
+        _wpnonce: $('meta[name=x-user-meta-nonce]').attr('content')
+    };
+    $.get(url, params, callback);
+ }
 
 jQuery(document).ready(function() {
     moment.lang('nb');
@@ -158,14 +192,18 @@ jQuery(document).ready(function() {
         var menu = $('#menu .user-menu');
         menu.toggleClass('visible');
     });
-
+    /* User intro dismiss and save */
     $('[data-toggle-introduction]').on('click', function() {
-        $(this).parent().fadeOut(600);
-        $.cookie('introduction-dismissed', '1');
+        //$(this).parent().fadeOut(600);
+        save_user_meta('introduction_dismissed', true);
     });
-    if( $.cookie('introduction-dismissed') !== '1' ) {
-        $('.introduction').show();
-        $('.introduction').addClass('fadein');
+    if( $('.introduction').length ) {
+        get_user_meta('introduction_dismissed', function(data) {
+            if(data.hasOwnProperty('result') && data.result !== 'true') {
+                $('.introduction').show();
+                $('.introduction').addClass('fadein');
+            }
+        });   
     }
 
     /* Program */
