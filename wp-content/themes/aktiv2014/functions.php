@@ -30,27 +30,35 @@ add_action( 'wp_enqueue_scripts' , 'neuf_enqueue_scripts' );
 
 /**
  * Force large uploaded images.
- *
  * Denies uploads of images smaller (in pixels) than given width and height values.
  */
 function neuf_handle_upload_prefilter( $file ) {
-	$width  = 640;
-	$height = 480;
+    /* Only check files with mime type 'image/*' */
+    $is_not_image = strpos($file['type'], 'image/') !== 0;
+    if( $is_not_image ) {
+        return $file;
+    }
+    $errors = array();
+    $minimum = array( 'width' => 640, 'height' => 480);
 
-	$img = getimagesize( $file['tmp_name'] );
-	$minimum = array( 'width' => $width , 'height' => $height );
-	$width = $img[0];
-	$height =$img[1];
+    $img = getimagesize( $file['tmp_name'] );
+    $width = $img[0];
+    $height = $img[1];
 
-	if ( $width < $minimum['width'] )
-		return array( "error" => "Image dimensions are too small. Minimum width is {$minimum['width']}px. Uploaded image width is $width px" );
 
-	elseif ($height <  $minimum['height'])
-		return array( "error" => "Image dimensions are too small. Minimum height is {$minimum['height']}px. Uploaded image width is $width px" );
-	else
-		return $file; 
+    if ( $width < $minimum['width'] ) {
+        $errors[] = "Minimum width is {$minimum['width']} px. Uploaded image wid th is $width px";
+    }
+    if ($height < $minimum['height']) {
+        $errors[] = "Minimum height is {$minimum['height']} px. Uploaded image h eight is $height px";
+    }
+
+    if( count($errors) > 0 ) {
+        return array( "error" => "Image dimensions are too small: ".implode(", " , $errors).".");
+    }
+
+    return $file;
 }
-// Commenting out for testing purposes
 add_filter( 'wp_handle_upload_prefilter' , 'neuf_handle_upload_prefilter' );
 
 /* Gets nicely the regular and member price nicely formated */
