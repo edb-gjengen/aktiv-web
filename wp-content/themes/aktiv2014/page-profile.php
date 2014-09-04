@@ -26,6 +26,12 @@ $user = wp_get_current_user();
         <h5>Passord</h5>
         <p>Endre passordet ditt via <a href="https://brukerinfo.neuf.no">Brukerinfo</a>.</p>
         <p></p>
+        <h5>Annet</h5>
+        <?php
+            $feedkey = get_usermeta($user->ID, 'feed_key');
+            $feedurl = get_bloginfo('url').'/feed/?feedkey='.$feedkey;
+        ?>
+        <a href="<?php echo $feedurl; ?>">Privat RSS-feed</a>
     </div>
 </div>
 <div class="account-details">
