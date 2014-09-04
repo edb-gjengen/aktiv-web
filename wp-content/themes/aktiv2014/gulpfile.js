@@ -3,7 +3,6 @@
 
 var gulp = require('gulp');
 
-
 // load plugins
 var $ = require('gulp-load-plugins')();
 var bowerFiles = require('main-bower-files');
