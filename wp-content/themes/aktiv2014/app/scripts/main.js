@@ -138,39 +138,55 @@ function load_initial_values() {
     }
 }
 function save_user_meta(key, value) {
-    console.log(key, value);
+    /* set localstorage first, then update database with usermeta key and value */
+    try {
+        localStorage.setItem(key, value);
+    } catch(err) { /* do nothing */ }
+
     var url = $('meta[name=x-siteurl]').attr('content') + '/wp-admin/admin-ajax.php';
     var params = {
         action: 'neuf_save_user_meta',
         meta_key: key,
         meta_value: value,
         unique: true,
-        user_id: $('meta[name=x-user-id]').attr('content'),
+        user_id: parseInt($('meta[name=x-user-id]').attr('content'), 10),
         _wpnonce: $('meta[name=x-user-meta-nonce]').attr('content')
     };
-    $.post(url, params, function() {
-        localStorage.setItem(key, value);
+
+    $.post(url, params, function(data) {
+        console.log(data);
     });
- }
- function get_user_meta(key, callback) {
-    // TODO you are here
+}
+
+function get_user_meta(key, callback) {
+    /* Check localstorage first, then database for usermeta key */
     try {
         var value = localStorage.getItem(key);
-        callback({result:value});
-        return;
-    } catch(err) {
-        console.log('no '+ key);
-    }
+        if(value !== null) {
+            callback({result:value});
+            return;
+        }
+    } catch(err) { /* Do nothing */ }
+
     var url = $('meta[name=x-siteurl]').attr('content') + '/wp-admin/admin-ajax.php';
     var params = {
         action: 'neuf_get_user_meta',
         meta_key: key,
         single: true,
-        user_id: $('meta[name=x-user-id]').attr('content'),
+        user_id: parseInt($('meta[name=x-user-id]').attr('content'), 10),
         _wpnonce: $('meta[name=x-user-meta-nonce]').attr('content')
     };
-    $.get(url, params, callback);
- }
+    $.getJSON(url, params, function(data) {
+        // Update localstorage if it's set
+        if(data.hasOwnProperty('result') && data.result !== '') {
+            try {
+                localStorage.setItem(key, data.result);
+            } catch(err) { /* do nothing */ }
+        }
+        // continue
+        callback(data);
+    });
+}
 
 jQuery(document).ready(function() {
     moment.lang('nb');
@@ -192,24 +208,25 @@ jQuery(document).ready(function() {
         var menu = $('#menu .user-menu');
         menu.toggleClass('visible');
     });
+
     /* User intro dismiss and save */
     $('[data-toggle-introduction]').on('click', function() {
-        //$(this).parent().fadeOut(600);
+        $(this).parent().fadeOut(600);
         save_user_meta('introduction_dismissed', true);
     });
-    if( $('.introduction').length ) {
+    if( $('.front-page .introduction').length ) {
         get_user_meta('introduction_dismissed', function(data) {
             if(data.hasOwnProperty('result') && data.result !== 'true') {
                 $('.introduction').show();
                 $('.introduction').addClass('fadein');
             }
-        });   
+        });
     }
 
-    /* Program */
+    /* Program page */
     var program_entrypoint = '.program-list';
     if( $(program_entrypoint).length ) {
-        /* */
+        /* Load program */
         $.getJSON(
             program_endpoint+'?callback=?',
             query_params,
@@ -222,7 +239,6 @@ jQuery(document).ready(function() {
             }
         );
     }
-
 
     /* Search page */
     if( $('.search-form').length ) {

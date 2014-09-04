@@ -414,13 +414,13 @@ add_filter( 'excerpt_more', 'neuf_excerpt_more' );
 function neuf_save_user_meta() {
 	global $wpdb;
 
-	$user_id = (int) $_POST['user_id']; // TODO: sanitize
+	$user_id = (int) $_POST['user_id'];
 	$meta_key = $_POST['meta_key']; // TODO: sanitize
 	$meta_value = $_POST['meta_value']; // TODO: sanitize
 	$unique = (bool) $_POST['unique'];
 
 	if( !get_userdata($user_id) ) {
-		die(json_encode(array('error' => 'Invalid user_id'.$_POST['user_id'])));
+		die(json_encode(array('error' => 'Invalid user_id: \''. $_POST['user_id'] .'\'')));
 	}
 	if( !is_user_logged_in() ) {
 		die(json_encode(array('error' => 'Log in first')));
@@ -443,18 +443,18 @@ function neuf_save_user_meta() {
 function neuf_get_user_meta() {
 	global $wpdb;
 
-	$user_id = (int) $_POST['user_id']; // TODO: sanitize
-	$meta_key = $_POST['meta_key']; // TODO: sanitize
-	$single = (bool) $_POST['single']; // TODO: sanitize
+	$user_id = (int) $_GET['user_id'];
+	$meta_key = $_GET['meta_key']; // TODO: sanitize
+	$single = (bool) $_GET['single'];
 
 	if( !get_userdata($user_id) ) {
-		die(json_encode(array('error' => 'Invalid user_id'.$_POST['user_id'])));
+		die(json_encode(array('error' => 'Invalid user_id: \''. $_GET['user_id'] .'\'')));
 	}
 	if( !is_user_logged_in() ) {
 		die(json_encode(array('error' => 'Log in first')));
 	}
 
-	if( !wp_verify_nonce( $_POST['_wpnonce'], 'user-meta' ) ) {
+	if( !wp_verify_nonce( $_GET['_wpnonce'], 'user-meta' ) ) {
 		die(json_encode(array('error' => 'Invalid nonce')));
 	}
 

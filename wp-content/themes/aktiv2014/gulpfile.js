@@ -6,30 +6,16 @@ var gulp = require('gulp');
 
 // load plugins
 var $ = require('gulp-load-plugins')();
-var gutil = require('gulp-util');
 var bowerFiles = require('main-bower-files');
-
-var onError = function (err) {
-    gutil.beep();
-    gutil.log( gutil.colors.red(err));
-};
-
-//gulp.task('components', function() {
-//    return gulp.src(['app/bower_components/chosen-bower/chosen.css'])
-//        .pipe($.rename('_chosen.scss'))
-//        .pipe(gulp.dest('app/styles'));
-//});
 
 gulp.task('styles', function () {
     return gulp.src('app/styles/main.scss')
-        //.pipe($.plumber(onError))
         .pipe($.sass({
             includePaths: ['app/bower_components/foundation/scss'],
-            errLogToConsole: true,
-            sourceComments: 'map'
+            errLogToConsole: true
+//            sourceComments: 'map' // TODO does not work yet
         }))
-        //.pipe($.autoprefixer('last 1 version'))
-        .pipe($.plumber.stop())
+        .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest('dist/styles'))
         .pipe($.size());
 });
