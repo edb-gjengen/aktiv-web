@@ -153,9 +153,7 @@ function save_user_meta(key, value) {
         _wpnonce: $('meta[name=x-user-meta-nonce]').attr('content')
     };
 
-    $.post(url, params, function(data) {
-        console.log(data);
-    });
+    $.post(url, params);
 }
 
 function get_user_meta(key, callback) {
@@ -294,7 +292,6 @@ jQuery(document).ready(function() {
             function(data) {
                 if( data.hasOwnProperty('results') && data.results.length === 1) {
                     var u = data.results[0];
-                    console.log(u);
                     var group_html = '';
                     for(var i=0;i<u.groups.length; i++) {
                         group_html += '<li>' + u.groups[i].name + '</li>';

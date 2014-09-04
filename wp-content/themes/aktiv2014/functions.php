@@ -439,6 +439,8 @@ function neuf_save_user_meta() {
 		die(json_encode(array('result' => 'User meta updated.')));
 	}
 }
+add_action( 'wp_ajax_neuf_save_user_meta', 'neuf_save_user_meta' );
+
 /* Save user meta options */
 function neuf_get_user_meta() {
 	global $wpdb;
@@ -462,7 +464,15 @@ function neuf_get_user_meta() {
 	die(json_encode(array('result' => $meta_value)));
 
 }
-
-add_action( 'wp_ajax_neuf_save_user_meta', 'neuf_save_user_meta' );
 add_action( 'wp_ajax_neuf_get_user_meta', 'neuf_get_user_meta' );
+
+function neuf_rsa_feed_override( $is_restricted ) {
+    global $wp;
+    // check query variables to see if this is the feed
+    if ( ! empty( $wp->query_vars['feed'] ) )
+        $is_restricted = false;
+
+    return $is_restricted;
+}
+add_filter( 'restricted_site_access_is_restricted', 'neuf_rsa_feed_override' );
 ?>
