@@ -12,7 +12,7 @@
 
     <meta name="x-siteurl" content="<?php echo get_option('siteurl'); ?>" />
     <?php neuf_doctitle(); ?>
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="icon" type="image/png" href="favicon.ico" />
     <link rel="alternate" type="application/rss+xml" href="<?php bloginfo('url'); ?>/feed/" title="Aktiv-nyheter" />
 
     <link href="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/styles/main.css" rel="stylesheet" type="text/css" />
