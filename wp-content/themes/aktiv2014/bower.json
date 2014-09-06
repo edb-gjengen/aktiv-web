@@ -4,9 +4,9 @@
   "dependencies": {
     "modernizr": "~2.8.3",
     "jquery": ">=2.1.0",
-    "foundation": "~5.3.0",
-    "moment": "~2.7.0",
-    "underscore": "~1.6.0",
+    "foundation": "~5.4.3",
+    "moment": "~2.8.3",
+    "underscore": "~1.7.0",
     "chosen-bower": "~1.1.0",
     "history.js": "~1.8.0"
   },

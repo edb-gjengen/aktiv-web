@@ -11,10 +11,10 @@ gulp.task('styles', function () {
     return gulp.src('app/styles/main.scss')
         .pipe($.sass({
             includePaths: ['app/bower_components/foundation/scss'],
-            errLogToConsole: true
-//            sourceComments: 'map' // TODO does not work yet
+            errLogToConsole: true,
+            sourceComments: 'map' // TODO does not work yet
         }))
-        .pipe($.autoprefixer('last 1 version'))
+//        .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest('dist/styles'))
         .pipe($.size());
 });
@@ -32,7 +32,6 @@ gulp.task('diststyles', function () {
 
 gulp.task('vendorscripts', function () {
     var wiredep = require('wiredep')();
-    
     return gulp.src(wiredep.js)
         .pipe($.concat('vendor.js'))
         .pipe(gulp.dest('dist/scripts'))

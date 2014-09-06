@@ -457,6 +457,100 @@ input[type=submit]{
     }
 }
 
+/* Mailinglists page */
+.page-mailinglists {
+    .page-title {
+        @include grid-column(12);
+    }
+    .sort-by {
+        @include grid-column(12);
+    }
+    .lists-list-wrap {
+        @include grid-column(12);
+    }
+    .list-members-wrap {
+        @include grid-column(12);
+        font-size: rem-calc(16);
+    }
+    .toptoptop{
+        @include grid-column(12);
+        margin-top: rem-calc(18);
+    }
+
+    @media #{$large-up} {
+        .lists-list-wrap {
+            @include grid-column(6);
+        }
+        .list-members-wrap {
+            @include grid-column(6);
+        }
+        .list-members-button {
+            display: none;
+        }
+    }
+
+    .lists-list {
+        ul {
+            list-style: none;
+            margin: 0;
+        }
+        li {
+            list-style: none;
+            padding: 10px;
+            display: block;
+            position: relative;
+            line-height: 1.15;
+            &:nth-child(odd) {
+                background-color: #eee;
+            }
+        }
+
+        .button-alt {
+            color: #666;
+            background-color: transparent;
+            &:hover {
+                background-color: #ccc;
+            }
+        }
+    }
+    .list-members {
+        ul {
+            list-style: none;
+            margin: 0;
+        }
+        li {
+            list-style: none;
+            &:nth-child(odd) {
+                background-color: #eee;
+            }
+            a {
+                padding: 8px 10px;
+                display: block;
+                position: relative;
+
+            }
+        }
+    }
+    .list-num-members {
+        font-size: rem-calc(14);
+        color: #666;
+    }
+    .email-aliases,
+    .email-mailman {
+        position: absolute;
+        right: 16px;
+        top: 8px;
+        .dashicons {
+            font-size: rem-calc(18);
+            vertical-align: baseline;
+            position: relative;
+            top: 4px;
+            left: -3px;
+        }
+    }
+
+}
+
 /* Sidebar */
 .sidebar {
     @include grid-column(12, $collapse:true);
