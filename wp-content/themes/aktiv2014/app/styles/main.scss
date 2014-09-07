@@ -1,5 +1,6 @@
 @import 'normalize';
 @import 'chosen';
+@import 'mixins';
 
 /* Colors */
 $body-bg: #fafafa;
@@ -435,6 +436,7 @@ input[type=submit]{
     .profile-details,
     .account-details {
         @include grid-column(12);
+        margin-bottom: rem-calc(16);
 
         @media #{$large-up} {
             @include grid-column(6);
@@ -485,12 +487,30 @@ input[type=submit]{
             display: none;
         }
     }
+    .list-manipulation {
+        padding-top: rem-calc(10);
+        @include clearfix();
 
-    .lists-list {
+        .button-alt {
+            margin-bottom: rem-calc(8);
+        }
+        .sort-buttons {
+            @include grid-column(6);
+        }
+        .search-field {
+            @include grid-column(6);
+        }
+    }
+    .lists-list-wrap {
+        #mailinglists {
+            @include card($padding: 0);
+        }
+        margin-bottom: rem-calc(18);
         ul {
             list-style: none;
             margin: 0;
             padding: 0;
+
         }
         li {
             list-style: none;
@@ -498,33 +518,50 @@ input[type=submit]{
             display: block;
             position: relative;
             line-height: 1.15;
-            &:nth-child(odd) {
-                background-color: #f4f4f4;
+            border-bottom: 1px solid #eee;
+            border-left: 4px solid transparent;
+
+            &:last-child {
+                border-bottom: transparent;
+            }
+            &.selected {
+                border-left: 4px solid $secondary-color;
+            }
+
+            .button-alt {
+                color: #666;
+                background-color: transparent;
+                &:hover {
+                    background-color: #eee;
+                }
             }
         }
 
-        .button-alt {
-            color: #666;
-            background-color: transparent;
-            &:hover {
-                background-color: #ccc;
-            }
-        }
     }
     .list-members {
+        .list-members-title{
+            line-height: 1.15;
+            display: inline-block;
+            margin-right: rem-calc(4);
+
+        }
         ul {
             list-style: none;
             margin: 0;
-            @extend .card;
+            @include card($padding: 0);
         }
         li {
             list-style: none;
+            font-size: rem-calc(14);
             a {
                 padding: 8px 10px;
                 display: block;
                 position: relative;
-                border-bottom: 1px solid #eee
+                border-bottom: 1px solid #eee;
 
+            }
+            &:last-child a {
+                border-bottom: transparent;
             }
         }
     }

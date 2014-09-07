@@ -1,5 +1,5 @@
 'use strict';
-/*global moment, jQuery, document, _, $, window */
+/*global moment, jQuery, document, _, $, window, List */
 var program_endpoint = 'https://studentersamfundet.no/api/events/get_today/';
 var inside_url = 'https://inside.studentersamfundet.no';
 var inside_groups_url = inside_url + '/api/groups.php';
@@ -194,12 +194,15 @@ function mailinglist_show(q) {
             _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
         },
         function(data) {
-            var list = '<h5>Medlemmer på ' + data.meta.list +'</h5><ul id="members-result"><% _.each(members, function(m) { %>' +
+            var list = '<h5 class="list-members-title">Medlemmer på ' + data.meta.list +'</h5><span class="list-num-members"><%= members.length %> stk</span><ul id="members-result"><% _.each(members, function(m) { %>' +
                 '<li><a href="mailto:<%= m %>"><span class="dashicons dashicons-email"></span> <%= m %></a></li>' +
                 '<% }); %></ul>';
             var html = _.template(list, data);
             $('.list-members').html(html);
             $('.lists-list-wrap .meta').html('<a href="#members-result" class="button radius list-members-button">Vis medlemmer på '+ data.meta.list +'</a>');
+
+            /* Highlight selected list */
+            $('[data-list-name=\''+q+'\']').addClass('selected');
         }
     );
 }
@@ -302,10 +305,9 @@ jQuery(document).ready(function() {
 
     /* Mailinglists page */
     if( $('.page-mailinglists').length ) {
-        // TODO:
-        //  - selected mailinglist logic and highlight
-        //  - better mobile layout
-        //  - sorting by list size
+        // TODO: better mobile layout
+        // TODO: dynamic show/hide of members
+
         /* Load list of lists*/
         $.getJSON(
             email_endpoint,
@@ -314,19 +316,24 @@ jQuery(document).ready(function() {
                 _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
             },
             function(data) {
-                // TODO, dynamic show/hide of members
-                var list = '<h5>Viser '+ data.meta.num +' epostlister:</h5><ul><% _.each(lists, function(l) { %>' +
-                    '<li><a href="'+ window.location.pathname + '?q=<%= l.name %>"><%= l.name %></a><br>' +
+                var list = '<% _.each(lists, function(l) { %>' +
+                    '<li data-list-name="<%= l.name %>"><a href="'+ window.location.pathname + '?q=<%= l.name %>" class="list-name"><%= l.name %></a><br>' +
                     '<span class="list-num-members"><%= l.num %> medlemmer</span>'+
                     '<a href="<%= l.admin_url %>" class="email-<%= l.type %> button-alt" title="<%= l.type %>"> '+
                     '<span class="dashicons dashicons-<% if( l.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"> </span>Endre'+
                     '</a></li>' +
-                    '<% }); %></ul>';
+                    '<% }); %>';
                 var html = _.template(list, data);
                 $('.lists-list').html(html);
+
+                /* Index list and make searchable and sortable */
+                var options = {
+                    valueNames: [ 'list-name', 'list-num-members' ]
+                };
+                new List('mailinglists', options);
+                mailinglists_load_initial();
             }
         );
-        mailinglists_load_initial();
     }
 
     /* Profile page */
