@@ -345,6 +345,9 @@ jQuery(document).ready(function() {
             exact: true,
             _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
         };
+        if(getParameterByName('username') !== '') {
+            params.q = getParameterByName('username');
+        }
 
         $.getJSON(
             user_search_endpoint,
@@ -363,6 +366,8 @@ jQuery(document).ready(function() {
                     } else {
                         is_member_field.html('Du har ikke et gyldig medlemskap. Du kan forny medlemskapet ditt via SMS, via <a href="http://snappordel.com">SnappOrder</a> eller via nettbutikken i <a href="https://inside.studentersamfundet.no">Inside</a>.');
                     }
+                    // if other profile, add link to profile
+                    $('.js-inside-link').attr('href', 'https://inside.studentersamfundet.no/?page=display-user&userid='+u.id);
                 }
             }
         );
