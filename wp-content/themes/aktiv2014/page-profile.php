@@ -2,13 +2,27 @@
 /*
  * Template Name: User profile
  */
+$user = null;
+$logged_in_user = true;
+if( isset($_GET['username']) && get_user_by( 'user_login', $_GET['username']) ) {
+    $user = get_user_by('user_login', $_GET['username']);
+    $logged_in_user = false;
+}
+if( !isset($_GET['username']) ) {
+    $user = wp_get_current_user();
+
+}
+if($user === null) {
+    header("HTTP/1.0 404 Not Found - Archive Empty");
+    require TEMPLATEPATH.'/404.php';
+    exit;
+}
 get_header();
-$user = wp_get_current_user();
 
 ?>
 <div class="container profile">
 
-<h1 class="page-title">Min aktivprofil</h1>
+<h1 class="page-title"><?php echo $logged_in_user ? "Min": $user->display_name." sin" ;?> aktivprofil</h1>
 
 <div class="profile-details">
     <div class="inner">

@@ -5,6 +5,7 @@ var inside_url = 'https://inside.studentersamfundet.no';
 var inside_groups_url = inside_url + '/api/groups.php';
 var user_search_endpoint = '/inside-api/';
 var email_endpoint = '/email-api/';
+var user_profile_url = '/profil/';
 var query_params = {
     //meta_key: '_neuf_events_starttime',
     //meta_value: moment().add('days', 1).format('X'),
@@ -55,7 +56,7 @@ function format_results(data) {
 
     var list = '<tbody><% _.each(results, function(u) { %>' +
         '<tr>' +
-        '<td><a href="'+ inside_url +'/?page=display-user&userid=<%= u.id %>"><%= u.firstname %> <%= u.lastname %></a></td>' +
+        '<td><a href="'+ user_profile_url +'?username=<%= u.username %>"><%= u.firstname %> <%= u.lastname %></a></td>' +
         '<td><%= u.username %></td>' +
         '<td><a href="mailto:<%= u.email %>"><%= u.email %></a></td>' +
         '<td><a href="tlf:<%= u.number %>"><%= u.number %></a></td>' +
