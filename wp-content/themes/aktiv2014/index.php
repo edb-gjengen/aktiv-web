@@ -37,7 +37,7 @@
     <?php endif; ?>
 
     <?php if( is_single() ): ?>
-        <?php comments_template(); ?>
+        <div class="entry-comments"><?php comments_template(); ?></div>
     <?php elseif( !is_page() ): ?>
         <div class="actions-container">
             <a class="button radius read-more" href="<?php echo get_permalink( get_the_ID() ); ?>">Les hele innlegget</a>
