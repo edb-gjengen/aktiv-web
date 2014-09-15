@@ -32,7 +32,7 @@ get_header();
             <li><strong>Medlemskapsstatus</strong>: <span class="is-member"></span></li>
             <li><strong>Rolle på aktiv.neuf.no</strong>: <?php echo $user->roles[0]; ?></li>
         </ul>
-        <?php if(!$logged_in_user ): ?>
+        <?php if($logged_in_user ): ?>
             <p>
                 <em>Endre navn, epost, med mer via <a href="https://inside.studentersamfundet.no">Inside</a></em>.
             </p>
