@@ -461,6 +461,8 @@ input[type=submit]{
 
 /* Mailinglists page */
 .page-mailinglists {
+    margin-top: rem-calc(18);
+
     .page-title,
     .search-about,
     .lists-list-wrap,
