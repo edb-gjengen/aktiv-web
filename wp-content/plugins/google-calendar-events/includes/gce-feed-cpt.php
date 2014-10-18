@@ -140,12 +140,8 @@ function gce_save_meta( $post_id ) {
 	// An array to hold all of our post meta ids so we can run them through a loop
 	$post_meta_fields = array(
 		'gce_feed_url',
-		'gce_retrieve_from',
-		'gce_retrieve_until',
-		'gce_retrieve_max',
 		'gce_date_format',
 		'gce_time_format',
-		'gce_timezone_offset',
 		'gce_cache',
 		'gce_multi_day_events',
 		'gce_display_mode',
@@ -153,6 +149,15 @@ function gce_save_meta( $post_id ) {
 		'gce_custom_until',
 		'gce_search_query',
 		'gce_expand_recurring',
+		'gce_paging',
+		'gce_list_max_num',
+		'gce_list_max_length',
+		'gce_list_start_offset_num',
+		'gce_list_start_offset_direction',
+		'gce_feed_start',
+		'gce_feed_start_interval',
+		'gce_feed_end',
+		'gce_feed_end_interval',
 		// Display options
 		'gce_display_start',
 		'gce_display_start_text',
@@ -182,12 +187,7 @@ function gce_save_meta( $post_id ) {
 					update_post_meta( $post_id, $pmf, stripslashes( $_POST[$pmf] ) );
 				}
 			} else {
-				// We want max to be set to 25 by default if nothing is entered
-				if( $pmf == 'gce_retrieve_max' ) {
-					update_post_meta( $post_id, $pmf, 25 );
-				} else {
-					delete_post_meta( $post_id, $pmf );
-				}
+				delete_post_meta( $post_id, $pmf );
 			}
 		}
 	}
@@ -206,10 +206,9 @@ function gce_add_column_headers( $defaults ) {
 		
 	$new_columns = array( 
 		'cb'           => $defaults['cb'],
-		'feed-id'      => 'Feed ID',
-		'feed-sc'      => 'Feed Shortcode',
-		'max-events'   => 'Max Events',
-		'display-type' => 'Display Type'
+		'feed-id'      => __( 'Feed ID', 'gce' ),
+		'feed-sc'      => __( 'Feed Shortcode', 'gce' ),
+		'display-type' => __( 'Display Type', 'gce' )
 	);
 
 	return array_merge( $defaults, $new_columns );
@@ -232,19 +231,15 @@ function gce_column_content( $column_name, $post_ID ) {
 		case 'feed-sc':
 			echo '<code>[gcal id="' . $post_ID . '"]</code>';
 			break;
-		case 'max-events':
-			$max = get_post_meta( $post_ID, 'gce_retrieve_max', true );
-			echo $max;
-			break;
 		case 'display-type':
 			$display = get_post_meta( $post_ID, 'gce_display_mode', true );
 			
 			if( $display == 'grid' ) {
-				echo 'Grid';
+				echo __( 'Grid', 'gce' );
 			} else if( $display == 'list' ) {
-				echo 'List';
+				echo __( 'List', 'gce' );
 			} else { 
-				echo 'Grouped List';
+				echo __( 'Grouped List', 'gce' );
 			}
 			break;
 	}
@@ -258,7 +253,7 @@ add_action( 'manage_gce_feed_posts_custom_column', 'gce_column_content', 10, 2 )
  */
 function gce_cpt_actions( $actions, $post ) {
 	if( $post->post_type == 'gce_feed' ) {
-		$actions['clear_cache'] = '<a href="' . add_query_arg( array( 'clear_cache' => $post->ID ) ). '">Clear Cache</a>';
+		$actions['clear_cache'] = '<a href="' . add_query_arg( array( 'clear_cache' => $post->ID ) ). '">' . __( 'Clear Cache', 'gce' ) . '</a>';
 	}
 	
 	return $actions;
