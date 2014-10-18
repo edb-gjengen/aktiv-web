@@ -13,7 +13,7 @@
     <meta name="x-siteurl" content="<?php echo get_option('siteurl'); ?>" />
     <?php neuf_doctitle(); ?>
     <link rel="icon" type="image/png" href="favicon.ico" />
-    <link rel="alternate" type="application/rss+xml" href="<?php bloginfo('url'); ?>/feed/" title="Aktiv-nyheter" />
+    <link rel="alternate" type="application/rss+xml" href="<?php echo get_feed_url(); ?>" title="aktiv.neuf.no - Nyheter" />
 
     <link href="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/styles/main.css" rel="stylesheet" type="text/css" />
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,700,800,600' rel='stylesheet' type='text/css'>

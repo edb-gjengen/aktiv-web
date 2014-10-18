@@ -42,11 +42,7 @@ get_header();
             <p>Endre passordet ditt via <a href="https://brukerinfo.neuf.no">Brukerinfo</a>.</p>
             <p></p>
             <h5>Annet</h5>
-            <?php
-                $feedkey = get_usermeta($user->ID, 'feed_key');
-                $feedurl = get_bloginfo('url').'/feed/?feedkey='.$feedkey;
-            ?>
-            <a href="<?php echo $feedurl; ?>">Privat RSS-feed</a>
+            <a href="<?php echo get_feed_url(); ?>">RSS-strøm - Nyheter</a>
         <?php else: ?>
             <a href="#" class="button radius js-inside-link">Vis i Inside</a>
         <?php endif; ?>
