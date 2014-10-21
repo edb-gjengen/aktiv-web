@@ -13,7 +13,7 @@
     <meta name="x-siteurl" content="<?php echo get_option('siteurl'); ?>" />
     <?php neuf_doctitle(); ?>
     <link rel="icon" type="image/png" href="favicon.ico" />
-    <link rel="alternate" type="application/rss+xml" href="<?php bloginfo('url'); ?>/feed/" title="Aktiv-nyheter" />
+    <link rel="alternate" type="application/rss+xml" href="<?php echo get_feed_url(); ?>" title="aktiv.neuf.no - Nyheter" />
 
     <link href="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/styles/main.css" rel="stylesheet" type="text/css" />
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,700,800,600' rel='stylesheet' type='text/css'>
@@ -28,14 +28,16 @@
 </head>
 
 <body <?php neuf_body_class(); ?>>
-    <script>(function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/nb_NO/all.js#xfbml=1&appId=220213643760";
-        fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));</script>
-    <div id="fb-root"></div>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-52914-18', 'auto');
+  ga('send', 'pageview');
+
+    </script>
     <header id="site-header">
         <div id="header-container">
             <div class="site-title">

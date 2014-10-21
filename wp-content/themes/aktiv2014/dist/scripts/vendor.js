@@ -11840,7 +11840,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         }
       });
     }
-    // # Patch to fix #5043 to move this *after* the if/else clause in order for Backbone and similar frameworks to have improved control over event binding and data-options updating. 
+    // # Patch to fix #5043 to move this *after* the if/else clause in order for Backbone and similar frameworks to have improved control over event binding and data-options updating.
     if (typeof method === 'string') {
       return this[method].call(this, options);
     }
@@ -12002,7 +12002,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   window.Foundation = {
     name : 'Foundation',
 
-    version : '5.3.1',
+    version : '5.4.2',
 
     media_queries : {
       small : S('.foundation-mq-small').css('font-family').replace(/^[\/\\'"]+|(;\s?})+|[\/\\'"]+$/g, ''),
@@ -12039,6 +12039,18 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           responses.push(this.init_lib(lib, libraries));
         }
       }
+
+      S(window).load(function(){
+        S(window)
+          .trigger('resize.fndtn.clearing')
+          .trigger('resize.fndtn.dropdown')
+          .trigger('resize.fndtn.equalizer')
+          .trigger('resize.fndtn.interchange')
+          .trigger('resize.fndtn.joyride')
+          .trigger('resize.fndtn.magellan')
+          .trigger('resize.fndtn.topbar')
+          .trigger('resize.fndtn.slider');
+      });
 
       return scope;
     },
@@ -12342,7 +12354,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.abide = {
     name : 'abide',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       live_validate : true,
@@ -12518,17 +12530,17 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           parent = direct_parent.parent();
         }
 
+        if (validator) {
+          valid = this.settings.validators[validator].apply(this, [el, required, parent]);
+          validations.push(valid);
+        }
+
         if (is_radio && required) {
           validations.push(this.valid_radio(el, required));
         } else if (is_checkbox && required) {
           validations.push(this.valid_checkbox(el, required));
         } else {
           
-          if (validator) {
-            valid = this.settings.validators[validator].apply(this, [el, required, parent]);
-            validations.push(valid);
-          }
-
           if (el_patterns[i][1].test(value) && valid_length ||
             !required && el.value.length < 1 || $(el).attr('disabled')) {
             validations.push(true);
@@ -12540,13 +12552,27 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
           if(validations[0]){
             this.S(el).removeAttr(this.invalid_attr);
+            el.setAttribute('aria-invalid', 'false');
+            el.removeAttribute('aria-describedby');
             parent.removeClass('error');
-            if (label.length > 0 && this.settings.error_labels) label.removeClass('error');
+            if (label.length > 0 && this.settings.error_labels) {
+              label.removeClass('error').removeAttr('role');
+            }
             $(el).triggerHandler('valid');
           } else {
-            parent.addClass('error');
             this.S(el).attr(this.invalid_attr, '');
-            if (label.length > 0 && this.settings.error_labels) label.addClass('error');
+            el.setAttribute('aria-invalid', 'true');
+
+            // Try to find the error associated with the input
+            var errorElem = parent.find('small.error, span.error');
+            var errorID = errorElem.length > 0 ? errorElem[0].id : "";
+            if (errorID.length > 0) el.setAttribute('aria-describedby', errorID);
+
+            // el.setAttribute('aria-describedby', $(el).find('.error')[0].id);
+            parent.addClass('error');
+            if (label.length > 0 && this.settings.error_labels) {
+              label.addClass('error').attr('role', 'alert');
+            }
             $(el).triggerHandler('invalid');
           }
 
@@ -12637,7 +12663,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.accordion = {
     name : 'accordion',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       active_class: 'active',
@@ -12703,7 +12729,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.alert = {
     name : 'alert',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       callback: function (){}
@@ -12717,7 +12743,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       var self = this,
           S = this.S;
 
-      $(this.scope).off('.alert').on('click.fndtn.alert', '[' + this.attr_name() + '] a.close', function (e) {
+      $(this.scope).off('.alert').on('click.fndtn.alert', '[' + this.attr_name() + '] .close', function (e) {
           var alertBox = S(this).closest('[' + self.attr_name() + ']'),
               settings = alertBox.data(self.attr_name(true) + '-init') || self.settings;
 
@@ -12747,7 +12773,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.clearing = {
     name : 'clearing',
 
-    version: '5.3.3',
+    version: '5.4.2',
 
     settings : {
       templates : {
@@ -13306,7 +13332,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.dropdown = {
     name : 'dropdown',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       active_class: 'open',
@@ -13405,9 +13431,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     close: function (dropdown) {
       var self = this;
       dropdown.each(function () {
+        var original_target = $('[' + self.attr_name() + '=' + dropdown[0].id + ']') || $('aria-controls=' + dropdown[0].id+ ']');
+        original_target.attr('aria-expanded', "false");
         if (self.S(this).hasClass(self.settings.active_class)) {
           self.S(this)
             .css(Foundation.rtl ? 'right':'left', '-99999px')
+            .attr('aria-hidden', "true")
             .removeClass(self.settings.active_class)
             .prev('[' + self.attr_name() + ']')
             .removeClass(self.settings.active_class)
@@ -13431,6 +13460,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             .addClass(this.settings.active_class), target);
         dropdown.prev('[' + this.attr_name() + ']').addClass(this.settings.active_class);
         dropdown.data('target', target.get(0)).trigger('opened').trigger('opened.fndtn.dropdown', [dropdown, target]);
+        dropdown.attr('aria-hidden', 'false');
+        target.attr('aria-expanded', 'true')
+        dropdown.focus();
     },
 
     data_attr: function () {
@@ -13620,7 +13652,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.equalizer = {
     name : 'equalizer',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       use_tallest: true,
@@ -13695,7 +13727,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.interchange = {
     name : 'interchange',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     cache : {},
 
@@ -14042,11 +14074,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.joyride = {
     name : 'joyride',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     defaults : {
       expose                   : false,     // turn on or off the expose feature
       modal                    : true,      // Whether to cover page with modal during the tour
+      keyboard                 : true,      // enable left, right and esc keystrokes
       tip_location             : 'bottom',  // 'top' or 'bottom' in relation to parent
       nub_position             : 'auto',    // override on a per tooltip bases
       scroll_speed             : 1500,      // Page scrolling speed in milliseconds, 0 = no scroll animation
@@ -14099,6 +14132,34 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       this.bindings(method, options)
     },
 
+    go_next : function() {
+      if (this.settings.$li.next().length < 1) {
+        this.end();
+      } else if (this.settings.timer > 0) {
+        clearTimeout(this.settings.automate);
+        this.hide();
+        this.show();
+        this.startTimer();
+      } else {
+        this.hide();
+        this.show();
+      }
+    },
+
+    go_prev : function() {
+      if (this.settings.$li.prev().length < 1) {
+        // Do nothing if there are no prev element
+      } else if (this.settings.timer > 0) {
+        clearTimeout(this.settings.automate);
+        this.hide();
+        this.show(null, true);
+        this.startTimer();
+      } else {
+        this.hide();
+        this.show(null, true);
+      }
+    },
+
     events : function () {
       var self = this;
 
@@ -14106,46 +14167,40 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         .off('.joyride')
         .on('click.fndtn.joyride', '.joyride-next-tip, .joyride-modal-bg', function (e) {
           e.preventDefault();
-
-          if (this.settings.$li.next().length < 1) {
-            this.end();
-          } else if (this.settings.timer > 0) {
-            clearTimeout(this.settings.automate);
-            this.hide();
-            this.show();
-            this.startTimer();
-          } else {
-            this.hide();
-            this.show();
-          }
-
+          this.go_next()
         }.bind(this))
         .on('click.fndtn.joyride', '.joyride-prev-tip', function (e) {
           e.preventDefault();
-
-          if (this.settings.$li.prev().length < 1) {
-            // Do nothing if there are no prev element
-          } else if (this.settings.timer > 0) {
-            clearTimeout(this.settings.automate);
-            this.hide();
-            this.show(null, true);
-            this.startTimer();
-          } else {
-            this.hide();
-            this.show(null, true);
-          }
-
+          this.go_prev();
         }.bind(this))
 
         .on('click.fndtn.joyride', '.joyride-close-tip', function (e) {
           e.preventDefault();
           this.end(this.settings.abort_on_close);
+        }.bind(this))
+
+        .on("keyup.joyride", function(e) {
+          if (!this.settings.keyboard) return;
+
+          switch (e.which) {
+            case 39: // right arrow
+              e.preventDefault();
+              this.go_next();
+              break;
+            case 37: // left arrow
+              e.preventDefault();
+              this.go_prev();
+              break;
+            case 27: // escape
+              e.preventDefault();
+              this.end(this.settings.abort_on_close);
+          }
         }.bind(this));
 
       $(window)
         .off('.joyride')
         .on('resize.fndtn.joyride', self.throttle(function () {
-          if ($('[' + self.attr_name() + ']').length > 0 && self.settings.$next_tip) {
+          if ($('[' + self.attr_name() + ']').length > 0 && self.settings.$next_tip && self.settings.riding) {
             if (self.settings.exposed.length > 0) {
               var $els = $(self.settings.exposed);
 
@@ -14184,6 +14239,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       this.settings.$tip_content = this.settings.$content_el.find('> li');
       this.settings.paused = false;
       this.settings.attempts = 0;
+      this.settings.riding = true;
 
       // can we create cookies?
       if (typeof $.cookie !== 'function') {
@@ -14896,7 +14952,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         this.un_expose();
       }
 
+      // Unplug keystrokes listener
+      $(this.scope).off('keyup.joyride')
+
       this.settings.$next_tip.data('closed', true);
+      this.settings.riding = false;
 
       $('.joyride-modal-bg').hide();
       this.settings.$current_tip.hide();
@@ -14928,7 +14988,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs['magellan-expedition'] = {
     name : 'magellan-expedition',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       active_class: 'active',
@@ -15035,7 +15095,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             placeholder.attr(self.add_namespace('data-magellan-expedition-clone'),'');
             expedition.before(placeholder);
           }
-          expedition.css({position:'fixed', top: settings.fixed_top});
+          expedition.css({position:'fixed', top: settings.fixed_top}).addClass('fixed');
         } else {
           expedition.prev('[' + self.add_namespace('data-magellan-expedition-clone') + ']').remove();
           expedition.attr('style',styles).css('position','').css('top','').removeClass('fixed');
@@ -15118,7 +15178,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.offcanvas = {
     name : 'offcanvas',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       open_method: 'move',
@@ -15140,6 +15200,10 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         move_class = 'move-';
         right_postfix = 'right';
         left_postfix = 'left';
+      } else if (this.settings.open_method === 'overlap_single') {
+        move_class = 'offcanvas-overlap-';
+        right_postfix = 'right';
+        left_postfix = 'left';
       } else if (this.settings.open_method === 'overlap') {
         move_class = 'offcanvas-overlap';
       }
@@ -15147,27 +15211,67 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       S(this.scope).off('.offcanvas')
         .on('click.fndtn.offcanvas', '.left-off-canvas-toggle', function (e) {
           self.click_toggle_class(e, move_class + right_postfix);
+          if (self.settings.open_method !== 'overlap'){
+            S(".left-submenu").removeClass(move_class + right_postfix);
+          }
+          $('.left-off-canvas-toggle').attr('aria-expanded', 'true');
         })
         .on('click.fndtn.offcanvas', '.left-off-canvas-menu a', function (e) {
           var settings = self.get_settings(e);
-          if (settings.close_on_click) {
+          var parent = S(this).parent();
+
+          if(settings.close_on_click && !parent.hasClass("has-submenu") && !parent.hasClass("back")){
             self.hide.call(self, move_class + right_postfix, self.get_wrapper(e));
+            parent.parent().removeClass(move_class + right_postfix);
+          }else if(S(this).parent().hasClass("has-submenu")){
+            e.preventDefault();
+            S(this).siblings(".left-submenu").toggleClass(move_class + right_postfix);
+          }else if(parent.hasClass("back")){
+            e.preventDefault();
+            parent.parent().removeClass(move_class + right_postfix);
           }
+          $('.left-off-canvas-toggle').attr('aria-expanded', 'true');
         })
         .on('click.fndtn.offcanvas', '.right-off-canvas-toggle', function (e) {
           self.click_toggle_class(e, move_class + left_postfix);
+          if (self.settings.open_method !== 'overlap'){
+            S(".right-submenu").removeClass(move_class + left_postfix);
+          }
+          $('.right-off-canvas-toggle').attr('aria-expanded', 'true');
         })
         .on('click.fndtn.offcanvas', '.right-off-canvas-menu a', function (e) {
           var settings = self.get_settings(e);
-          if (settings.close_on_click) {
+          var parent = S(this).parent();
+
+          if(settings.close_on_click && !parent.hasClass("has-submenu") && !parent.hasClass("back")){
             self.hide.call(self, move_class + left_postfix, self.get_wrapper(e));
+            parent.parent().removeClass(move_class + left_postfix);
+          }else if(S(this).parent().hasClass("has-submenu")){
+            e.preventDefault();
+            S(this).siblings(".right-submenu").toggleClass(move_class + left_postfix);
+          }else if(parent.hasClass("back")){
+            e.preventDefault();
+            parent.parent().removeClass(move_class + left_postfix);
           }
+          $('.right-off-canvas-toggle').attr('aria-expanded', 'true');
         })
         .on('click.fndtn.offcanvas', '.exit-off-canvas', function (e) {
           self.click_remove_class(e, move_class + left_postfix);
-          if (right_postfix) self.click_remove_class(e, move_class + right_postfix);
+          S(".right-submenu").removeClass(move_class + left_postfix);
+          if (right_postfix){
+            self.click_remove_class(e, move_class + right_postfix);
+            S(".left-submenu").removeClass(move_class + left_postfix);
+          }
+          $('.right-off-canvas-toggle').attr('aria-expanded', 'true');
+        })
+        .on('click.fndtn.offcanvas', '.exit-off-canvas', function (e) {
+          self.click_remove_class(e, move_class + left_postfix);
+          $('.left-off-canvas-toggle').attr('aria-expanded', 'false');
+          if (right_postfix) {
+            self.click_remove_class(e, move_class + right_postfix);
+            $('.right-off-canvas-toggle').attr('aria-expanded', "false");
+          }
         });
-
     },
 
     toggle: function(class_name, $off_canvas) {
@@ -15625,7 +15729,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.orbit = {
     name: 'orbit',
 
-    version: '5.3.1',
+    version: '5.4.2',
 
     settings: {
       animation: 'slide',
@@ -15700,7 +15804,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.reveal = {
     name : 'reveal',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     locked : false,
 
@@ -16144,7 +16248,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.slider = {
     name : 'slider',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings: {
       start: 0,
@@ -16268,6 +16372,15 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       $handle.parent().children('input[type=hidden]').val(value);
 
+      if (!$handle[0].hasAttribute('aria-valuemin')) {
+        $handle.attr({
+          'aria-valuemin': settings.start,
+          'aria-valuemax': settings.end,
+        });
+      }
+      $handle.attr('aria-valuenow', value);
+
+
       if (settings.input_id != '') {
         $(settings.display_selector).each(function(){
           if (this.hasOwnProperty('value')) {
@@ -16281,7 +16394,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     },
 
     normalized_percentage : function(val, start, end) {
-      return (val - start)/(end - start);
+      return Math.min(1, (val - start)/(end - start));
     },
 
     normalized_value : function(val, start, end, step) {
@@ -16376,7 +16489,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.tab = {
     name : 'tab',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       active_class: 'active',
@@ -16407,17 +16520,20 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       var self = this,
           S = this.S;
 
-      S(this.scope)
-        .off('.tab')
-        // Click event: tab title
-        .on('click.fndtn.tab', '[' + this.attr_name() + '] > * > a', function (e) {
+      var usual_tab_behavior =  function (e) {
           var settings = S(this).closest('[' + self.attr_name() +']').data(self.attr_name(true) + '-init');
           if (!settings.is_hover || Modernizr.touch) {
             e.preventDefault();
             e.stopPropagation();
             self.toggle_active_tab(S(this).parent());
           }
-        })
+        };
+
+      S(this.scope)
+        .off('.tab')
+        // Click event: tab title
+        .on('focus.fndtn.tab', '[' + this.attr_name() + '] > * > a', usual_tab_behavior )
+        .on('click.fndtn.tab', '[' + this.attr_name() + '] > * > a', usual_tab_behavior )
         // Hover event: tab title
         .on('mouseenter.fndtn.tab', '[' + this.attr_name() + '] > * > a', function (e) {
           var settings = S(this).closest('[' + self.attr_name() +']').data(self.attr_name(true) + '-init');
@@ -16428,7 +16544,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       S(window).on('hashchange.fndtn.tab', function (e) {
         e.preventDefault();
         self.handle_location_hash_change();
-      });
+
+      }).on('keyup', function (e) {
+        if (e.keyword == 9) {
+          // active tab
+          console.log(document.querySelector('[data-tab] .tab-title :focus'))
+        }
+      });
+      ;
     },
 
     handle_location_hash_change : function () {
@@ -16468,11 +16591,58 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     toggle_active_tab: function (tab, location_hash) {
       var S = this.S,
           tabs = tab.closest('[' + this.attr_name() + ']'),
+          tab_link = tab.find('a'),
           anchor = tab.children('a').first(),
           target_hash = '#' + anchor.attr('href').split('#')[1],
           target = S(target_hash),
           siblings = tab.siblings(),
-          settings = tabs.data(this.attr_name(true) + '-init');
+          settings = tabs.data(this.attr_name(true) + '-init'),
+          interpret_keyup_action = function(e) {
+            // Light modification of Heydon Pickering's Practical ARIA Examples: http://heydonworks.com/practical_aria_examples/js/a11y.js 
+
+            // define current, previous and next (possible) tabs
+
+            var $original = $(this);
+            var $prev = $(this).parents('li').prev().children('[role="tab"]');
+            var $next = $(this).parents('li').next().children('[role="tab"]');
+            var $target;
+
+            // find the direction (prev or next)
+
+            switch (e.keyCode) {
+              case 37:
+                $target = $prev;
+                break;
+              case 39:
+                $target = $next;
+                break;
+              default:
+                $target = false
+                  break;
+            }
+
+            if ($target.length) {
+              $original.attr({
+                'tabindex' : '-1',
+                'aria-selected' : null
+              });
+              $target.attr({
+                'tabindex' : '0',
+                'aria-selected' : true
+              }).focus();
+            }
+
+            // Hide panels
+
+            $('[role="tabpanel"]')
+              .attr('aria-hidden', 'true');
+
+            // Show panel which corresponds to target
+
+            $('#' + $(document.activeElement).attr('href').substring(1))
+              .attr('aria-hidden', null);
+
+          };
 
       // allow usage of data-tab-content attribute instead of href
       if (S(this).data(this.data_attr('tab-content'))) {
@@ -16516,12 +16686,18 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       // WARNING: The activation and deactivation of the tab content must
       // occur after the deep linking in order to properly refresh the browser
       // window (notably in Chrome).
+      // Clean up multiple attr instances to done once
       tab.addClass(settings.active_class).triggerHandler('opened');
-      siblings.removeClass(settings.active_class);
-      target.siblings().removeClass(settings.active_class).end().addClass(settings.active_class);
+      tab_link.attr({"aria-selected": "true",  tabindex: 0});
+      siblings.removeClass(settings.active_class)
+      siblings.find('a').attr({"aria-selected": "false",  tabindex: -1});
+      target.siblings().removeClass(settings.active_class).attr({"aria-hidden": "true",  tabindex: -1}).end().addClass(settings.active_class).attr('aria-hidden', 'false').find(':first-child').attr('tabindex', 0);
       settings.callback(tab);
+      target.children().attr('tab-index', 0);
       target.triggerHandler('toggled', [tab]);
       tabs.triggerHandler('toggled', [target]);
+
+      tab_link.on('keydown', interpret_keyup_action );
     },
 
     data_attr: function (str) {
@@ -16544,7 +16720,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.tooltip = {
     name : 'tooltip',
 
-    version : '5.3.3',
+    version : '5.4.2',
 
     settings : {
       additional_inheritable_classes : [],
@@ -16555,9 +16731,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       hover_delay: 200,
       show_on : 'all',
       tip_template : function (selector, content) {
-        return '<span data-selector="' + selector + '" class="'
+        return '<span data-selector="' + selector + '" id="' + selector + '" class="'
           + Foundation.libs.tooltip.settings.tooltip_class.substring(1)
-          + '">' + content + '<span class="nub"></span></span>';
+          + '" role="tooltip">' + content + '<span class="nub"></span></span>';
       }
     },
 
@@ -16683,7 +16859,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       if ((id && id.length < 1 || !id) && typeof dataSelector != 'string') {
         dataSelector = this.random_str(6);
-        $target.attr('data-selector', dataSelector);
+        $target
+          .attr('data-selector', dataSelector)
+          .attr('aria-describedby', dataSelector);
       }
 
       return (id && id.length > 0) ? id : dataSelector;
@@ -16843,7 +17021,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   Foundation.libs.topbar = {
     name : 'topbar',
 
-    version: '5.3.3',
+    version: '5.4.2',
 
     settings : {
       index : 0,
@@ -16855,7 +17033,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       scrolltop : true, // jump to top when sticky nav menu toggle is clicked
       sticky_on : 'all'
     },
-    
+
     init : function (section, method, options) {
       Foundation.inherit(this, 'add_custom_rule register_media throttle');
       var self = this;
@@ -16867,7 +17045,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       self.S('[' + this.attr_name() + ']', this.scope).each(function () {
         var topbar = $(this),
             settings = topbar.data(self.attr_name(true) + '-init'),
-            section = self.S('section', this);
+            section = self.S('section, .top-bar-section', this);
         topbar.data('index', 0);
         var topbarContainer = topbar.parent();
         if (topbarContainer.hasClass('fixed') || self.is_sticky(topbar, topbarContainer, settings) ) {
@@ -16906,7 +17084,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         return true;
       } else if (sticky && this.small() && settings.sticky_on === 'small') {
         return (matchMedia(Foundation.media_queries.small).matches && !matchMedia(Foundation.media_queries.medium).matches &&
-            !matchMedia(Foundation.media_queries.large).matches); 
+            !matchMedia(Foundation.media_queries.large).matches);
         //return true;
       } else if (sticky && this.medium() && settings.sticky_on === 'medium') {
         return (matchMedia(Foundation.media_queries.small).matches && matchMedia(Foundation.media_queries.medium).matches &&
@@ -16933,7 +17111,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
       var settings = topbar.data(this.attr_name(true) + '-init');
 
-      var section = self.S('section, .section', topbar);
+      var section = self.S('section, .top-bar-section', topbar);
 
       if (self.breakpoint()) {
         if (!self.rtl) {
@@ -17049,7 +17227,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
             var $this = S(this),
                 topbar = $this.closest('[' + self.attr_name() + ']'),
-                section = topbar.find('section, .section'),
+                section = topbar.find('section, .top-bar-section'),
                 dropdownHeight = $this.next('.dropdown').outerHeight(),
                 $selectedLi = $this.closest('li');
 
@@ -17067,10 +17245,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             topbar.css('height', $this.siblings('ul').outerHeight(true) + topbar.data('height'));
           }
         });
-      
-      S(window).off('.topbar').on('resize.fndtn.topbar', self.throttle(function () {
-        self.resize.call(self);
-      }, 50)).trigger('resize').trigger('resize.fndtn.topbar');
+
+      S(window).off(".topbar").on("resize.fndtn.topbar", self.throttle(function() {
+          self.resize.call(self);
+      }, 50)).trigger("resize").trigger("resize.fndtn.topbar").load(function(){
+          // Ensure that the offset is calculated after all of the pages resources have loaded
+          S(this).trigger("resize.fndtn.topbar");
+      });
 
       S('body').off('.topbar').on('click.fndtn.topbar', function (e) {
         var parent = S(e.target).closest('li').closest('li.hover');
@@ -17088,7 +17269,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         var $this = S(this),
             topbar = $this.closest('[' + self.attr_name() + ']'),
-            section = topbar.find('section, .section'),
+            section = topbar.find('section, .top-bar-section'),
             settings = topbar.data(self.attr_name(true) + '-init'),
             $movedLi = $this.closest('li.moved'),
             $previousLevelUl = $movedLi.parent();
@@ -17113,6 +17294,15 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           $movedLi.removeClass('moved');
         }, 300);
       });
+
+      // Show dropdown menus when their items are focused
+      S(this.scope).find('.dropdown a')
+        .focus(function() {
+          $(this).parents('.has-dropdown').addClass('hover');
+        })
+        .blur(function() {
+          $(this).parents('.has-dropdown').removeClass('hover');
+        });
     },
 
     resize : function () {
@@ -17177,7 +17367,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     assemble : function (topbar) {
       var self = this,
           settings = topbar.data(this.attr_name(true) + '-init'),
-          section = self.S('section', topbar);
+          section = self.S('section, .top-bar-section', topbar);
 
       // Pull element out of the DOM for manipulation
       section.detach();
@@ -17196,7 +17386,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
           } else {
             $titleLi = $('<li class="title back js-generated"><h5><a href="javascript:void(0)"></a></h5>');
           }
-          
+
           // Copy link to subnav
           if (settings.custom_back_text == true) {
             $('h5>a', $titleLi).html(settings.back_text);
@@ -17224,8 +17414,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       var total = 0,
           self = this;
 
-      $('> li', ul).each(function () { 
-        total += self.S(this).outerHeight(true); 
+      $('> li', ul).each(function () {
+        total += self.S(this).outerHeight(true);
       });
 
       return total;
@@ -17241,7 +17431,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     update_sticky_positioning: function() {
       var klass = '.' + this.settings.sticky_class,
-          $window = this.S(window), 
+          $window = this.S(window),
           self = this;
 
       if (self.settings.sticky_topbar && self.is_sticky(this.settings.sticky_topbar,this.settings.sticky_topbar.parent(), this.settings)) {
@@ -17269,26 +17459,26 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     reflow : function () {}
   };
-}(jQuery, this, this.document));
+}(jQuery, window, window.document));
 
 //! moment.js
-//! version : 2.7.0
+//! version : 2.8.3
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
 
 (function (undefined) {
-
     /************************************
         Constants
     ************************************/
 
     var moment,
-        VERSION = "2.7.0",
+        VERSION = '2.8.3',
         // the global-scope this is NOT the global object in Node.js
         globalScope = typeof global !== 'undefined' ? global : this,
         oldGlobalMoment,
         round = Math.round,
+        hasOwnProperty = Object.prototype.hasOwnProperty,
         i,
 
         YEAR = 0,
@@ -17299,22 +17489,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         SECOND = 5,
         MILLISECOND = 6,
 
-        // internal storage for language config files
-        languages = {},
+        // internal storage for locale config files
+        locales = {},
 
-        // moment internal properties
-        momentProperties = {
-            _isAMomentObject: null,
-            _i : null,
-            _f : null,
-            _l : null,
-            _strict : null,
-            _tzm : null,
-            _isUTC : null,
-            _offset : null,  // optional. Combine with _isUTC
-            _pf : null,
-            _lang : null  // optional
-        },
+        // extra moment internal properties (plugins register props here)
+        momentProperties = [],
 
         // check for nodeJS
         hasModule = (typeof module !== 'undefined' && module.exports),
@@ -17373,7 +17552,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             ['HH', /(T| )\d\d/]
         ],
 
-        // timezone chunker "+10:00" > ["10", "00"] or "-1530" > ["-15", "30"]
+        // timezone chunker '+10:00' > ['10', '00'] or '-1530' > ['-15', '30']
         parseTimezoneChunker = /([\+\-]|\d\d)/gi,
 
         // getter and setter names
@@ -17420,12 +17599,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         // default relative time thresholds
         relativeTimeThresholds = {
-          s: 45,   //seconds to minutes
-          m: 45,   //minutes to hours
-          h: 22,   //hours to days
-          dd: 25,  //days to month (month == 1)
-          dm: 45,  //days to months (months > 1)
-          dy: 345  //days to year
+            s: 45,  // seconds to minute
+            m: 45,  // minutes to hour
+            h: 22,  // hours to day
+            d: 26,  // days to month
+            M: 11   // months to year
         },
 
         // tokens to ordinalize and pad
@@ -17437,10 +17615,10 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 return this.month() + 1;
             },
             MMM  : function (format) {
-                return this.lang().monthsShort(this, format);
+                return this.localeData().monthsShort(this, format);
             },
             MMMM : function (format) {
-                return this.lang().months(this, format);
+                return this.localeData().months(this, format);
             },
             D    : function () {
                 return this.date();
@@ -17452,13 +17630,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 return this.day();
             },
             dd   : function (format) {
-                return this.lang().weekdaysMin(this, format);
+                return this.localeData().weekdaysMin(this, format);
             },
             ddd  : function (format) {
-                return this.lang().weekdaysShort(this, format);
+                return this.localeData().weekdaysShort(this, format);
             },
             dddd : function (format) {
-                return this.lang().weekdays(this, format);
+                return this.localeData().weekdays(this, format);
             },
             w    : function () {
                 return this.week();
@@ -17504,10 +17682,10 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 return this.isoWeekday();
             },
             a    : function () {
-                return this.lang().meridiem(this.hours(), this.minutes(), true);
+                return this.localeData().meridiem(this.hours(), this.minutes(), true);
             },
             A    : function () {
-                return this.lang().meridiem(this.hours(), this.minutes(), false);
+                return this.localeData().meridiem(this.hours(), this.minutes(), false);
             },
             H    : function () {
                 return this.hours();
@@ -17535,19 +17713,19 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             },
             Z    : function () {
                 var a = -this.zone(),
-                    b = "+";
+                    b = '+';
                 if (a < 0) {
                     a = -a;
-                    b = "-";
+                    b = '-';
                 }
-                return b + leftZeroFill(toInt(a / 60), 2) + ":" + leftZeroFill(toInt(a) % 60, 2);
+                return b + leftZeroFill(toInt(a / 60), 2) + ':' + leftZeroFill(toInt(a) % 60, 2);
             },
             ZZ   : function () {
                 var a = -this.zone(),
-                    b = "+";
+                    b = '+';
                 if (a < 0) {
                     a = -a;
-                    b = "-";
+                    b = '-';
                 }
                 return b + leftZeroFill(toInt(a / 60), 2) + leftZeroFill(toInt(a) % 60, 2);
             },
@@ -17565,6 +17743,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             }
         },
 
+        deprecations = {},
+
         lists = ['months', 'monthsShort', 'weekdays', 'weekdaysShort', 'weekdaysMin'];
 
     // Pick the first defined of two or three arguments. dfl comes from
@@ -17573,8 +17753,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         switch (arguments.length) {
             case 2: return a != null ? a : b;
             case 3: return a != null ? a : b != null ? b : c;
-            default: throw new Error("Implement me");
+            default: throw new Error('Implement me');
         }
+    }
+
+    function hasOwnProp(a, b) {
+        return hasOwnProperty.call(a, b);
     }
 
     function defaultParsingFlags() {
@@ -17594,21 +17778,29 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         };
     }
 
+    function printMsg(msg) {
+        if (moment.suppressDeprecationWarnings === false &&
+                typeof console !== 'undefined' && console.warn) {
+            console.warn('Deprecation warning: ' + msg);
+        }
+    }
+
     function deprecate(msg, fn) {
         var firstTime = true;
-        function printMsg() {
-            if (moment.suppressDeprecationWarnings === false &&
-                    typeof console !== 'undefined' && console.warn) {
-                console.warn("Deprecation warning: " + msg);
-            }
-        }
         return extend(function () {
             if (firstTime) {
-                printMsg();
+                printMsg(msg);
                 firstTime = false;
             }
             return fn.apply(this, arguments);
         }, fn);
+    }
+
+    function deprecateSimple(name, msg) {
+        if (!deprecations[name]) {
+            printMsg(msg);
+            deprecations[name] = true;
+        }
     }
 
     function padToken(func, count) {
@@ -17618,7 +17810,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     }
     function ordinalizeToken(func, period) {
         return function (a) {
-            return this.lang().ordinal(func.call(this, a), period);
+            return this.localeData().ordinal(func.call(this, a), period);
         };
     }
 
@@ -17637,14 +17829,16 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         Constructors
     ************************************/
 
-    function Language() {
-
+    function Locale() {
     }
 
     // Moment prototype object
-    function Moment(config) {
-        checkOverflow(config);
-        extend(this, config);
+    function Moment(config, skipOverflow) {
+        if (skipOverflow !== false) {
+            checkOverflow(config);
+        }
+        copyConfig(this, config);
+        this._d = new Date(+config._d);
     }
 
     // Duration Constructor
@@ -17678,6 +17872,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         this._data = {};
 
+        this._locale = moment.localeData();
+
         this._bubble();
     }
 
@@ -17688,31 +17884,67 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     function extend(a, b) {
         for (var i in b) {
-            if (b.hasOwnProperty(i)) {
+            if (hasOwnProp(b, i)) {
                 a[i] = b[i];
             }
         }
 
-        if (b.hasOwnProperty("toString")) {
+        if (hasOwnProp(b, 'toString')) {
             a.toString = b.toString;
         }
 
-        if (b.hasOwnProperty("valueOf")) {
+        if (hasOwnProp(b, 'valueOf')) {
             a.valueOf = b.valueOf;
         }
 
         return a;
     }
 
-    function cloneMoment(m) {
-        var result = {}, i;
-        for (i in m) {
-            if (m.hasOwnProperty(i) && momentProperties.hasOwnProperty(i)) {
-                result[i] = m[i];
+    function copyConfig(to, from) {
+        var i, prop, val;
+
+        if (typeof from._isAMomentObject !== 'undefined') {
+            to._isAMomentObject = from._isAMomentObject;
+        }
+        if (typeof from._i !== 'undefined') {
+            to._i = from._i;
+        }
+        if (typeof from._f !== 'undefined') {
+            to._f = from._f;
+        }
+        if (typeof from._l !== 'undefined') {
+            to._l = from._l;
+        }
+        if (typeof from._strict !== 'undefined') {
+            to._strict = from._strict;
+        }
+        if (typeof from._tzm !== 'undefined') {
+            to._tzm = from._tzm;
+        }
+        if (typeof from._isUTC !== 'undefined') {
+            to._isUTC = from._isUTC;
+        }
+        if (typeof from._offset !== 'undefined') {
+            to._offset = from._offset;
+        }
+        if (typeof from._pf !== 'undefined') {
+            to._pf = from._pf;
+        }
+        if (typeof from._locale !== 'undefined') {
+            to._locale = from._locale;
+        }
+
+        if (momentProperties.length > 0) {
+            for (i in momentProperties) {
+                prop = momentProperties[i];
+                val = from[prop];
+                if (typeof val !== 'undefined') {
+                    to[prop] = val;
+                }
             }
         }
 
-        return result;
+        return to;
     }
 
     function absRound(number) {
@@ -17735,7 +17967,51 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         return (sign ? (forceSign ? '+' : '') : '-') + output;
     }
 
-    // helper function for _.addTime and _.subtractTime
+    function positiveMomentsDifference(base, other) {
+        var res = {milliseconds: 0, months: 0};
+
+        res.months = other.month() - base.month() +
+            (other.year() - base.year()) * 12;
+        if (base.clone().add(res.months, 'M').isAfter(other)) {
+            --res.months;
+        }
+
+        res.milliseconds = +other - +(base.clone().add(res.months, 'M'));
+
+        return res;
+    }
+
+    function momentsDifference(base, other) {
+        var res;
+        other = makeAs(other, base);
+        if (base.isBefore(other)) {
+            res = positiveMomentsDifference(base, other);
+        } else {
+            res = positiveMomentsDifference(other, base);
+            res.milliseconds = -res.milliseconds;
+            res.months = -res.months;
+        }
+
+        return res;
+    }
+
+    // TODO: remove 'name' arg after deprecation is removed
+    function createAdder(direction, name) {
+        return function (val, period) {
+            var dur, tmp;
+            //invert the arguments, but complain about it
+            if (period !== null && !isNaN(+period)) {
+                deprecateSimple(name, 'moment().' + name  + '(period, number) is deprecated. Please use moment().' + name + '(number, period).');
+                tmp = val; val = period; period = tmp;
+            }
+
+            val = typeof val === 'string' ? +val : val;
+            dur = moment.duration(val, period);
+            addOrSubtractDurationFromMoment(this, dur, direction);
+            return this;
+        };
+    }
+
     function addOrSubtractDurationFromMoment(mom, duration, isAdding, updateOffset) {
         var milliseconds = duration._milliseconds,
             days = duration._days,
@@ -17762,8 +18038,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     }
 
     function isDate(input) {
-        return  Object.prototype.toString.call(input) === '[object Date]' ||
-                input instanceof Date;
+        return Object.prototype.toString.call(input) === '[object Date]' ||
+            input instanceof Date;
     }
 
     // compare two arrays, return the number of differences
@@ -17795,7 +18071,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             prop;
 
         for (prop in inputObject) {
-            if (inputObject.hasOwnProperty(prop)) {
+            if (hasOwnProp(inputObject, prop)) {
                 normalizedProp = normalizeUnits(prop);
                 if (normalizedProp) {
                     normalizedInput[normalizedProp] = inputObject[prop];
@@ -17823,7 +18099,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         moment[field] = function (format, index) {
             var i, getter,
-                method = moment.fn._lang[field],
+                method = moment._locale[field],
                 results = [];
 
             if (typeof format === 'number') {
@@ -17833,7 +18109,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
             getter = function (i) {
                 var m = moment().utc().set(setter, i);
-                return method.call(moment.fn._lang, m, format || '');
+                return method.call(moment._locale, m, format || '');
             };
 
             if (index != null) {
@@ -17918,8 +18194,48 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         return m._isValid;
     }
 
-    function normalizeLanguage(key) {
+    function normalizeLocale(key) {
         return key ? key.toLowerCase().replace('_', '-') : key;
+    }
+
+    // pick the locale from the array
+    // try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
+    // substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
+    function chooseLocale(names) {
+        var i = 0, j, next, locale, split;
+
+        while (i < names.length) {
+            split = normalizeLocale(names[i]).split('-');
+            j = split.length;
+            next = normalizeLocale(names[i + 1]);
+            next = next ? next.split('-') : null;
+            while (j > 0) {
+                locale = loadLocale(split.slice(0, j).join('-'));
+                if (locale) {
+                    return locale;
+                }
+                if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
+                    //the next array item is better than a shallower substring of this one
+                    break;
+                }
+                j--;
+            }
+            i++;
+        }
+        return null;
+    }
+
+    function loadLocale(name) {
+        var oldLocale = null;
+        if (!locales[name] && hasModule) {
+            try {
+                oldLocale = moment.locale();
+                require('./locale/' + name);
+                // because defineLocale currently also sets the global locale, we want to undo that for lazy loaded locales
+                moment.locale(oldLocale);
+            } catch (e) { }
+        }
+        return locales[name];
     }
 
     // Return a moment from input, that is local/utc/zone equivalent to model.
@@ -17929,11 +18245,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     }
 
     /************************************
-        Languages
+        Locale
     ************************************/
 
 
-    extend(Language.prototype, {
+    extend(Locale.prototype, {
 
         set : function (config) {
             var prop, i;
@@ -17947,12 +18263,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             }
         },
 
-        _months : "January_February_March_April_May_June_July_August_September_October_November_December".split("_"),
+        _months : 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_'),
         months : function (m) {
             return this._months[m.month()];
         },
 
-        _monthsShort : "Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_"),
+        _monthsShort : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
         monthsShort : function (m) {
             return this._monthsShort[m.month()];
         },
@@ -17978,17 +18294,17 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             }
         },
 
-        _weekdays : "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),
+        _weekdays : 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_'),
         weekdays : function (m) {
             return this._weekdays[m.day()];
         },
 
-        _weekdaysShort : "Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_"),
+        _weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
         weekdaysShort : function (m) {
             return this._weekdaysShort[m.day()];
         },
 
-        _weekdaysMin : "Su_Mo_Tu_We_Th_Fr_Sa".split("_"),
+        _weekdaysMin : 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
         weekdaysMin : function (m) {
             return this._weekdaysMin[m.day()];
         },
@@ -18015,11 +18331,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         _longDateFormat : {
-            LT : "h:mm A",
-            L : "MM/DD/YYYY",
-            LL : "MMMM D YYYY",
-            LLL : "MMMM D YYYY LT",
-            LLLL : "dddd, MMMM D YYYY LT"
+            LT : 'h:mm A',
+            L : 'MM/DD/YYYY',
+            LL : 'MMMM D, YYYY',
+            LLL : 'MMMM D, YYYY LT',
+            LLLL : 'dddd, MMMM D, YYYY LT'
         },
         longDateFormat : function (key) {
             var output = this._longDateFormat[key];
@@ -18061,35 +18377,37 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         _relativeTime : {
-            future : "in %s",
-            past : "%s ago",
-            s : "a few seconds",
-            m : "a minute",
-            mm : "%d minutes",
-            h : "an hour",
-            hh : "%d hours",
-            d : "a day",
-            dd : "%d days",
-            M : "a month",
-            MM : "%d months",
-            y : "a year",
-            yy : "%d years"
+            future : 'in %s',
+            past : '%s ago',
+            s : 'a few seconds',
+            m : 'a minute',
+            mm : '%d minutes',
+            h : 'an hour',
+            hh : '%d hours',
+            d : 'a day',
+            dd : '%d days',
+            M : 'a month',
+            MM : '%d months',
+            y : 'a year',
+            yy : '%d years'
         },
+
         relativeTime : function (number, withoutSuffix, string, isFuture) {
             var output = this._relativeTime[string];
             return (typeof output === 'function') ?
                 output(number, withoutSuffix, string, isFuture) :
                 output.replace(/%d/i, number);
         },
+
         pastFuture : function (diff, output) {
             var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
             return typeof format === 'function' ? format(output) : format.replace(/%s/i, output);
         },
 
         ordinal : function (number) {
-            return this._ordinal.replace("%d", number);
+            return this._ordinal.replace('%d', number);
         },
-        _ordinal : "%d",
+        _ordinal : '%d',
 
         preparse : function (string) {
             return string;
@@ -18114,78 +18432,6 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         }
     });
 
-    // Loads a language definition into the `languages` cache.  The function
-    // takes a key and optionally values.  If not in the browser and no values
-    // are provided, it will load the language file module.  As a convenience,
-    // this function also returns the language values.
-    function loadLang(key, values) {
-        values.abbr = key;
-        if (!languages[key]) {
-            languages[key] = new Language();
-        }
-        languages[key].set(values);
-        return languages[key];
-    }
-
-    // Remove a language from the `languages` cache. Mostly useful in tests.
-    function unloadLang(key) {
-        delete languages[key];
-    }
-
-    // Determines which language definition to use and returns it.
-    //
-    // With no parameters, it will return the global language.  If you
-    // pass in a language key, such as 'en', it will return the
-    // definition for 'en', so long as 'en' has already been loaded using
-    // moment.lang.
-    function getLangDefinition(key) {
-        var i = 0, j, lang, next, split,
-            get = function (k) {
-                if (!languages[k] && hasModule) {
-                    try {
-                        require('./lang/' + k);
-                    } catch (e) { }
-                }
-                return languages[k];
-            };
-
-        if (!key) {
-            return moment.fn._lang;
-        }
-
-        if (!isArray(key)) {
-            //short-circuit everything else
-            lang = get(key);
-            if (lang) {
-                return lang;
-            }
-            key = [key];
-        }
-
-        //pick the language from the array
-        //try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
-        //substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
-        while (i < key.length) {
-            split = normalizeLanguage(key[i]).split('-');
-            j = split.length;
-            next = normalizeLanguage(key[i + 1]);
-            next = next ? next.split('-') : null;
-            while (j > 0) {
-                lang = get(split.slice(0, j).join('-'));
-                if (lang) {
-                    return lang;
-                }
-                if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
-                    //the next array item is better than a shallower substring of this one
-                    break;
-                }
-                j--;
-            }
-            i++;
-        }
-        return moment.fn._lang;
-    }
-
     /************************************
         Formatting
     ************************************/
@@ -18193,9 +18439,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     function removeFormattingTokens(input) {
         if (input.match(/\[[\s\S]/)) {
-            return input.replace(/^\[|\]$/g, "");
+            return input.replace(/^\[|\]$/g, '');
         }
-        return input.replace(/\\/g, "");
+        return input.replace(/\\/g, '');
     }
 
     function makeFormatFunction(format) {
@@ -18210,7 +18456,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         }
 
         return function (mom) {
-            var output = "";
+            var output = '';
             for (i = 0; i < length; i++) {
                 output += array[i] instanceof Function ? array[i].call(mom, format) : array[i];
             }
@@ -18220,12 +18466,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     // format date using native date object
     function formatMoment(m, format) {
-
         if (!m.isValid()) {
-            return m.lang().invalidDate();
+            return m.localeData().invalidDate();
         }
 
-        format = expandFormat(format, m.lang());
+        format = expandFormat(format, m.localeData());
 
         if (!formatFunctions[format]) {
             formatFunctions[format] = makeFormatFunction(format);
@@ -18234,11 +18479,11 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         return formatFunctions[format](m);
     }
 
-    function expandFormat(format, lang) {
+    function expandFormat(format, locale) {
         var i = 5;
 
         function replaceLongDateFormatTokens(input) {
-            return lang.longDateFormat(input) || input;
+            return locale.longDateFormat(input) || input;
         }
 
         localFormattingTokens.lastIndex = 0;
@@ -18279,13 +18524,19 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         case 'ggggg':
             return strict ? parseTokenSixDigits : parseTokenOneToSixDigits;
         case 'S':
-            if (strict) { return parseTokenOneDigit; }
+            if (strict) {
+                return parseTokenOneDigit;
+            }
             /* falls through */
         case 'SS':
-            if (strict) { return parseTokenTwoDigits; }
+            if (strict) {
+                return parseTokenTwoDigits;
+            }
             /* falls through */
         case 'SSS':
-            if (strict) { return parseTokenThreeDigits; }
+            if (strict) {
+                return parseTokenThreeDigits;
+            }
             /* falls through */
         case 'DDD':
             return parseTokenOneToThreeDigits;
@@ -18297,7 +18548,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             return parseTokenWord;
         case 'a':
         case 'A':
-            return getLangDefinition(config._l)._meridiemParse;
+            return config._locale._meridiemParse;
         case 'X':
             return parseTokenTimestampMs;
         case 'Z':
@@ -18334,13 +18585,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         case 'Do':
             return parseTokenOrdinal;
         default :
-            a = new RegExp(regexpEscape(unescapeFormat(token.replace('\\', '')), "i"));
+            a = new RegExp(regexpEscape(unescapeFormat(token.replace('\\', '')), 'i'));
             return a;
         }
     }
 
     function timezoneMinutesFromString(string) {
-        string = string || "";
+        string = string || '';
         var possibleTzMatches = (string.match(parseTokenTimezone) || []),
             tzChunk = possibleTzMatches[possibleTzMatches.length - 1] || [],
             parts = (tzChunk + '').match(parseTimezoneChunker) || ['-', 0, 0],
@@ -18369,7 +18620,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             break;
         case 'MMM' : // fall through to MMMM
         case 'MMMM' :
-            a = getLangDefinition(config._l).monthsParse(input);
+            a = config._locale.monthsParse(input);
             // if we didn't find a month name, mark the date as invalid.
             if (a != null) {
                 datePartArray[MONTH] = a;
@@ -18409,7 +18660,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         // AM / PM
         case 'a' : // fall through to A
         case 'A' :
-            config._isPm = getLangDefinition(config._l).isPM(input);
+            config._isPm = config._locale.isPM(input);
             break;
         // 24 HOUR
         case 'H' : // fall through to hh
@@ -18449,7 +18700,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         case 'dd':
         case 'ddd':
         case 'dddd':
-            a = getLangDefinition(config._l).weekdaysParse(input);
+            a = config._locale.weekdaysParse(input);
             // if we didn't get a weekday name, mark the date as invalid
             if (a != null) {
                 config._w = config._w || {};
@@ -18485,7 +18736,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     }
 
     function dayOfYearFromWeekInfo(config) {
-        var w, weekYear, week, weekday, dow, doy, temp, lang;
+        var w, weekYear, week, weekday, dow, doy, temp;
 
         w = config._w;
         if (w.GG != null || w.W != null || w.E != null) {
@@ -18500,9 +18751,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             week = dfl(w.W, 1);
             weekday = dfl(w.E, 1);
         } else {
-            lang = getLangDefinition(config._l);
-            dow = lang._week.dow;
-            doy = lang._week.doy;
+            dow = config._locale._week.dow;
+            doy = config._locale._week.doy;
 
             weekYear = dfl(w.gg, config._a[YEAR], weekOfYear(moment(), dow, doy).year);
             week = dfl(w.w, 1);
@@ -18616,7 +18866,6 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     // date from string and format string
     function makeDateFromStringAndFormat(config) {
-
         if (config._f === moment.ISO_8601) {
             parseISO(config);
             return;
@@ -18626,13 +18875,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         config._pf.empty = true;
 
         // This array is used to make a Date, either with `new Date` or `Date.UTC`
-        var lang = getLangDefinition(config._l),
-            string = '' + config._i,
+        var string = '' + config._i,
             i, parsedInput, tokens, token, skipped,
             stringLength = string.length,
             totalParsedInputLength = 0;
 
-        tokens = expandFormat(config._f, lang).match(formattingTokens) || [];
+        tokens = expandFormat(config._f, config._locale).match(formattingTokens) || [];
 
         for (i = 0; i < tokens.length; i++) {
             token = tokens[i];
@@ -18707,7 +18955,10 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         for (i = 0; i < config._f.length; i++) {
             currentScore = 0;
-            tempConfig = extend({}, config);
+            tempConfig = copyConfig({}, config);
+            if (config._useUTC != null) {
+                tempConfig._useUTC = config._useUTC;
+            }
             tempConfig._pf = defaultParsingFlags();
             tempConfig._f = config._f[i];
             makeDateFromStringAndFormat(tempConfig);
@@ -18743,8 +18994,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             config._pf.iso = true;
             for (i = 0, l = isoDates.length; i < l; i++) {
                 if (isoDates[i][1].exec(string)) {
-                    // match[5] should be "T" or undefined
-                    config._f = isoDates[i][0] + (match[6] || " ");
+                    // match[5] should be 'T' or undefined
+                    config._f = isoDates[i][0] + (match[6] || ' ');
                     break;
                 }
             }
@@ -18755,7 +19006,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 }
             }
             if (string.match(parseTokenTimezone)) {
-                config._f += "Z";
+                config._f += 'Z';
             }
             makeDateFromStringAndFormat(config);
         } else {
@@ -18772,21 +19023,29 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         }
     }
 
-    function makeDateFromInput(config) {
-        var input = config._i,
-            matched = aspNetJsonRegex.exec(input);
+    function map(arr, fn) {
+        var res = [], i;
+        for (i = 0; i < arr.length; ++i) {
+            res.push(fn(arr[i], i));
+        }
+        return res;
+    }
 
+    function makeDateFromInput(config) {
+        var input = config._i, matched;
         if (input === undefined) {
             config._d = new Date();
-        } else if (matched) {
+        } else if (isDate(input)) {
+            config._d = new Date(+input);
+        } else if ((matched = aspNetJsonRegex.exec(input)) !== null) {
             config._d = new Date(+matched[1]);
         } else if (typeof input === 'string') {
             makeDateFromString(config);
         } else if (isArray(input)) {
-            config._a = input.slice(0);
+            config._a = map(input.slice(0), function (obj) {
+                return parseInt(obj, 10);
+            });
             dateFromConfig(config);
-        } else if (isDate(input)) {
-            config._d = new Date(+input);
         } else if (typeof(input) === 'object') {
             dateFromObject(config);
         } else if (typeof(input) === 'number') {
@@ -18817,13 +19076,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         return date;
     }
 
-    function parseWeekday(input, language) {
+    function parseWeekday(input, locale) {
         if (typeof input === 'string') {
             if (!isNaN(input)) {
                 input = parseInt(input, 10);
             }
             else {
-                input = language.weekdaysParse(input);
+                input = locale.weekdaysParse(input);
                 if (typeof input !== 'number') {
                     return null;
                 }
@@ -18838,29 +19097,33 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
 
     // helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
-    function substituteTimeAgo(string, number, withoutSuffix, isFuture, lang) {
-        return lang.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+    function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale) {
+        return locale.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
     }
 
-    function relativeTime(milliseconds, withoutSuffix, lang) {
-        var seconds = round(Math.abs(milliseconds) / 1000),
-            minutes = round(seconds / 60),
-            hours = round(minutes / 60),
-            days = round(hours / 24),
-            years = round(days / 365),
-            args = seconds < relativeTimeThresholds.s  && ['s', seconds] ||
+    function relativeTime(posNegDuration, withoutSuffix, locale) {
+        var duration = moment.duration(posNegDuration).abs(),
+            seconds = round(duration.as('s')),
+            minutes = round(duration.as('m')),
+            hours = round(duration.as('h')),
+            days = round(duration.as('d')),
+            months = round(duration.as('M')),
+            years = round(duration.as('y')),
+
+            args = seconds < relativeTimeThresholds.s && ['s', seconds] ||
                 minutes === 1 && ['m'] ||
                 minutes < relativeTimeThresholds.m && ['mm', minutes] ||
                 hours === 1 && ['h'] ||
                 hours < relativeTimeThresholds.h && ['hh', hours] ||
                 days === 1 && ['d'] ||
-                days <= relativeTimeThresholds.dd && ['dd', days] ||
-                days <= relativeTimeThresholds.dm && ['M'] ||
-                days < relativeTimeThresholds.dy && ['MM', round(days / 30)] ||
+                days < relativeTimeThresholds.d && ['dd', days] ||
+                months === 1 && ['M'] ||
+                months < relativeTimeThresholds.M && ['MM', months] ||
                 years === 1 && ['y'] || ['yy', years];
+
         args[2] = withoutSuffix;
-        args[3] = milliseconds > 0;
-        args[4] = lang;
+        args[3] = +posNegDuration > 0;
+        args[4] = locale;
         return substituteTimeAgo.apply({}, args);
     }
 
@@ -18891,7 +19154,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             daysToDayOfWeek += 7;
         }
 
-        adjustedMoment = moment(mom).add('d', daysToDayOfWeek);
+        adjustedMoment = moment(mom).add(daysToDayOfWeek, 'd');
         return {
             week: Math.ceil(adjustedMoment.dayOfYear() / 7),
             year: adjustedMoment.year()
@@ -18921,18 +19184,18 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         var input = config._i,
             format = config._f;
 
+        config._locale = config._locale || moment.localeData(config._l);
+
         if (input === null || (format === undefined && input === '')) {
             return moment.invalid({nullInput: true});
         }
 
         if (typeof input === 'string') {
-            config._i = input = getLangDefinition().preparse(input);
+            config._i = input = config._locale.preparse(input);
         }
 
         if (moment.isMoment(input)) {
-            config = cloneMoment(input);
-
-            config._d = new Date(+input._d);
+            return new Moment(input, true);
         } else if (format) {
             if (isArray(format)) {
                 makeDateFromStringAndArray(config);
@@ -18946,12 +19209,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         return new Moment(config);
     }
 
-    moment = function (input, format, lang, strict) {
+    moment = function (input, format, locale, strict) {
         var c;
 
-        if (typeof(lang) === "boolean") {
-            strict = lang;
-            lang = undefined;
+        if (typeof(locale) === 'boolean') {
+            strict = locale;
+            locale = undefined;
         }
         // object construction must be done this way.
         // https://github.com/moment/moment/issues/1423
@@ -18959,7 +19222,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         c._isAMomentObject = true;
         c._i = input;
         c._f = format;
-        c._l = lang;
+        c._l = locale;
         c._strict = strict;
         c._isUTC = false;
         c._pf = defaultParsingFlags();
@@ -18970,13 +19233,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     moment.suppressDeprecationWarnings = false;
 
     moment.createFromInputFallback = deprecate(
-            "moment construction falls back to js Date. This is " +
-            "discouraged and will be removed in upcoming major " +
-            "release. Please refer to " +
-            "https://github.com/moment/moment/issues/1407 for more info.",
-            function (config) {
-        config._d = new Date(config._i);
-    });
+        'moment construction falls back to js Date. This is ' +
+        'discouraged and will be removed in upcoming major ' +
+        'release. Please refer to ' +
+        'https://github.com/moment/moment/issues/1407 for more info.',
+        function (config) {
+            config._d = new Date(config._i);
+        }
+    );
 
     // Pick a moment m from moments so that m[fn](other) is true for all
     // other. This relies on the function fn to be transitive.
@@ -19013,12 +19277,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     };
 
     // creating with utc
-    moment.utc = function (input, format, lang, strict) {
+    moment.utc = function (input, format, locale, strict) {
         var c;
 
-        if (typeof(lang) === "boolean") {
-            strict = lang;
-            lang = undefined;
+        if (typeof(locale) === 'boolean') {
+            strict = locale;
+            locale = undefined;
         }
         // object construction must be done this way.
         // https://github.com/moment/moment/issues/1423
@@ -19026,7 +19290,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         c._isAMomentObject = true;
         c._useUTC = true;
         c._isUTC = true;
-        c._l = lang;
+        c._l = locale;
         c._i = input;
         c._f = format;
         c._strict = strict;
@@ -19047,7 +19311,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             match = null,
             sign,
             ret,
-            parseIso;
+            parseIso,
+            diffRes;
 
         if (moment.isDuration(input)) {
             duration = {
@@ -19063,7 +19328,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 duration.milliseconds = input;
             }
         } else if (!!(match = aspNetTimeSpanJsonRegex.exec(input))) {
-            sign = (match[1] === "-") ? -1 : 1;
+            sign = (match[1] === '-') ? -1 : 1;
             duration = {
                 y: 0,
                 d: toInt(match[DATE]) * sign,
@@ -19073,7 +19338,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 ms: toInt(match[MILLISECOND]) * sign
             };
         } else if (!!(match = isoDurationRegex.exec(input))) {
-            sign = (match[1] === "-") ? -1 : 1;
+            sign = (match[1] === '-') ? -1 : 1;
             parseIso = function (inp) {
                 // We'd normally use ~~inp for this, but unfortunately it also
                 // converts floats to ints.
@@ -19091,12 +19356,19 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 s: parseIso(match[7]),
                 w: parseIso(match[8])
             };
+        } else if (typeof duration === 'object' &&
+                ('from' in duration || 'to' in duration)) {
+            diffRes = momentsDifference(moment(duration.from), moment(duration.to));
+
+            duration = {};
+            duration.ms = diffRes.milliseconds;
+            duration.M = diffRes.months;
         }
 
         ret = new Duration(duration);
 
-        if (moment.isDuration(input) && input.hasOwnProperty('_lang')) {
-            ret._lang = input._lang;
+        if (moment.isDuration(input) && hasOwnProp(input, '_locale')) {
+            ret._locale = input._locale;
         }
 
         return ret;
@@ -19120,46 +19392,99 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     moment.updateOffset = function () {};
 
     // This function allows you to set a threshold for relative time strings
-    moment.relativeTimeThreshold = function(threshold, limit) {
-      if (relativeTimeThresholds[threshold] === undefined) {
-        return false;
-      }
-      relativeTimeThresholds[threshold] = limit;
-      return true;
+    moment.relativeTimeThreshold = function (threshold, limit) {
+        if (relativeTimeThresholds[threshold] === undefined) {
+            return false;
+        }
+        if (limit === undefined) {
+            return relativeTimeThresholds[threshold];
+        }
+        relativeTimeThresholds[threshold] = limit;
+        return true;
     };
 
-    // This function will load languages and then set the global language.  If
+    moment.lang = deprecate(
+        'moment.lang is deprecated. Use moment.locale instead.',
+        function (key, value) {
+            return moment.locale(key, value);
+        }
+    );
+
+    // This function will load locale and then set the global locale.  If
     // no arguments are passed in, it will simply return the current global
-    // language key.
-    moment.lang = function (key, values) {
-        var r;
-        if (!key) {
-            return moment.fn._lang._abbr;
+    // locale key.
+    moment.locale = function (key, values) {
+        var data;
+        if (key) {
+            if (typeof(values) !== 'undefined') {
+                data = moment.defineLocale(key, values);
+            }
+            else {
+                data = moment.localeData(key);
+            }
+
+            if (data) {
+                moment.duration._locale = moment._locale = data;
+            }
         }
-        if (values) {
-            loadLang(normalizeLanguage(key), values);
-        } else if (values === null) {
-            unloadLang(key);
-            key = 'en';
-        } else if (!languages[key]) {
-            getLangDefinition(key);
-        }
-        r = moment.duration.fn._lang = moment.fn._lang = getLangDefinition(key);
-        return r._abbr;
+
+        return moment._locale._abbr;
     };
 
-    // returns language data
-    moment.langData = function (key) {
-        if (key && key._lang && key._lang._abbr) {
-            key = key._lang._abbr;
+    moment.defineLocale = function (name, values) {
+        if (values !== null) {
+            values.abbr = name;
+            if (!locales[name]) {
+                locales[name] = new Locale();
+            }
+            locales[name].set(values);
+
+            // backwards compat for now: also set the locale
+            moment.locale(name);
+
+            return locales[name];
+        } else {
+            // useful for testing
+            delete locales[name];
+            return null;
         }
-        return getLangDefinition(key);
+    };
+
+    moment.langData = deprecate(
+        'moment.langData is deprecated. Use moment.localeData instead.',
+        function (key) {
+            return moment.localeData(key);
+        }
+    );
+
+    // returns locale data
+    moment.localeData = function (key) {
+        var locale;
+
+        if (key && key._locale && key._locale._abbr) {
+            key = key._locale._abbr;
+        }
+
+        if (!key) {
+            return moment._locale;
+        }
+
+        if (!isArray(key)) {
+            //short-circuit everything else
+            locale = loadLocale(key);
+            if (locale) {
+                return locale;
+            }
+            key = [key];
+        }
+
+        return chooseLocale(key);
     };
 
     // compare moment object
     moment.isMoment = function (obj) {
         return obj instanceof Moment ||
-            (obj != null &&  obj.hasOwnProperty('_isAMomentObject'));
+            (obj != null && hasOwnProp(obj, '_isAMomentObject'));
     };
 
     // for typechecking Duration objects
@@ -19215,7 +19540,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         toString : function () {
-            return this.clone().lang('en').format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ");
+            return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
         },
 
         toDate : function () {
@@ -19249,7 +19574,6 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         isDSTShifted : function () {
-
             if (this._a) {
                 return this.isValid() && compareArrays(this._a, (this._isUTC ? moment.utc(this._a) : moment(this._a)).toArray()) > 0;
             }
@@ -19265,53 +19589,35 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             return this._pf.overflow;
         },
 
-        utc : function () {
-            return this.zone(0);
+        utc : function (keepLocalTime) {
+            return this.zone(0, keepLocalTime);
         },
 
-        local : function () {
-            this.zone(0);
-            this._isUTC = false;
+        local : function (keepLocalTime) {
+            if (this._isUTC) {
+                this.zone(0, keepLocalTime);
+                this._isUTC = false;
+
+                if (keepLocalTime) {
+                    this.add(this._dateTzOffset(), 'm');
+                }
+            }
             return this;
         },
 
         format : function (inputString) {
             var output = formatMoment(this, inputString || moment.defaultFormat);
-            return this.lang().postformat(output);
+            return this.localeData().postformat(output);
         },
 
-        add : function (input, val) {
-            var dur;
-            // switch args to support add('s', 1) and add(1, 's')
-            if (typeof input === 'string' && typeof val === 'string') {
-                dur = moment.duration(isNaN(+val) ? +input : +val, isNaN(+val) ? val : input);
-            } else if (typeof input === 'string') {
-                dur = moment.duration(+val, input);
-            } else {
-                dur = moment.duration(input, val);
-            }
-            addOrSubtractDurationFromMoment(this, dur, 1);
-            return this;
-        },
+        add : createAdder(1, 'add'),
 
-        subtract : function (input, val) {
-            var dur;
-            // switch args to support subtract('s', 1) and subtract(1, 's')
-            if (typeof input === 'string' && typeof val === 'string') {
-                dur = moment.duration(isNaN(+val) ? +input : +val, isNaN(+val) ? val : input);
-            } else if (typeof input === 'string') {
-                dur = moment.duration(+val, input);
-            } else {
-                dur = moment.duration(input, val);
-            }
-            addOrSubtractDurationFromMoment(this, dur, -1);
-            return this;
-        },
+        subtract : createAdder(-1, 'subtract'),
 
         diff : function (input, units, asFloat) {
             var that = makeAs(input, this),
                 zoneDiff = (this.zone() - that.zone()) * 6e4,
-                diff, output;
+                diff, output, daysAdjust;
 
             units = normalizeUnits(units);
 
@@ -19322,11 +19628,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 output = ((this.year() - that.year()) * 12) + (this.month() - that.month());
                 // adjust by taking difference in days, average number of days
                 // and dst in the given months.
-                output += ((this - moment(this).startOf('month')) -
-                        (that - moment(that).startOf('month'))) / diff;
+                daysAdjust = (this - moment(this).startOf('month')) -
+                    (that - moment(that).startOf('month'));
                 // same as above but with zones, to negate all dst
-                output -= ((this.zone() - moment(this).startOf('month').zone()) -
-                        (that.zone() - moment(that).startOf('month').zone())) * 6e4 / diff;
+                daysAdjust -= ((this.zone() - moment(this).startOf('month').zone()) -
+                        (that.zone() - moment(that).startOf('month').zone())) * 6e4;
+                output += daysAdjust / diff;
                 if (units === 'year') {
                     output = output / 12;
                 }
@@ -19343,7 +19650,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         from : function (time, withoutSuffix) {
-            return moment.duration(this.diff(time)).lang(this.lang()._abbr).humanize(!withoutSuffix);
+            return moment.duration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
         },
 
         fromNow : function (withoutSuffix) {
@@ -19362,7 +19669,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                     diff < 1 ? 'sameDay' :
                     diff < 2 ? 'nextDay' :
                     diff < 7 ? 'nextWeek' : 'sameElse';
-            return this.format(this.lang().calendar(format, this));
+            return this.format(this.localeData().calendar(format, this));
         },
 
         isLeapYear : function () {
@@ -19377,8 +19684,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         day : function (input) {
             var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
             if (input != null) {
-                input = parseWeekday(input, this.lang());
-                return this.add({ d : input - day });
+                input = parseWeekday(input, this.localeData());
+                return this.add(input - day, 'd');
             } else {
                 return day;
             }
@@ -19386,7 +19693,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         month : makeAccessor('Month', true),
 
-        startOf: function (units) {
+        startOf : function (units) {
             units = normalizeUnits(units);
             // the following switch intentionally omits break keywords
             // to utilize falling through the cases.
@@ -19431,26 +19738,41 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         endOf: function (units) {
             units = normalizeUnits(units);
-            return this.startOf(units).add((units === 'isoWeek' ? 'week' : units), 1).subtract('ms', 1);
+            return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
         },
 
         isAfter: function (input, units) {
-            units = typeof units !== 'undefined' ? units : 'millisecond';
-            return +this.clone().startOf(units) > +moment(input).startOf(units);
+            units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');
+            if (units === 'millisecond') {
+                input = moment.isMoment(input) ? input : moment(input);
+                return +this > +input;
+            } else {
+                return +this.clone().startOf(units) > +moment(input).startOf(units);
+            }
         },
 
         isBefore: function (input, units) {
-            units = typeof units !== 'undefined' ? units : 'millisecond';
-            return +this.clone().startOf(units) < +moment(input).startOf(units);
+            units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');
+            if (units === 'millisecond') {
+                input = moment.isMoment(input) ? input : moment(input);
+                return +this < +input;
+            } else {
+                return +this.clone().startOf(units) < +moment(input).startOf(units);
+            }
         },
 
         isSame: function (input, units) {
-            units = units || 'ms';
-            return +this.clone().startOf(units) === +makeAs(input, this).startOf(units);
+            units = normalizeUnits(units || 'millisecond');
+            if (units === 'millisecond') {
+                input = moment.isMoment(input) ? input : moment(input);
+                return +this === +input;
+            } else {
+                return +this.clone().startOf(units) === +makeAs(input, this).startOf(units);
+            }
         },
 
         min: deprecate(
-                 "moment().min is deprecated, use moment.min instead. https://github.com/moment/moment/issues/1548",
+                 'moment().min is deprecated, use moment.min instead. https://github.com/moment/moment/issues/1548',
                  function (other) {
                      other = moment.apply(null, arguments);
                      return other < this ? this : other;
@@ -19458,36 +19780,43 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
          ),
 
         max: deprecate(
-                "moment().max is deprecated, use moment.max instead. https://github.com/moment/moment/issues/1548",
+                'moment().max is deprecated, use moment.max instead. https://github.com/moment/moment/issues/1548',
                 function (other) {
                     other = moment.apply(null, arguments);
                     return other > this ? this : other;
                 }
         ),
 
-        // keepTime = true means only change the timezone, without affecting
-        // the local hour. So 5:31:26 +0300 --[zone(2, true)]--> 5:31:26 +0200
-        // It is possible that 5:31:26 doesn't exist int zone +0200, so we
-        // adjust the time as needed, to be valid.
+        // keepLocalTime = true means only change the timezone, without
+        // affecting the local hour. So 5:31:26 +0300 --[zone(2, true)]-->
+        // 5:31:26 +0200 It is possible that 5:31:26 doesn't exist int zone
+        // +0200, so we adjust the time as needed, to be valid.
         //
         // Keeping the time actually adds/subtracts (one hour)
         // from the actual represented time. That is why we call updateOffset
         // a second time. In case it wants us to change the offset again
         // _changeInProgress == true case, then we have to adjust, because
         // there is no such time in the given timezone.
-        zone : function (input, keepTime) {
-            var offset = this._offset || 0;
+        zone : function (input, keepLocalTime) {
+            var offset = this._offset || 0,
+                localAdjust;
             if (input != null) {
-                if (typeof input === "string") {
+                if (typeof input === 'string') {
                     input = timezoneMinutesFromString(input);
                 }
                 if (Math.abs(input) < 16) {
                     input = input * 60;
                 }
+                if (!this._isUTC && keepLocalTime) {
+                    localAdjust = this._dateTzOffset();
+                }
                 this._offset = input;
                 this._isUTC = true;
+                if (localAdjust != null) {
+                    this.subtract(localAdjust, 'm');
+                }
                 if (offset !== input) {
-                    if (!keepTime || this._changeInProgress) {
+                    if (!keepLocalTime || this._changeInProgress) {
                         addOrSubtractDurationFromMoment(this,
                                 moment.duration(offset - input, 'm'), 1, false);
                     } else if (!this._changeInProgress) {
@@ -19497,17 +19826,17 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                     }
                 }
             } else {
-                return this._isUTC ? offset : this._d.getTimezoneOffset();
+                return this._isUTC ? offset : this._dateTzOffset();
             }
             return this;
         },
 
         zoneAbbr : function () {
-            return this._isUTC ? "UTC" : "";
+            return this._isUTC ? 'UTC' : '';
         },
 
         zoneName : function () {
-            return this._isUTC ? "Coordinated Universal Time" : "";
+            return this._isUTC ? 'Coordinated Universal Time' : '';
         },
 
         parseZone : function () {
@@ -19536,7 +19865,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         dayOfYear : function (input) {
             var dayOfYear = round((moment(this).startOf('day') - moment(this).startOf('year')) / 864e5) + 1;
-            return input == null ? dayOfYear : this.add("d", (input - dayOfYear));
+            return input == null ? dayOfYear : this.add((input - dayOfYear), 'd');
         },
 
         quarter : function (input) {
@@ -19544,28 +19873,28 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         weekYear : function (input) {
-            var year = weekOfYear(this, this.lang()._week.dow, this.lang()._week.doy).year;
-            return input == null ? year : this.add("y", (input - year));
+            var year = weekOfYear(this, this.localeData()._week.dow, this.localeData()._week.doy).year;
+            return input == null ? year : this.add((input - year), 'y');
         },
 
         isoWeekYear : function (input) {
             var year = weekOfYear(this, 1, 4).year;
-            return input == null ? year : this.add("y", (input - year));
+            return input == null ? year : this.add((input - year), 'y');
         },
 
         week : function (input) {
-            var week = this.lang().week(this);
-            return input == null ? week : this.add("d", (input - week) * 7);
+            var week = this.localeData().week(this);
+            return input == null ? week : this.add((input - week) * 7, 'd');
         },
 
         isoWeek : function (input) {
             var week = weekOfYear(this, 1, 4).week;
-            return input == null ? week : this.add("d", (input - week) * 7);
+            return input == null ? week : this.add((input - week) * 7, 'd');
         },
 
         weekday : function (input) {
-            var weekday = (this.day() + 7 - this.lang()._week.dow) % 7;
-            return input == null ? weekday : this.add("d", input - weekday);
+            var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+            return input == null ? weekday : this.add(input - weekday, 'd');
         },
 
         isoWeekday : function (input) {
@@ -19580,7 +19909,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         weeksInYear : function () {
-            var weekInfo = this._lang._week;
+            var weekInfo = this.localeData()._week;
             return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
         },
 
@@ -19597,16 +19926,42 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             return this;
         },
 
-        // If passed a language key, it will set the language for this
-        // instance.  Otherwise, it will return the language configuration
+        // If passed a locale key, it will set the locale for this
+        // instance.  Otherwise, it will return the locale configuration
         // variables for this instance.
-        lang : function (key) {
+        locale : function (key) {
+            var newLocaleData;
+
             if (key === undefined) {
-                return this._lang;
+                return this._locale._abbr;
             } else {
-                this._lang = getLangDefinition(key);
+                newLocaleData = moment.localeData(key);
+                if (newLocaleData != null) {
+                    this._locale = newLocaleData;
+                }
                 return this;
             }
+        },
+
+        lang : deprecate(
+            'moment().lang() is deprecated. Use moment().localeData() instead.',
+            function (key) {
+                if (key === undefined) {
+                    return this.localeData();
+                } else {
+                    return this.locale(key);
+                }
+            }
+        ),
+
+        localeData : function () {
+            return this._locale;
+        },
+
+        _dateTzOffset : function () {
+            // On Firefox.24 Date#getTimezoneOffset returns a floating point.
+            // https://github.com/moment/moment/pull/1871
+            return Math.round(this._d.getTimezoneOffset() / 15) * 15;
         }
     });
 
@@ -19615,7 +19970,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
         // TODO: Move this out of here!
         if (typeof value === 'string') {
-            value = mom.lang().monthsParse(value);
+            value = mom.localeData().monthsParse(value);
             // TODO: Another silent failure?
             if (typeof value !== 'number') {
                 return mom;
@@ -19662,9 +20017,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     moment.fn.hour = moment.fn.hours = makeAccessor('Hours', true);
     // moment.fn.month is defined separately
     moment.fn.date = makeAccessor('Date', true);
-    moment.fn.dates = deprecate("dates accessor is deprecated. Use date instead.", makeAccessor('Date', true));
+    moment.fn.dates = deprecate('dates accessor is deprecated. Use date instead.', makeAccessor('Date', true));
     moment.fn.year = makeAccessor('FullYear', true);
-    moment.fn.years = deprecate("years accessor is deprecated. Use year instead.", makeAccessor('FullYear', true));
+    moment.fn.years = deprecate('years accessor is deprecated. Use year instead.', makeAccessor('FullYear', true));
 
     // add plural methods
     moment.fn.days = moment.fn.day;
@@ -19681,6 +20036,17 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     ************************************/
 
 
+    function daysToYears (days) {
+        // 400 years have 146097 days (taking into account leap year rules)
+        return days * 400 / 146097;
+    }
+
+    function yearsToDays (years) {
+        // years * 365 + absRound(years / 4) -
+        //     absRound(years / 100) + absRound(years / 400);
+        return years * 146097 / 400;
+    }
+
     extend(moment.duration.fn = Duration.prototype, {
 
         _bubble : function () {
@@ -19688,7 +20054,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 days = this._days,
                 months = this._months,
                 data = this._data,
-                seconds, minutes, hours, years;
+                seconds, minutes, hours, years = 0;
 
             // The following code bubbles up values, see the tests for
             // examples of what that means.
@@ -19704,13 +20070,38 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
             data.hours = hours % 24;
 
             days += absRound(hours / 24);
-            data.days = days % 30;
 
+            // Accurately convert days to years, assume start from year 0.
+            years = absRound(daysToYears(days));
+            days -= absRound(yearsToDays(years));
+
+            // 30 days to a month
+            // TODO (iskren): Use anchor date (like 1st Jan) to compute this.
             months += absRound(days / 30);
-            data.months = months % 12;
+            days %= 30;
 
-            years = absRound(months / 12);
+            // 12 months -> 1 year
+            years += absRound(months / 12);
+            months %= 12;
+
+            data.days = days;
+            data.months = months;
             data.years = years;
+        },
+
+        abs : function () {
+            this._milliseconds = Math.abs(this._milliseconds);
+            this._days = Math.abs(this._days);
+            this._months = Math.abs(this._months);
+
+            this._data.milliseconds = Math.abs(this._data.milliseconds);
+            this._data.seconds = Math.abs(this._data.seconds);
+            this._data.minutes = Math.abs(this._data.minutes);
+            this._data.hours = Math.abs(this._data.hours);
+            this._data.months = Math.abs(this._data.months);
+            this._data.years = Math.abs(this._data.years);
+
+            return this;
         },
 
         weeks : function () {
@@ -19725,14 +20116,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         humanize : function (withSuffix) {
-            var difference = +this,
-                output = relativeTime(difference, !withSuffix, this.lang());
+            var output = relativeTime(this, !withSuffix, this.localeData());
 
             if (withSuffix) {
-                output = this.lang().pastFuture(difference, output);
+                output = this.localeData().pastFuture(+this, output);
             }
 
-            return this.lang().postformat(output);
+            return this.localeData().postformat(output);
         },
 
         add : function (input, val) {
@@ -19766,13 +20156,41 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         },
 
         as : function (units) {
+            var days, months;
             units = normalizeUnits(units);
-            return this['as' + units.charAt(0).toUpperCase() + units.slice(1) + 's']();
+
+            if (units === 'month' || units === 'year') {
+                days = this._days + this._milliseconds / 864e5;
+                months = this._months + daysToYears(days) * 12;
+                return units === 'month' ? months : months / 12;
+            } else {
+                // handle milliseconds separately because of floating point math errors (issue #1867)
+                days = this._days + yearsToDays(this._months / 12);
+                switch (units) {
+                    case 'week': return days / 7 + this._milliseconds / 6048e5;
+                    case 'day': return days + this._milliseconds / 864e5;
+                    case 'hour': return days * 24 + this._milliseconds / 36e5;
+                    case 'minute': return days * 24 * 60 + this._milliseconds / 6e4;
+                    case 'second': return days * 24 * 60 * 60 + this._milliseconds / 1000;
+                    // Math.floor prevents floating point math errors here
+                    case 'millisecond': return Math.floor(days * 24 * 60 * 60 * 1000) + this._milliseconds;
+                    default: throw new Error('Unknown unit ' + units);
+                }
+            }
         },
 
         lang : moment.fn.lang,
+        locale : moment.fn.locale,
 
-        toIsoString : function () {
+        toIsoString : deprecate(
+            'toIsoString() is deprecated. Please use toISOString() instead ' +
+            '(notice the capitals)',
+            function () {
+                return this.toISOString();
+            }
+        ),
+
+        toISOString : function () {
             // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
             var years = Math.abs(this.years()),
                 months = Math.abs(this.months()),
@@ -19796,8 +20214,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
                 (hours ? hours + 'H' : '') +
                 (minutes ? minutes + 'M' : '') +
                 (seconds ? seconds + 'S' : '');
+        },
+
+        localeData : function () {
+            return this._locale;
         }
     });
+
+    moment.duration.fn.toString = moment.duration.fn.toISOString;
 
     function makeDurationGetter(name) {
         moment.duration.fn[name] = function () {
@@ -19805,32 +20229,44 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         };
     }
 
-    function makeDurationAsGetter(name, factor) {
-        moment.duration.fn['as' + name] = function () {
-            return +this / factor;
-        };
-    }
-
     for (i in unitMillisecondFactors) {
-        if (unitMillisecondFactors.hasOwnProperty(i)) {
-            makeDurationAsGetter(i, unitMillisecondFactors[i]);
+        if (hasOwnProp(unitMillisecondFactors, i)) {
             makeDurationGetter(i.toLowerCase());
         }
     }
 
-    makeDurationAsGetter('Weeks', 6048e5);
+    moment.duration.fn.asMilliseconds = function () {
+        return this.as('ms');
+    };
+    moment.duration.fn.asSeconds = function () {
+        return this.as('s');
+    };
+    moment.duration.fn.asMinutes = function () {
+        return this.as('m');
+    };
+    moment.duration.fn.asHours = function () {
+        return this.as('h');
+    };
+    moment.duration.fn.asDays = function () {
+        return this.as('d');
+    };
+    moment.duration.fn.asWeeks = function () {
+        return this.as('weeks');
+    };
     moment.duration.fn.asMonths = function () {
-        return (+this - this.years() * 31536e6) / 2592e6 + this.years() * 12;
+        return this.as('M');
+    };
+    moment.duration.fn.asYears = function () {
+        return this.as('y');
     };
 
-
     /************************************
-        Default Lang
+        Default Locale
     ************************************/
 
 
-    // Set default language, other languages will inherit from English.
-    moment.lang('en', {
+    // Set default locale, other locale will inherit from English.
+    moment.locale('en', {
         ordinal : function (number) {
             var b = number % 10,
                 output = (toInt(number % 100 / 10) === 1) ? 'th' :
@@ -19841,7 +20277,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         }
     });
 
-    /* EMBED_LANGUAGES */
+    /* EMBED_LOCALES */
 
     /************************************
         Exposing Moment
@@ -19855,9 +20291,9 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
         oldGlobalMoment = globalScope.moment;
         if (shouldDeprecate) {
             globalScope.moment = deprecate(
-                    "Accessing Moment through the global scope is " +
-                    "deprecated, and will be removed in an upcoming " +
-                    "release.",
+                    'Accessing Moment through the global scope is ' +
+                    'deprecated, and will be removed in an upcoming ' +
+                    'release.',
                     moment);
         } else {
             globalScope.moment = moment;
@@ -19867,8 +20303,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     // CommonJS module is defined
     if (hasModule) {
         module.exports = moment;
-    } else if (typeof define === "function" && define.amd) {
-        define("moment", function (require, exports, module) {
+    } else if (typeof define === 'function' && define.amd) {
+        define('moment', function (require, exports, module) {
             if (module.config && module.config() && module.config().noGlobal === true) {
                 // release the global variable
                 globalScope.moment = oldGlobalMoment;
@@ -19882,7 +20318,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     }
 }).call(this);
 
-//     Underscore.js 1.6.0
+//     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
@@ -19898,9 +20334,6 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // Save the previous value of the `_` variable.
   var previousUnderscore = root._;
 
-  // Establish the object that gets returned to break out of a loop iteration.
-  var breaker = {};
-
   // Save bytes in the minified (but not gzipped) version:
   var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
 
@@ -19915,15 +20348,6 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
   var
-    nativeForEach      = ArrayProto.forEach,
-    nativeMap          = ArrayProto.map,
-    nativeReduce       = ArrayProto.reduce,
-    nativeReduceRight  = ArrayProto.reduceRight,
-    nativeFilter       = ArrayProto.filter,
-    nativeEvery        = ArrayProto.every,
-    nativeSome         = ArrayProto.some,
-    nativeIndexOf      = ArrayProto.indexOf,
-    nativeLastIndexOf  = ArrayProto.lastIndexOf,
     nativeIsArray      = Array.isArray,
     nativeKeys         = Object.keys,
     nativeBind         = FuncProto.bind;
@@ -19937,8 +20361,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
   // Export the Underscore object for **Node.js**, with
   // backwards-compatibility for the old `require()` API. If we're in
-  // the browser, add `_` as a global object via a string identifier,
-  // for Closure Compiler "advanced" mode.
+  // the browser, add `_` as a global object.
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
       exports = module.exports = _;
@@ -19949,98 +20372,125 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   }
 
   // Current version.
-  _.VERSION = '1.6.0';
+  _.VERSION = '1.7.0';
+
+  // Internal function that returns an efficient (for current engines) version
+  // of the passed-in callback, to be repeatedly applied in other Underscore
+  // functions.
+  var createCallback = function(func, context, argCount) {
+    if (context === void 0) return func;
+    switch (argCount == null ? 3 : argCount) {
+      case 1: return function(value) {
+        return func.call(context, value);
+      };
+      case 2: return function(value, other) {
+        return func.call(context, value, other);
+      };
+      case 3: return function(value, index, collection) {
+        return func.call(context, value, index, collection);
+      };
+      case 4: return function(accumulator, value, index, collection) {
+        return func.call(context, accumulator, value, index, collection);
+      };
+    }
+    return function() {
+      return func.apply(context, arguments);
+    };
+  };
+
+  // A mostly-internal function to generate callbacks that can be applied
+  // to each element in a collection, returning the desired result — either
+  // identity, an arbitrary callback, a property matcher, or a property accessor.
+  _.iteratee = function(value, context, argCount) {
+    if (value == null) return _.identity;
+    if (_.isFunction(value)) return createCallback(value, context, argCount);
+    if (_.isObject(value)) return _.matches(value);
+    return _.property(value);
+  };
 
   // Collection Functions
   // --------------------
 
   // The cornerstone, an `each` implementation, aka `forEach`.
-  // Handles objects with the built-in `forEach`, arrays, and raw objects.
-  // Delegates to **ECMAScript 5**'s native `forEach` if available.
-  var each = _.each = _.forEach = function(obj, iterator, context) {
+  // Handles raw objects in addition to array-likes. Treats all
+  // sparse array-likes as if they were dense.
+  _.each = _.forEach = function(obj, iteratee, context) {
     if (obj == null) return obj;
-    if (nativeForEach && obj.forEach === nativeForEach) {
-      obj.forEach(iterator, context);
-    } else if (obj.length === +obj.length) {
-      for (var i = 0, length = obj.length; i < length; i++) {
-        if (iterator.call(context, obj[i], i, obj) === breaker) return;
+    iteratee = createCallback(iteratee, context);
+    var i, length = obj.length;
+    if (length === +length) {
+      for (i = 0; i < length; i++) {
+        iteratee(obj[i], i, obj);
       }
     } else {
       var keys = _.keys(obj);
-      for (var i = 0, length = keys.length; i < length; i++) {
-        if (iterator.call(context, obj[keys[i]], keys[i], obj) === breaker) return;
+      for (i = 0, length = keys.length; i < length; i++) {
+        iteratee(obj[keys[i]], keys[i], obj);
       }
     }
     return obj;
   };
 
-  // Return the results of applying the iterator to each element.
-  // Delegates to **ECMAScript 5**'s native `map` if available.
-  _.map = _.collect = function(obj, iterator, context) {
-    var results = [];
-    if (obj == null) return results;
-    if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
-    each(obj, function(value, index, list) {
-      results.push(iterator.call(context, value, index, list));
-    });
+  // Return the results of applying the iteratee to each element.
+  _.map = _.collect = function(obj, iteratee, context) {
+    if (obj == null) return [];
+    iteratee = _.iteratee(iteratee, context);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        results = Array(length),
+        currentKey;
+    for (var index = 0; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      results[index] = iteratee(obj[currentKey], currentKey, obj);
+    }
     return results;
   };
 
   var reduceError = 'Reduce of empty array with no initial value';
 
   // **Reduce** builds up a single result from a list of values, aka `inject`,
-  // or `foldl`. Delegates to **ECMAScript 5**'s native `reduce` if available.
-  _.reduce = _.foldl = _.inject = function(obj, iterator, memo, context) {
-    var initial = arguments.length > 2;
+  // or `foldl`.
+  _.reduce = _.foldl = _.inject = function(obj, iteratee, memo, context) {
     if (obj == null) obj = [];
-    if (nativeReduce && obj.reduce === nativeReduce) {
-      if (context) iterator = _.bind(iterator, context);
-      return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
+    iteratee = createCallback(iteratee, context, 4);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        index = 0, currentKey;
+    if (arguments.length < 3) {
+      if (!length) throw new TypeError(reduceError);
+      memo = obj[keys ? keys[index++] : index++];
     }
-    each(obj, function(value, index, list) {
-      if (!initial) {
-        memo = value;
-        initial = true;
-      } else {
-        memo = iterator.call(context, memo, value, index, list);
-      }
-    });
-    if (!initial) throw new TypeError(reduceError);
+    for (; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      memo = iteratee(memo, obj[currentKey], currentKey, obj);
+    }
     return memo;
   };
 
   // The right-associative version of reduce, also known as `foldr`.
-  // Delegates to **ECMAScript 5**'s native `reduceRight` if available.
-  _.reduceRight = _.foldr = function(obj, iterator, memo, context) {
-    var initial = arguments.length > 2;
+  _.reduceRight = _.foldr = function(obj, iteratee, memo, context) {
     if (obj == null) obj = [];
-    if (nativeReduceRight && obj.reduceRight === nativeReduceRight) {
-      if (context) iterator = _.bind(iterator, context);
-      return initial ? obj.reduceRight(iterator, memo) : obj.reduceRight(iterator);
+    iteratee = createCallback(iteratee, context, 4);
+    var keys = obj.length !== + obj.length && _.keys(obj),
+        index = (keys || obj).length,
+        currentKey;
+    if (arguments.length < 3) {
+      if (!index) throw new TypeError(reduceError);
+      memo = obj[keys ? keys[--index] : --index];
     }
-    var length = obj.length;
-    if (length !== +length) {
-      var keys = _.keys(obj);
-      length = keys.length;
+    while (index--) {
+      currentKey = keys ? keys[index] : index;
+      memo = iteratee(memo, obj[currentKey], currentKey, obj);
     }
-    each(obj, function(value, index, list) {
-      index = keys ? keys[--length] : --length;
-      if (!initial) {
-        memo = obj[index];
-        initial = true;
-      } else {
-        memo = iterator.call(context, memo, obj[index], index, list);
-      }
-    });
-    if (!initial) throw new TypeError(reduceError);
     return memo;
   };
 
   // Return the first value which passes a truth test. Aliased as `detect`.
   _.find = _.detect = function(obj, predicate, context) {
     var result;
-    any(obj, function(value, index, list) {
-      if (predicate.call(context, value, index, list)) {
+    predicate = _.iteratee(predicate, context);
+    _.some(obj, function(value, index, list) {
+      if (predicate(value, index, list)) {
         result = value;
         return true;
       }
@@ -20049,61 +20499,58 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   };
 
   // Return all the elements that pass a truth test.
-  // Delegates to **ECMAScript 5**'s native `filter` if available.
   // Aliased as `select`.
   _.filter = _.select = function(obj, predicate, context) {
     var results = [];
     if (obj == null) return results;
-    if (nativeFilter && obj.filter === nativeFilter) return obj.filter(predicate, context);
-    each(obj, function(value, index, list) {
-      if (predicate.call(context, value, index, list)) results.push(value);
+    predicate = _.iteratee(predicate, context);
+    _.each(obj, function(value, index, list) {
+      if (predicate(value, index, list)) results.push(value);
     });
     return results;
   };
 
   // Return all the elements for which a truth test fails.
   _.reject = function(obj, predicate, context) {
-    return _.filter(obj, function(value, index, list) {
-      return !predicate.call(context, value, index, list);
-    }, context);
+    return _.filter(obj, _.negate(_.iteratee(predicate)), context);
   };
 
   // Determine whether all of the elements match a truth test.
-  // Delegates to **ECMAScript 5**'s native `every` if available.
   // Aliased as `all`.
   _.every = _.all = function(obj, predicate, context) {
-    predicate || (predicate = _.identity);
-    var result = true;
-    if (obj == null) return result;
-    if (nativeEvery && obj.every === nativeEvery) return obj.every(predicate, context);
-    each(obj, function(value, index, list) {
-      if (!(result = result && predicate.call(context, value, index, list))) return breaker;
-    });
-    return !!result;
+    if (obj == null) return true;
+    predicate = _.iteratee(predicate, context);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        index, currentKey;
+    for (index = 0; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      if (!predicate(obj[currentKey], currentKey, obj)) return false;
+    }
+    return true;
   };
 
   // Determine if at least one element in the object matches a truth test.
-  // Delegates to **ECMAScript 5**'s native `some` if available.
   // Aliased as `any`.
-  var any = _.some = _.any = function(obj, predicate, context) {
-    predicate || (predicate = _.identity);
-    var result = false;
-    if (obj == null) return result;
-    if (nativeSome && obj.some === nativeSome) return obj.some(predicate, context);
-    each(obj, function(value, index, list) {
-      if (result || (result = predicate.call(context, value, index, list))) return breaker;
-    });
-    return !!result;
+  _.some = _.any = function(obj, predicate, context) {
+    if (obj == null) return false;
+    predicate = _.iteratee(predicate, context);
+    var keys = obj.length !== +obj.length && _.keys(obj),
+        length = (keys || obj).length,
+        index, currentKey;
+    for (index = 0; index < length; index++) {
+      currentKey = keys ? keys[index] : index;
+      if (predicate(obj[currentKey], currentKey, obj)) return true;
+    }
+    return false;
   };
 
   // Determine if the array or object contains a given value (using `===`).
   // Aliased as `include`.
   _.contains = _.include = function(obj, target) {
     if (obj == null) return false;
-    if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
-    return any(obj, function(value) {
-      return value === target;
-    });
+    if (obj.length !== +obj.length) obj = _.values(obj);
+    return _.indexOf(obj, target) >= 0;
   };
 
   // Invoke a method (with arguments) on every item in a collection.
@@ -20132,51 +20579,67 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     return _.find(obj, _.matches(attrs));
   };
 
-  // Return the maximum element or (element-based computation).
-  // Can't optimize arrays of integers longer than 65,535 elements.
-  // See [WebKit Bug 80797](https://bugs.webkit.org/show_bug.cgi?id=80797)
-  _.max = function(obj, iterator, context) {
-    if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
-      return Math.max.apply(Math, obj);
-    }
-    var result = -Infinity, lastComputed = -Infinity;
-    each(obj, function(value, index, list) {
-      var computed = iterator ? iterator.call(context, value, index, list) : value;
-      if (computed > lastComputed) {
-        result = value;
-        lastComputed = computed;
+  // Return the maximum element (or element-based computation).
+  _.max = function(obj, iteratee, context) {
+    var result = -Infinity, lastComputed = -Infinity,
+        value, computed;
+    if (iteratee == null && obj != null) {
+      obj = obj.length === +obj.length ? obj : _.values(obj);
+      for (var i = 0, length = obj.length; i < length; i++) {
+        value = obj[i];
+        if (value > result) {
+          result = value;
+        }
       }
-    });
+    } else {
+      iteratee = _.iteratee(iteratee, context);
+      _.each(obj, function(value, index, list) {
+        computed = iteratee(value, index, list);
+        if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+          result = value;
+          lastComputed = computed;
+        }
+      });
+    }
     return result;
   };
 
   // Return the minimum element (or element-based computation).
-  _.min = function(obj, iterator, context) {
-    if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
-      return Math.min.apply(Math, obj);
-    }
-    var result = Infinity, lastComputed = Infinity;
-    each(obj, function(value, index, list) {
-      var computed = iterator ? iterator.call(context, value, index, list) : value;
-      if (computed < lastComputed) {
-        result = value;
-        lastComputed = computed;
+  _.min = function(obj, iteratee, context) {
+    var result = Infinity, lastComputed = Infinity,
+        value, computed;
+    if (iteratee == null && obj != null) {
+      obj = obj.length === +obj.length ? obj : _.values(obj);
+      for (var i = 0, length = obj.length; i < length; i++) {
+        value = obj[i];
+        if (value < result) {
+          result = value;
+        }
       }
-    });
+    } else {
+      iteratee = _.iteratee(iteratee, context);
+      _.each(obj, function(value, index, list) {
+        computed = iteratee(value, index, list);
+        if (computed < lastComputed || computed === Infinity && result === Infinity) {
+          result = value;
+          lastComputed = computed;
+        }
+      });
+    }
     return result;
   };
 
-  // Shuffle an array, using the modern version of the
+  // Shuffle a collection, using the modern version of the
   // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
   _.shuffle = function(obj) {
-    var rand;
-    var index = 0;
-    var shuffled = [];
-    each(obj, function(value) {
-      rand = _.random(index++);
-      shuffled[index - 1] = shuffled[rand];
-      shuffled[rand] = value;
-    });
+    var set = obj && obj.length === +obj.length ? obj : _.values(obj);
+    var length = set.length;
+    var shuffled = Array(length);
+    for (var index = 0, rand; index < length; index++) {
+      rand = _.random(0, index);
+      if (rand !== index) shuffled[index] = shuffled[rand];
+      shuffled[rand] = set[index];
+    }
     return shuffled;
   };
 
@@ -20191,21 +20654,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     return _.shuffle(obj).slice(0, Math.max(0, n));
   };
 
-  // An internal function to generate lookup iterators.
-  var lookupIterator = function(value) {
-    if (value == null) return _.identity;
-    if (_.isFunction(value)) return value;
-    return _.property(value);
-  };
-
-  // Sort the object's values by a criterion produced by an iterator.
-  _.sortBy = function(obj, iterator, context) {
-    iterator = lookupIterator(iterator);
+  // Sort the object's values by a criterion produced by an iteratee.
+  _.sortBy = function(obj, iteratee, context) {
+    iteratee = _.iteratee(iteratee, context);
     return _.pluck(_.map(obj, function(value, index, list) {
       return {
         value: value,
         index: index,
-        criteria: iterator.call(context, value, index, list)
+        criteria: iteratee(value, index, list)
       };
     }).sort(function(left, right) {
       var a = left.criteria;
@@ -20220,12 +20676,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
   // An internal function used for aggregate "group by" operations.
   var group = function(behavior) {
-    return function(obj, iterator, context) {
+    return function(obj, iteratee, context) {
       var result = {};
-      iterator = lookupIterator(iterator);
-      each(obj, function(value, index) {
-        var key = iterator.call(context, value, index, obj);
-        behavior(result, key, value);
+      iteratee = _.iteratee(iteratee, context);
+      _.each(obj, function(value, index) {
+        var key = iteratee(value, index, obj);
+        behavior(result, value, key);
       });
       return result;
     };
@@ -20233,32 +20689,32 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
   // Groups the object's values by a criterion. Pass either a string attribute
   // to group by, or a function that returns the criterion.
-  _.groupBy = group(function(result, key, value) {
-    _.has(result, key) ? result[key].push(value) : result[key] = [value];
+  _.groupBy = group(function(result, value, key) {
+    if (_.has(result, key)) result[key].push(value); else result[key] = [value];
   });
 
   // Indexes the object's values by a criterion, similar to `groupBy`, but for
   // when you know that your index values will be unique.
-  _.indexBy = group(function(result, key, value) {
+  _.indexBy = group(function(result, value, key) {
     result[key] = value;
   });
 
   // Counts instances of an object that group by a certain criterion. Pass
   // either a string attribute to count by, or a function that returns the
   // criterion.
-  _.countBy = group(function(result, key) {
-    _.has(result, key) ? result[key]++ : result[key] = 1;
+  _.countBy = group(function(result, value, key) {
+    if (_.has(result, key)) result[key]++; else result[key] = 1;
   });
 
   // Use a comparator function to figure out the smallest index at which
   // an object should be inserted so as to maintain order. Uses binary search.
-  _.sortedIndex = function(array, obj, iterator, context) {
-    iterator = lookupIterator(iterator);
-    var value = iterator.call(context, obj);
+  _.sortedIndex = function(array, obj, iteratee, context) {
+    iteratee = _.iteratee(iteratee, context, 1);
+    var value = iteratee(obj);
     var low = 0, high = array.length;
     while (low < high) {
-      var mid = (low + high) >>> 1;
-      iterator.call(context, array[mid]) < value ? low = mid + 1 : high = mid;
+      var mid = low + high >>> 1;
+      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
     }
     return low;
   };
@@ -20274,7 +20730,18 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // Return the number of elements in an object.
   _.size = function(obj) {
     if (obj == null) return 0;
-    return (obj.length === +obj.length) ? obj.length : _.keys(obj).length;
+    return obj.length === +obj.length ? obj.length : _.keys(obj).length;
+  };
+
+  // Split a collection into two arrays: one whose elements all satisfy the given
+  // predicate, and one whose elements all do not satisfy the predicate.
+  _.partition = function(obj, predicate, context) {
+    predicate = _.iteratee(predicate, context);
+    var pass = [], fail = [];
+    _.each(obj, function(value, key, obj) {
+      (predicate(value, key, obj) ? pass : fail).push(value);
+    });
+    return [pass, fail];
   };
 
   // Array Functions
@@ -20285,7 +20752,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
     if (array == null) return void 0;
-    if ((n == null) || guard) return array[0];
+    if (n == null || guard) return array[0];
     if (n < 0) return [];
     return slice.call(array, 0, n);
   };
@@ -20295,14 +20762,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // the array, excluding the last N. The **guard** check allows it to work with
   // `_.map`.
   _.initial = function(array, n, guard) {
-    return slice.call(array, 0, array.length - ((n == null) || guard ? 1 : n));
+    return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
   };
 
   // Get the last element of an array. Passing **n** will return the last N
   // values in the array. The **guard** check allows it to work with `_.map`.
   _.last = function(array, n, guard) {
     if (array == null) return void 0;
-    if ((n == null) || guard) return array[array.length - 1];
+    if (n == null || guard) return array[array.length - 1];
     return slice.call(array, Math.max(array.length - n, 0));
   };
 
@@ -20311,7 +20778,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // the rest N values in the array. The **guard**
   // check allows it to work with `_.map`.
   _.rest = _.tail = _.drop = function(array, n, guard) {
-    return slice.call(array, (n == null) || guard ? 1 : n);
+    return slice.call(array, n == null || guard ? 1 : n);
   };
 
   // Trim out all falsy values from an array.
@@ -20320,23 +20787,26 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   };
 
   // Internal implementation of a recursive `flatten` function.
-  var flatten = function(input, shallow, output) {
+  var flatten = function(input, shallow, strict, output) {
     if (shallow && _.every(input, _.isArray)) {
       return concat.apply(output, input);
     }
-    each(input, function(value) {
-      if (_.isArray(value) || _.isArguments(value)) {
-        shallow ? push.apply(output, value) : flatten(value, shallow, output);
+    for (var i = 0, length = input.length; i < length; i++) {
+      var value = input[i];
+      if (!_.isArray(value) && !_.isArguments(value)) {
+        if (!strict) output.push(value);
+      } else if (shallow) {
+        push.apply(output, value);
       } else {
-        output.push(value);
+        flatten(value, shallow, strict, output);
       }
-    });
+    }
     return output;
   };
 
   // Flatten out an array, either recursively (by default), or just one level.
   _.flatten = function(array, shallow) {
-    return flatten(array, shallow, []);
+    return flatten(array, shallow, false, []);
   };
 
   // Return a version of the array that does not contain the specified value(s).
@@ -20344,68 +20814,77 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     return _.difference(array, slice.call(arguments, 1));
   };
 
-  // Split an array into two arrays: one whose elements all satisfy the given
-  // predicate, and one whose elements all do not satisfy the predicate.
-  _.partition = function(array, predicate) {
-    var pass = [], fail = [];
-    each(array, function(elem) {
-      (predicate(elem) ? pass : fail).push(elem);
-    });
-    return [pass, fail];
-  };
-
   // Produce a duplicate-free version of the array. If the array has already
   // been sorted, you have the option of using a faster algorithm.
   // Aliased as `unique`.
-  _.uniq = _.unique = function(array, isSorted, iterator, context) {
-    if (_.isFunction(isSorted)) {
-      context = iterator;
-      iterator = isSorted;
+  _.uniq = _.unique = function(array, isSorted, iteratee, context) {
+    if (array == null) return [];
+    if (!_.isBoolean(isSorted)) {
+      context = iteratee;
+      iteratee = isSorted;
       isSorted = false;
     }
-    var initial = iterator ? _.map(array, iterator, context) : array;
-    var results = [];
+    if (iteratee != null) iteratee = _.iteratee(iteratee, context);
+    var result = [];
     var seen = [];
-    each(initial, function(value, index) {
-      if (isSorted ? (!index || seen[seen.length - 1] !== value) : !_.contains(seen, value)) {
-        seen.push(value);
-        results.push(array[index]);
+    for (var i = 0, length = array.length; i < length; i++) {
+      var value = array[i];
+      if (isSorted) {
+        if (!i || seen !== value) result.push(value);
+        seen = value;
+      } else if (iteratee) {
+        var computed = iteratee(value, i, array);
+        if (_.indexOf(seen, computed) < 0) {
+          seen.push(computed);
+          result.push(value);
+        }
+      } else if (_.indexOf(result, value) < 0) {
+        result.push(value);
       }
-    });
-    return results;
+    }
+    return result;
   };
 
   // Produce an array that contains the union: each distinct element from all of
   // the passed-in arrays.
   _.union = function() {
-    return _.uniq(_.flatten(arguments, true));
+    return _.uniq(flatten(arguments, true, true, []));
   };
 
   // Produce an array that contains every item shared between all the
   // passed-in arrays.
   _.intersection = function(array) {
-    var rest = slice.call(arguments, 1);
-    return _.filter(_.uniq(array), function(item) {
-      return _.every(rest, function(other) {
-        return _.contains(other, item);
-      });
-    });
+    if (array == null) return [];
+    var result = [];
+    var argsLength = arguments.length;
+    for (var i = 0, length = array.length; i < length; i++) {
+      var item = array[i];
+      if (_.contains(result, item)) continue;
+      for (var j = 1; j < argsLength; j++) {
+        if (!_.contains(arguments[j], item)) break;
+      }
+      if (j === argsLength) result.push(item);
+    }
+    return result;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
-    var rest = concat.apply(ArrayProto, slice.call(arguments, 1));
-    return _.filter(array, function(value){ return !_.contains(rest, value); });
+    var rest = flatten(slice.call(arguments, 1), true, true, []);
+    return _.filter(array, function(value){
+      return !_.contains(rest, value);
+    });
   };
 
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
-  _.zip = function() {
-    var length = _.max(_.pluck(arguments, 'length').concat(0));
-    var results = new Array(length);
+  _.zip = function(array) {
+    if (array == null) return [];
+    var length = _.max(arguments, 'length').length;
+    var results = Array(length);
     for (var i = 0; i < length; i++) {
-      results[i] = _.pluck(arguments, '' + i);
+      results[i] = _.pluck(arguments, i);
     }
     return results;
   };
@@ -20426,10 +20905,8 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     return result;
   };
 
-  // If the browser doesn't supply us with indexOf (I'm looking at you, **MSIE**),
-  // we need this function. Return the position of the first occurrence of an
-  // item in an array, or -1 if the item is not included in the array.
-  // Delegates to **ECMAScript 5**'s native `indexOf` if available.
+  // Return the position of the first occurrence of an item in an array,
+  // or -1 if the item is not included in the array.
   // If the array is large and already in sort order, pass `true`
   // for **isSorted** to use binary search.
   _.indexOf = function(array, item, isSorted) {
@@ -20437,26 +20914,23 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     var i = 0, length = array.length;
     if (isSorted) {
       if (typeof isSorted == 'number') {
-        i = (isSorted < 0 ? Math.max(0, length + isSorted) : isSorted);
+        i = isSorted < 0 ? Math.max(0, length + isSorted) : isSorted;
       } else {
         i = _.sortedIndex(array, item);
         return array[i] === item ? i : -1;
       }
     }
-    if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item, isSorted);
     for (; i < length; i++) if (array[i] === item) return i;
     return -1;
   };
 
-  // Delegates to **ECMAScript 5**'s native `lastIndexOf` if available.
   _.lastIndexOf = function(array, item, from) {
     if (array == null) return -1;
-    var hasIndex = from != null;
-    if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf) {
-      return hasIndex ? array.lastIndexOf(item, from) : array.lastIndexOf(item);
+    var idx = array.length;
+    if (typeof from == 'number') {
+      idx = from < 0 ? idx + from + 1 : Math.min(idx, from + 1);
     }
-    var i = (hasIndex ? from : array.length);
-    while (i--) if (array[i] === item) return i;
+    while (--idx >= 0) if (array[idx] === item) return idx;
     return -1;
   };
 
@@ -20468,15 +20942,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       stop = start || 0;
       start = 0;
     }
-    step = arguments[2] || 1;
+    step = step || 1;
 
     var length = Math.max(Math.ceil((stop - start) / step), 0);
-    var idx = 0;
-    var range = new Array(length);
+    var range = Array(length);
 
-    while(idx < length) {
-      range[idx++] = start;
-      start += step;
+    for (var idx = 0; idx < length; idx++, start += step) {
+      range[idx] = start;
     }
 
     return range;
@@ -20486,7 +20958,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // ------------------
 
   // Reusable constructor function for prototype setting.
-  var ctor = function(){};
+  var Ctor = function(){};
 
   // Create a function bound to a given object (assigning `this`, and arguments,
   // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
@@ -20494,17 +20966,18 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   _.bind = function(func, context) {
     var args, bound;
     if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    if (!_.isFunction(func)) throw new TypeError;
+    if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
     args = slice.call(arguments, 2);
-    return bound = function() {
+    bound = function() {
       if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
-      ctor.prototype = func.prototype;
-      var self = new ctor;
-      ctor.prototype = null;
+      Ctor.prototype = func.prototype;
+      var self = new Ctor;
+      Ctor.prototype = null;
       var result = func.apply(self, args.concat(slice.call(arguments)));
-      if (Object(result) === result) return result;
+      if (_.isObject(result)) return result;
       return self;
     };
+    return bound;
   };
 
   // Partially apply a function by creating a version that has had some of its
@@ -20527,27 +21000,34 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // are the method names to be bound. Useful for ensuring that all callbacks
   // defined on an object belong to it.
   _.bindAll = function(obj) {
-    var funcs = slice.call(arguments, 1);
-    if (funcs.length === 0) throw new Error('bindAll must be passed function names');
-    each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
+    var i, length = arguments.length, key;
+    if (length <= 1) throw new Error('bindAll must be passed function names');
+    for (i = 1; i < length; i++) {
+      key = arguments[i];
+      obj[key] = _.bind(obj[key], obj);
+    }
     return obj;
   };
 
   // Memoize an expensive function by storing its results.
   _.memoize = function(func, hasher) {
-    var memo = {};
-    hasher || (hasher = _.identity);
-    return function() {
-      var key = hasher.apply(this, arguments);
-      return _.has(memo, key) ? memo[key] : (memo[key] = func.apply(this, arguments));
+    var memoize = function(key) {
+      var cache = memoize.cache;
+      var address = hasher ? hasher.apply(this, arguments) : key;
+      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
+      return cache[address];
     };
+    memoize.cache = {};
+    return memoize;
   };
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
   _.delay = function(func, wait) {
     var args = slice.call(arguments, 2);
-    return setTimeout(function(){ return func.apply(null, args); }, wait);
+    return setTimeout(function(){
+      return func.apply(null, args);
+    }, wait);
   };
 
   // Defers a function, scheduling it to run after the current call stack has
@@ -20565,12 +21045,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     var context, args, result;
     var timeout = null;
     var previous = 0;
-    options || (options = {});
+    if (!options) options = {};
     var later = function() {
       previous = options.leading === false ? 0 : _.now();
       timeout = null;
       result = func.apply(context, args);
-      context = args = null;
+      if (!timeout) context = args = null;
     };
     return function() {
       var now = _.now();
@@ -20578,12 +21058,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       var remaining = wait - (now - previous);
       context = this;
       args = arguments;
-      if (remaining <= 0) {
+      if (remaining <= 0 || remaining > wait) {
         clearTimeout(timeout);
         timeout = null;
         previous = now;
         result = func.apply(context, args);
-        context = args = null;
+        if (!timeout) context = args = null;
       } else if (!timeout && options.trailing !== false) {
         timeout = setTimeout(later, remaining);
       }
@@ -20600,13 +21080,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     var later = function() {
       var last = _.now() - timestamp;
-      if (last < wait) {
+
+      if (last < wait && last > 0) {
         timeout = setTimeout(later, wait - last);
       } else {
         timeout = null;
         if (!immediate) {
           result = func.apply(context, args);
-          context = args = null;
+          if (!timeout) context = args = null;
         }
       }
     };
@@ -20616,28 +21097,13 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       args = arguments;
       timestamp = _.now();
       var callNow = immediate && !timeout;
-      if (!timeout) {
-        timeout = setTimeout(later, wait);
-      }
+      if (!timeout) timeout = setTimeout(later, wait);
       if (callNow) {
         result = func.apply(context, args);
         context = args = null;
       }
 
       return result;
-    };
-  };
-
-  // Returns a function that will be executed at most one time, no matter how
-  // often you call it. Useful for lazy initialization.
-  _.once = function(func) {
-    var ran = false, memo;
-    return function() {
-      if (ran) return memo;
-      ran = true;
-      memo = func.apply(this, arguments);
-      func = null;
-      return memo;
     };
   };
 
@@ -20648,16 +21114,23 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     return _.partial(wrapper, func);
   };
 
+  // Returns a negated version of the passed-in predicate.
+  _.negate = function(predicate) {
+    return function() {
+      return !predicate.apply(this, arguments);
+    };
+  };
+
   // Returns a function that is the composition of a list of functions, each
   // consuming the return value of the function that follows.
   _.compose = function() {
-    var funcs = arguments;
+    var args = arguments;
+    var start = args.length - 1;
     return function() {
-      var args = arguments;
-      for (var i = funcs.length - 1; i >= 0; i--) {
-        args = [funcs[i].apply(this, args)];
-      }
-      return args[0];
+      var i = start;
+      var result = args[start].apply(this, arguments);
+      while (i--) result = args[i].call(this, result);
+      return result;
     };
   };
 
@@ -20669,6 +21142,23 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       }
     };
   };
+
+  // Returns a function that will only be executed before being called N times.
+  _.before = function(times, func) {
+    var memo;
+    return function() {
+      if (--times > 0) {
+        memo = func.apply(this, arguments);
+      } else {
+        func = null;
+      }
+      return memo;
+    };
+  };
+
+  // Returns a function that will be executed at most one time, no matter how
+  // often you call it. Useful for lazy initialization.
+  _.once = _.partial(_.before, 2);
 
   // Object Functions
   // ----------------
@@ -20687,7 +21177,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   _.values = function(obj) {
     var keys = _.keys(obj);
     var length = keys.length;
-    var values = new Array(length);
+    var values = Array(length);
     for (var i = 0; i < length; i++) {
       values[i] = obj[keys[i]];
     }
@@ -20698,7 +21188,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   _.pairs = function(obj) {
     var keys = _.keys(obj);
     var length = keys.length;
-    var pairs = new Array(length);
+    var pairs = Array(length);
     for (var i = 0; i < length; i++) {
       pairs[i] = [keys[i], obj[keys[i]]];
     }
@@ -20727,45 +21217,62 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
   // Extend a given object with all the properties in passed-in object(s).
   _.extend = function(obj) {
-    each(slice.call(arguments, 1), function(source) {
-      if (source) {
-        for (var prop in source) {
-          obj[prop] = source[prop];
+    if (!_.isObject(obj)) return obj;
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      source = arguments[i];
+      for (prop in source) {
+        if (hasOwnProperty.call(source, prop)) {
+            obj[prop] = source[prop];
         }
       }
-    });
+    }
     return obj;
   };
 
   // Return a copy of the object only containing the whitelisted properties.
-  _.pick = function(obj) {
-    var copy = {};
-    var keys = concat.apply(ArrayProto, slice.call(arguments, 1));
-    each(keys, function(key) {
-      if (key in obj) copy[key] = obj[key];
-    });
-    return copy;
+  _.pick = function(obj, iteratee, context) {
+    var result = {}, key;
+    if (obj == null) return result;
+    if (_.isFunction(iteratee)) {
+      iteratee = createCallback(iteratee, context);
+      for (key in obj) {
+        var value = obj[key];
+        if (iteratee(value, key, obj)) result[key] = value;
+      }
+    } else {
+      var keys = concat.apply([], slice.call(arguments, 1));
+      obj = new Object(obj);
+      for (var i = 0, length = keys.length; i < length; i++) {
+        key = keys[i];
+        if (key in obj) result[key] = obj[key];
+      }
+    }
+    return result;
   };
 
    // Return a copy of the object without the blacklisted properties.
-  _.omit = function(obj) {
-    var copy = {};
-    var keys = concat.apply(ArrayProto, slice.call(arguments, 1));
-    for (var key in obj) {
-      if (!_.contains(keys, key)) copy[key] = obj[key];
+  _.omit = function(obj, iteratee, context) {
+    if (_.isFunction(iteratee)) {
+      iteratee = _.negate(iteratee);
+    } else {
+      var keys = _.map(concat.apply([], slice.call(arguments, 1)), String);
+      iteratee = function(value, key) {
+        return !_.contains(keys, key);
+      };
     }
-    return copy;
+    return _.pick(obj, iteratee, context);
   };
 
   // Fill in a given object with default properties.
   _.defaults = function(obj) {
-    each(slice.call(arguments, 1), function(source) {
-      if (source) {
-        for (var prop in source) {
-          if (obj[prop] === void 0) obj[prop] = source[prop];
-        }
+    if (!_.isObject(obj)) return obj;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+      var source = arguments[i];
+      for (var prop in source) {
+        if (obj[prop] === void 0) obj[prop] = source[prop];
       }
-    });
+    }
     return obj;
   };
 
@@ -20787,7 +21294,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   var eq = function(a, b, aStack, bStack) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
     // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
-    if (a === b) return a !== 0 || 1 / a == 1 / b;
+    if (a === b) return a !== 0 || 1 / a === 1 / b;
     // A strict comparison is necessary because `null == undefined`.
     if (a == null || b == null) return a === b;
     // Unwrap any wrapped objects.
@@ -20795,29 +21302,27 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     if (b instanceof _) b = b._wrapped;
     // Compare `[[Class]]` names.
     var className = toString.call(a);
-    if (className != toString.call(b)) return false;
+    if (className !== toString.call(b)) return false;
     switch (className) {
-      // Strings, numbers, dates, and booleans are compared by value.
+      // Strings, numbers, regular expressions, dates, and booleans are compared by value.
+      case '[object RegExp]':
+      // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
       case '[object String]':
         // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
         // equivalent to `new String("5")`.
-        return a == String(b);
+        return '' + a === '' + b;
       case '[object Number]':
-        // `NaN`s are equivalent, but non-reflexive. An `egal` comparison is performed for
-        // other numeric values.
-        return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+        // `NaN`s are equivalent, but non-reflexive.
+        // Object(NaN) is equivalent to NaN
+        if (+a !== +a) return +b !== +b;
+        // An `egal` comparison is performed for other numeric values.
+        return +a === 0 ? 1 / +a === 1 / b : +a === +b;
       case '[object Date]':
       case '[object Boolean]':
         // Coerce dates and booleans to numeric primitive values. Dates are compared by their
         // millisecond representations. Note that invalid dates with millisecond representations
         // of `NaN` are not equivalent.
-        return +a == +b;
-      // RegExps are compared by their source patterns and flags.
-      case '[object RegExp]':
-        return a.source == b.source &&
-               a.global == b.global &&
-               a.multiline == b.multiline &&
-               a.ignoreCase == b.ignoreCase;
+        return +a === +b;
     }
     if (typeof a != 'object' || typeof b != 'object') return false;
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
@@ -20826,25 +21331,29 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     while (length--) {
       // Linear search. Performance is inversely proportional to the number of
       // unique nested structures.
-      if (aStack[length] == a) return bStack[length] == b;
+      if (aStack[length] === a) return bStack[length] === b;
     }
     // Objects with different constructors are not equivalent, but `Object`s
     // from different frames are.
     var aCtor = a.constructor, bCtor = b.constructor;
-    if (aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) &&
-                             _.isFunction(bCtor) && (bCtor instanceof bCtor))
-                        && ('constructor' in a && 'constructor' in b)) {
+    if (
+      aCtor !== bCtor &&
+      // Handle Object.create(x) cases
+      'constructor' in a && 'constructor' in b &&
+      !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+        _.isFunction(bCtor) && bCtor instanceof bCtor)
+    ) {
       return false;
     }
     // Add the first object to the stack of traversed objects.
     aStack.push(a);
     bStack.push(b);
-    var size = 0, result = true;
+    var size, result;
     // Recursively compare objects and arrays.
-    if (className == '[object Array]') {
+    if (className === '[object Array]') {
       // Compare array lengths to determine if a deep comparison is necessary.
       size = a.length;
-      result = size == b.length;
+      result = size === b.length;
       if (result) {
         // Deep compare the contents, ignoring non-numeric properties.
         while (size--) {
@@ -20853,20 +21362,16 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       }
     } else {
       // Deep compare objects.
-      for (var key in a) {
-        if (_.has(a, key)) {
-          // Count the expected number of properties.
-          size++;
-          // Deep compare each member.
+      var keys = _.keys(a), key;
+      size = keys.length;
+      // Ensure that both objects contain the same number of properties before comparing deep equality.
+      result = _.keys(b).length === size;
+      if (result) {
+        while (size--) {
+          // Deep compare each member
+          key = keys[size];
           if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
         }
-      }
-      // Ensure that both objects contain the same number of properties.
-      if (result) {
-        for (key in b) {
-          if (_.has(b, key) && !(size--)) break;
-        }
-        result = !size;
       }
     }
     // Remove the first object from the stack of traversed objects.
@@ -20884,7 +21389,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // An "empty" object has no enumerable own-properties.
   _.isEmpty = function(obj) {
     if (obj == null) return true;
-    if (_.isArray(obj) || _.isString(obj)) return obj.length === 0;
+    if (_.isArray(obj) || _.isString(obj) || _.isArguments(obj)) return obj.length === 0;
     for (var key in obj) if (_.has(obj, key)) return false;
     return true;
   };
@@ -20897,18 +21402,19 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // Is a given value an array?
   // Delegates to ECMA5's native Array.isArray
   _.isArray = nativeIsArray || function(obj) {
-    return toString.call(obj) == '[object Array]';
+    return toString.call(obj) === '[object Array]';
   };
 
   // Is a given variable an object?
   _.isObject = function(obj) {
-    return obj === Object(obj);
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
   };
 
   // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
-  each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
+  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
     _['is' + name] = function(obj) {
-      return toString.call(obj) == '[object ' + name + ']';
+      return toString.call(obj) === '[object ' + name + ']';
     };
   });
 
@@ -20916,14 +21422,14 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // there isn't any inspectable "Arguments" type.
   if (!_.isArguments(arguments)) {
     _.isArguments = function(obj) {
-      return !!(obj && _.has(obj, 'callee'));
+      return _.has(obj, 'callee');
     };
   }
 
-  // Optimize `isFunction` if appropriate.
-  if (typeof (/./) !== 'function') {
+  // Optimize `isFunction` if appropriate. Work around an IE 11 bug.
+  if (typeof /./ !== 'function') {
     _.isFunction = function(obj) {
-      return typeof obj === 'function';
+      return typeof obj == 'function' || false;
     };
   }
 
@@ -20934,12 +21440,12 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
   // Is the given value `NaN`? (NaN is the only number which does not equal itself).
   _.isNaN = function(obj) {
-    return _.isNumber(obj) && obj != +obj;
+    return _.isNumber(obj) && obj !== +obj;
   };
 
   // Is a given value a boolean?
   _.isBoolean = function(obj) {
-    return obj === true || obj === false || toString.call(obj) == '[object Boolean]';
+    return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
   };
 
   // Is a given value equal to null?
@@ -20955,7 +21461,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   // Shortcut function for checking if an object has a given property directly
   // on itself (in other words, not on a prototype).
   _.has = function(obj, key) {
-    return hasOwnProperty.call(obj, key);
+    return obj != null && hasOwnProperty.call(obj, key);
   };
 
   // Utility Functions
@@ -20968,16 +21474,18 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     return this;
   };
 
-  // Keep the identity function around for default iterators.
+  // Keep the identity function around for default iteratees.
   _.identity = function(value) {
     return value;
   };
 
   _.constant = function(value) {
-    return function () {
+    return function() {
       return value;
     };
   };
+
+  _.noop = function(){};
 
   _.property = function(key) {
     return function(obj) {
@@ -20987,20 +21495,23 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
   // Returns a predicate for checking whether an object has a given set of `key:value` pairs.
   _.matches = function(attrs) {
+    var pairs = _.pairs(attrs), length = pairs.length;
     return function(obj) {
-      if (obj === attrs) return true; //avoid comparing an object to itself.
-      for (var key in attrs) {
-        if (attrs[key] !== obj[key])
-          return false;
+      if (obj == null) return !length;
+      obj = new Object(obj);
+      for (var i = 0; i < length; i++) {
+        var pair = pairs[i], key = pair[0];
+        if (pair[1] !== obj[key] || !(key in obj)) return false;
       }
       return true;
-    }
+    };
   };
 
   // Run a function **n** times.
-  _.times = function(n, iterator, context) {
+  _.times = function(n, iteratee, context) {
     var accum = Array(Math.max(0, n));
-    for (var i = 0; i < n; i++) accum[i] = iterator.call(context, i);
+    iteratee = createCallback(iteratee, context, 1);
+    for (var i = 0; i < n; i++) accum[i] = iteratee(i);
     return accum;
   };
 
@@ -21014,54 +21525,44 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
   };
 
   // A (possibly faster) way to get the current timestamp as an integer.
-  _.now = Date.now || function() { return new Date().getTime(); };
-
-  // List of HTML entities for escaping.
-  var entityMap = {
-    escape: {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#x27;'
-    }
+  _.now = Date.now || function() {
+    return new Date().getTime();
   };
-  entityMap.unescape = _.invert(entityMap.escape);
 
-  // Regexes containing the keys and values listed immediately above.
-  var entityRegexes = {
-    escape:   new RegExp('[' + _.keys(entityMap.escape).join('') + ']', 'g'),
-    unescape: new RegExp('(' + _.keys(entityMap.unescape).join('|') + ')', 'g')
+   // List of HTML entities for escaping.
+  var escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '`': '&#x60;'
   };
+  var unescapeMap = _.invert(escapeMap);
 
   // Functions for escaping and unescaping strings to/from HTML interpolation.
-  _.each(['escape', 'unescape'], function(method) {
-    _[method] = function(string) {
-      if (string == null) return '';
-      return ('' + string).replace(entityRegexes[method], function(match) {
-        return entityMap[method][match];
-      });
+  var createEscaper = function(map) {
+    var escaper = function(match) {
+      return map[match];
     };
-  });
+    // Regexes for identifying a key that needs to be escaped
+    var source = '(?:' + _.keys(map).join('|') + ')';
+    var testRegexp = RegExp(source);
+    var replaceRegexp = RegExp(source, 'g');
+    return function(string) {
+      string = string == null ? '' : '' + string;
+      return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+    };
+  };
+  _.escape = createEscaper(escapeMap);
+  _.unescape = createEscaper(unescapeMap);
 
   // If the value of the named `property` is a function then invoke it with the
   // `object` as context; otherwise, return it.
   _.result = function(object, property) {
     if (object == null) return void 0;
     var value = object[property];
-    return _.isFunction(value) ? value.call(object) : value;
-  };
-
-  // Add your own custom functions to the Underscore object.
-  _.mixin = function(obj) {
-    each(_.functions(obj), function(name) {
-      var func = _[name] = obj[name];
-      _.prototype[name] = function() {
-        var args = [this._wrapped];
-        push.apply(args, arguments);
-        return result.call(this, func.apply(_, args));
-      };
-    });
+    return _.isFunction(value) ? object[property]() : value;
   };
 
   // Generate a unique integer id (unique within the entire client session).
@@ -21092,22 +21593,26 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     '\\':     '\\',
     '\r':     'r',
     '\n':     'n',
-    '\t':     't',
     '\u2028': 'u2028',
     '\u2029': 'u2029'
   };
 
-  var escaper = /\\|'|\r|\n|\t|\u2028|\u2029/g;
+  var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
+
+  var escapeChar = function(match) {
+    return '\\' + escapes[match];
+  };
 
   // JavaScript micro-templating, similar to John Resig's implementation.
   // Underscore templating handles arbitrary delimiters, preserves whitespace,
   // and correctly escapes quotes within interpolated code.
-  _.template = function(text, data, settings) {
-    var render;
+  // NB: `oldSettings` only exists for backwards compatibility.
+  _.template = function(text, settings, oldSettings) {
+    if (!settings && oldSettings) settings = oldSettings;
     settings = _.defaults({}, settings, _.templateSettings);
 
     // Combine delimiters into one regular expression via alternation.
-    var matcher = new RegExp([
+    var matcher = RegExp([
       (settings.escape || noMatch).source,
       (settings.interpolate || noMatch).source,
       (settings.evaluate || noMatch).source
@@ -21117,19 +21622,18 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     var index = 0;
     var source = "__p+='";
     text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
-      source += text.slice(index, offset)
-        .replace(escaper, function(match) { return '\\' + escapes[match]; });
+      source += text.slice(index, offset).replace(escaper, escapeChar);
+      index = offset + match.length;
 
       if (escape) {
         source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
-      }
-      if (interpolate) {
+      } else if (interpolate) {
         source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-      }
-      if (evaluate) {
+      } else if (evaluate) {
         source += "';\n" + evaluate + "\n__p+='";
       }
-      index = offset + match.length;
+
+      // Adobe VMs need the match returned to produce the correct offest.
       return match;
     });
     source += "';\n";
@@ -21139,29 +21643,31 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
 
     source = "var __t,__p='',__j=Array.prototype.join," +
       "print=function(){__p+=__j.call(arguments,'');};\n" +
-      source + "return __p;\n";
+      source + 'return __p;\n';
 
     try {
-      render = new Function(settings.variable || 'obj', '_', source);
+      var render = new Function(settings.variable || 'obj', '_', source);
     } catch (e) {
       e.source = source;
       throw e;
     }
 
-    if (data) return render(data, _);
     var template = function(data) {
       return render.call(this, data, _);
     };
 
-    // Provide the compiled function source as a convenience for precompilation.
-    template.source = 'function(' + (settings.variable || 'obj') + '){\n' + source + '}';
+    // Provide the compiled source as a convenience for precompilation.
+    var argument = settings.variable || 'obj';
+    template.source = 'function(' + argument + '){\n' + source + '}';
 
     return template;
   };
 
-  // Add a "chain" function, which will delegate to the wrapper.
+  // Add a "chain" function. Start chaining a wrapped Underscore object.
   _.chain = function(obj) {
-    return _(obj).chain();
+    var instance = _(obj);
+    instance._chain = true;
+    return instance;
   };
 
   // OOP
@@ -21175,42 +21681,44 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
     return this._chain ? _(obj).chain() : obj;
   };
 
+  // Add your own custom functions to the Underscore object.
+  _.mixin = function(obj) {
+    _.each(_.functions(obj), function(name) {
+      var func = _[name] = obj[name];
+      _.prototype[name] = function() {
+        var args = [this._wrapped];
+        push.apply(args, arguments);
+        return result.call(this, func.apply(_, args));
+      };
+    });
+  };
+
   // Add all of the Underscore functions to the wrapper object.
   _.mixin(_);
 
   // Add all mutator Array functions to the wrapper.
-  each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+  _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
     var method = ArrayProto[name];
     _.prototype[name] = function() {
       var obj = this._wrapped;
       method.apply(obj, arguments);
-      if ((name == 'shift' || name == 'splice') && obj.length === 0) delete obj[0];
+      if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
       return result.call(this, obj);
     };
   });
 
   // Add all accessor Array functions to the wrapper.
-  each(['concat', 'join', 'slice'], function(name) {
+  _.each(['concat', 'join', 'slice'], function(name) {
     var method = ArrayProto[name];
     _.prototype[name] = function() {
       return result.call(this, method.apply(this._wrapped, arguments));
     };
   });
 
-  _.extend(_.prototype, {
-
-    // Start chaining a wrapped Underscore object.
-    chain: function() {
-      this._chain = true;
-      return this;
-    },
-
-    // Extracts the result from a wrapped and chained object.
-    value: function() {
-      return this._wrapped;
-    }
-
-  });
+  // Extracts the result from a wrapped and chained object.
+  _.prototype.value = function() {
+    return this._wrapped;
+  };
 
   // AMD registration happens at the end for compatibility with AMD loaders
   // that may not enforce next-turn semantics on modules. Even though general
@@ -21224,7 +21732,7 @@ if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) 
       return _;
     });
   }
-}).call(this);
+}.call(this));
 
 /*!
 Chosen, a Select Box Enhancer for jQuery and Prototype
@@ -22439,3 +22947,1477 @@ This file is generated by `grunt build`, do not edit it by hand.
 }).call(this);
 
 typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<10?"0"+e:e}function quote(e){return escapable.lastIndex=0,escapable.test(e)?'"'+e.replace(escapable,function(e){var t=meta[e];return typeof t=="string"?t:"\\u"+("0000"+e.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+e+'"'}function str(e,t){var n,r,i,s,o=gap,u,a=t[e];a&&typeof a=="object"&&typeof a.toJSON=="function"&&(a=a.toJSON(e)),typeof rep=="function"&&(a=rep.call(t,e,a));switch(typeof a){case"string":return quote(a);case"number":return isFinite(a)?String(a):"null";case"boolean":case"null":return String(a);case"object":if(!a)return"null";gap+=indent,u=[];if(Object.prototype.toString.apply(a)==="[object Array]"){s=a.length;for(n=0;n<s;n+=1)u[n]=str(n,a)||"null";return i=u.length===0?"[]":gap?"[\n"+gap+u.join(",\n"+gap)+"\n"+o+"]":"["+u.join(",")+"]",gap=o,i}if(rep&&typeof rep=="object"){s=rep.length;for(n=0;n<s;n+=1)typeof rep[n]=="string"&&(r=rep[n],i=str(r,a),i&&u.push(quote(r)+(gap?": ":":")+i))}else for(r in a)Object.prototype.hasOwnProperty.call(a,r)&&(i=str(r,a),i&&u.push(quote(r)+(gap?": ":":")+i));return i=u.length===0?"{}":gap?"{\n"+gap+u.join(",\n"+gap)+"\n"+o+"}":"{"+u.join(",")+"}",gap=o,i}}typeof Date.prototype.toJSON!="function"&&(Date.prototype.toJSON=function(e){return isFinite(this.valueOf())?this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z":null},String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(e){return this.valueOf()});var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={"\b":"\\b","	":"\\t","\n":"\\n","\f":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"},rep;typeof JSON.stringify!="function"&&(JSON.stringify=function(e,t,n){var r;gap="",indent="";if(typeof n=="number")for(r=0;r<n;r+=1)indent+=" ";else typeof n=="string"&&(indent=n);rep=t;if(!t||typeof t=="function"||typeof t=="object"&&typeof t.length=="number")return str("",{"":e});throw new Error("JSON.stringify")}),typeof JSON.parse!="function"&&(JSON.parse=function(text,reviver){function walk(e,t){var n,r,i=e[t];if(i&&typeof i=="object")for(n in i)Object.prototype.hasOwnProperty.call(i,n)&&(r=walk(i,n),r!==undefined?i[n]=r:delete i[n]);return reviver.call(e,t,i)}var j;text=String(text),cx.lastIndex=0,cx.test(text)&&(text=text.replace(cx,function(e){return"\\u"+("0000"+e.charCodeAt(0).toString(16)).slice(-4)}));if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,"@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:\s*\[)+/g,"")))return j=eval("("+text+")"),typeof reviver=="function"?walk({"":j},""):j;throw new SyntaxError("JSON.parse")})}(),function(e,t){"use strict";var n=e.History=e.History||{};if(typeof n.Adapter!="undefined")throw new Error("History.js Adapter has already been loaded...");n.Adapter={handlers:{},_uid:1,uid:function(e){return e._uid||(e._uid=n.Adapter._uid++)},bind:function(e,t,r){var i=n.Adapter.uid(e);n.Adapter.handlers[i]=n.Adapter.handlers[i]||{},n.Adapter.handlers[i][t]=n.Adapter.handlers[i][t]||[],n.Adapter.handlers[i][t].push(r),e["on"+t]=function(e,t){return function(r){n.Adapter.trigger(e,t,r)}}(e,t)},trigger:function(e,t,r){r=r||{};var i=n.Adapter.uid(e),s,o;n.Adapter.handlers[i]=n.Adapter.handlers[i]||{},n.Adapter.handlers[i][t]=n.Adapter.handlers[i][t]||[];for(s=0,o=n.Adapter.handlers[i][t].length;s<o;++s)n.Adapter.handlers[i][t][s].apply(this,[r])},extractEventData:function(e,n){var r=n&&n[e]||t;return r},onDomLoad:function(t){var n=e.setTimeout(function(){t()},2e3);e.onload=function(){clearTimeout(n),t()}}},typeof n.init!="undefined"&&n.init()}(window),function(e,t){"use strict";var n=e.document,r=e.setTimeout||r,i=e.clearTimeout||i,s=e.setInterval||s,o=e.History=e.History||{};if(typeof o.initHtml4!="undefined")throw new Error("History.js HTML4 Support has already been loaded...");o.initHtml4=function(){if(typeof o.initHtml4.initialized!="undefined")return!1;o.initHtml4.initialized=!0,o.enabled=!0,o.savedHashes=[],o.isLastHash=function(e){var t=o.getHashByIndex(),n;return n=e===t,n},o.isHashEqual=function(e,t){return e=encodeURIComponent(e).replace(/%25/g,"%"),t=encodeURIComponent(t).replace(/%25/g,"%"),e===t},o.saveHash=function(e){return o.isLastHash(e)?!1:(o.savedHashes.push(e),!0)},o.getHashByIndex=function(e){var t=null;return typeof e=="undefined"?t=o.savedHashes[o.savedHashes.length-1]:e<0?t=o.savedHashes[o.savedHashes.length+e]:t=o.savedHashes[e],t},o.discardedHashes={},o.discardedStates={},o.discardState=function(e,t,n){var r=o.getHashByState(e),i;return i={discardedState:e,backState:n,forwardState:t},o.discardedStates[r]=i,!0},o.discardHash=function(e,t,n){var r={discardedHash:e,backState:n,forwardState:t};return o.discardedHashes[e]=r,!0},o.discardedState=function(e){var t=o.getHashByState(e),n;return n=o.discardedStates[t]||!1,n},o.discardedHash=function(e){var t=o.discardedHashes[e]||!1;return t},o.recycleState=function(e){var t=o.getHashByState(e);return o.discardedState(e)&&delete o.discardedStates[t],!0},o.emulated.hashChange&&(o.hashChangeInit=function(){o.checkerFunction=null;var t="",r,i,u,a,f=Boolean(o.getHash());return o.isInternetExplorer()?(r="historyjs-iframe",i=n.createElement("iframe"),i.setAttribute("id",r),i.setAttribute("src","#"),i.style.display="none",n.body.appendChild(i),i.contentWindow.document.open(),i.contentWindow.document.close(),u="",a=!1,o.checkerFunction=function(){if(a)return!1;a=!0;var n=o.getHash(),r=o.getHash(i.contentWindow.document);return n!==t?(t=n,r!==n&&(u=r=n,i.contentWindow.document.open(),i.contentWindow.document.close(),i.contentWindow.document.location.hash=o.escapeHash(n)),o.Adapter.trigger(e,"hashchange")):r!==u&&(u=r,f&&r===""?o.back():o.setHash(r,!1)),a=!1,!0}):o.checkerFunction=function(){var n=o.getHash()||"";return n!==t&&(t=n,o.Adapter.trigger(e,"hashchange")),!0},o.intervalList.push(s(o.checkerFunction,o.options.hashChangeInterval)),!0},o.Adapter.onDomLoad(o.hashChangeInit)),o.emulated.pushState&&(o.onHashChange=function(t){var n=t&&t.newURL||o.getLocationHref(),r=o.getHashByUrl(n),i=null,s=null,u=null,a;return o.isLastHash(r)?(o.busy(!1),!1):(o.doubleCheckComplete(),o.saveHash(r),r&&o.isTraditionalAnchor(r)?(o.Adapter.trigger(e,"anchorchange"),o.busy(!1),!1):(i=o.extractState(o.getFullUrl(r||o.getLocationHref()),!0),o.isLastSavedState(i)?(o.busy(!1),!1):(s=o.getHashByState(i),a=o.discardedState(i),a?(o.getHashByIndex(-2)===o.getHashByState(a.forwardState)?o.back(!1):o.forward(!1),!1):(o.pushState(i.data,i.title,encodeURI(i.url),!1),!0))))},o.Adapter.bind(e,"hashchange",o.onHashChange),o.pushState=function(t,n,r,i){r=encodeURI(r).replace(/%25/g,"%");if(o.getHashByUrl(r))throw new Error("History.js does not support states with fragment-identifiers (hashes/anchors).");if(i!==!1&&o.busy())return o.pushQueue({scope:o,callback:o.pushState,args:arguments,queue:i}),!1;o.busy(!0);var s=o.createStateObject(t,n,r),u=o.getHashByState(s),a=o.getState(!1),f=o.getHashByState(a),l=o.getHash(),c=o.expectedStateId==s.id;return o.storeState(s),o.expectedStateId=s.id,o.recycleState(s),o.setTitle(s),u===f?(o.busy(!1),!1):(o.saveState(s),c||o.Adapter.trigger(e,"statechange"),!o.isHashEqual(u,l)&&!o.isHashEqual(u,o.getShortUrl(o.getLocationHref()))&&o.setHash(u,!1),o.busy(!1),!0)},o.replaceState=function(t,n,r,i){r=encodeURI(r).replace(/%25/g,"%");if(o.getHashByUrl(r))throw new Error("History.js does not support states with fragment-identifiers (hashes/anchors).");if(i!==!1&&o.busy())return o.pushQueue({scope:o,callback:o.replaceState,args:arguments,queue:i}),!1;o.busy(!0);var s=o.createStateObject(t,n,r),u=o.getHashByState(s),a=o.getState(!1),f=o.getHashByState(a),l=o.getStateByIndex(-2);return o.discardState(a,s,l),u===f?(o.storeState(s),o.expectedStateId=s.id,o.recycleState(s),o.setTitle(s),o.saveState(s),o.Adapter.trigger(e,"statechange"),o.busy(!1)):o.pushState(s.data,s.title,s.url,!1),!0}),o.emulated.pushState&&o.getHash()&&!o.emulated.hashChange&&o.Adapter.onDomLoad(function(){o.Adapter.trigger(e,"hashchange")})},typeof o.init!="undefined"&&o.init()}(window),function(e,t){"use strict";var n=e.console||t,r=e.document,i=e.navigator,s=e.sessionStorage||!1,o=e.setTimeout,u=e.clearTimeout,a=e.setInterval,f=e.clearInterval,l=e.JSON,c=e.alert,h=e.History=e.History||{},p=e.history;try{s.setItem("TEST","1"),s.removeItem("TEST")}catch(d){s=!1}l.stringify=l.stringify||l.encode,l.parse=l.parse||l.decode;if(typeof h.init!="undefined")throw new Error("History.js Core has already been loaded...");h.init=function(e){return typeof h.Adapter=="undefined"?!1:(typeof h.initCore!="undefined"&&h.initCore(),typeof h.initHtml4!="undefined"&&h.initHtml4(),!0)},h.initCore=function(d){if(typeof h.initCore.initialized!="undefined")return!1;h.initCore.initialized=!0,h.options=h.options||{},h.options.hashChangeInterval=h.options.hashChangeInterval||100,h.options.safariPollInterval=h.options.safariPollInterval||500,h.options.doubleCheckInterval=h.options.doubleCheckInterval||500,h.options.disableSuid=h.options.disableSuid||!1,h.options.storeInterval=h.options.storeInterval||1e3,h.options.busyDelay=h.options.busyDelay||250,h.options.debug=h.options.debug||!1,h.options.initialTitle=h.options.initialTitle||r.title,h.options.html4Mode=h.options.html4Mode||!1,h.options.delayInit=h.options.delayInit||!1,h.intervalList=[],h.clearAllIntervals=function(){var e,t=h.intervalList;if(typeof t!="undefined"&&t!==null){for(e=0;e<t.length;e++)f(t[e]);h.intervalList=null}},h.debug=function(){(h.options.debug||!1)&&h.log.apply(h,arguments)},h.log=function(){var e=typeof n!="undefined"&&typeof n.log!="undefined"&&typeof n.log.apply!="undefined",t=r.getElementById("log"),i,s,o,u,a;e?(u=Array.prototype.slice.call(arguments),i=u.shift(),typeof n.debug!="undefined"?n.debug.apply(n,[i,u]):n.log.apply(n,[i,u])):i="\n"+arguments[0]+"\n";for(s=1,o=arguments.length;s<o;++s){a=arguments[s];if(typeof a=="object"&&typeof l!="undefined")try{a=l.stringify(a)}catch(f){}i+="\n"+a+"\n"}return t?(t.value+=i+"\n-----\n",t.scrollTop=t.scrollHeight-t.clientHeight):e||c(i),!0},h.getInternetExplorerMajorVersion=function(){var e=h.getInternetExplorerMajorVersion.cached=typeof h.getInternetExplorerMajorVersion.cached!="undefined"?h.getInternetExplorerMajorVersion.cached:function(){var e=3,t=r.createElement("div"),n=t.getElementsByTagName("i");while((t.innerHTML="<!--[if gt IE "+ ++e+"]><i></i><![endif]-->")&&n[0]);return e>4?e:!1}();return e},h.isInternetExplorer=function(){var e=h.isInternetExplorer.cached=typeof h.isInternetExplorer.cached!="undefined"?h.isInternetExplorer.cached:Boolean(h.getInternetExplorerMajorVersion());return e},h.options.html4Mode?h.emulated={pushState:!0,hashChange:!0}:h.emulated={pushState:!Boolean(e.history&&e.history.pushState&&e.history.replaceState&&!/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i.test(i.userAgent)&&!/AppleWebKit\/5([0-2]|3[0-2])/i.test(i.userAgent)),hashChange:Boolean(!("onhashchange"in e||"onhashchange"in r)||h.isInternetExplorer()&&h.getInternetExplorerMajorVersion()<8)},h.enabled=!h.emulated.pushState,h.bugs={setHash:Boolean(!h.emulated.pushState&&i.vendor==="Apple Computer, Inc."&&/AppleWebKit\/5([0-2]|3[0-3])/.test(i.userAgent)),safariPoll:Boolean(!h.emulated.pushState&&i.vendor==="Apple Computer, Inc."&&/AppleWebKit\/5([0-2]|3[0-3])/.test(i.userAgent)),ieDoubleCheck:Boolean(h.isInternetExplorer()&&h.getInternetExplorerMajorVersion()<8),hashEscape:Boolean(h.isInternetExplorer()&&h.getInternetExplorerMajorVersion()<7)},h.isEmptyObject=function(e){for(var t in e)if(e.hasOwnProperty(t))return!1;return!0},h.cloneObject=function(e){var t,n;return e?(t=l.stringify(e),n=l.parse(t)):n={},n},h.getRootUrl=function(){var e=r.location.protocol+"//"+(r.location.hostname||r.location.host);if(r.location.port||!1)e+=":"+r.location.port;return e+="/",e},h.getBaseHref=function(){var e=r.getElementsByTagName("base"),t=null,n="";return e.length===1&&(t=e[0],n=t.href.replace(/[^\/]+$/,"")),n=n.replace(/\/+$/,""),n&&(n+="/"),n},h.getBaseUrl=function(){var e=h.getBaseHref()||h.getBasePageUrl()||h.getRootUrl();return e},h.getPageUrl=function(){var e=h.getState(!1,!1),t=(e||{}).url||h.getLocationHref(),n;return n=t.replace(/\/+$/,"").replace(/[^\/]+$/,function(e,t,n){return/\./.test(e)?e:e+"/"}),n},h.getBasePageUrl=function(){var e=h.getLocationHref().replace(/[#\?].*/,"").replace(/[^\/]+$/,function(e,t,n){return/[^\/]$/.test(e)?"":e}).replace(/\/+$/,"")+"/";return e},h.getFullUrl=function(e,t){var n=e,r=e.substring(0,1);return t=typeof t=="undefined"?!0:t,/[a-z]+\:\/\//.test(e)||(r==="/"?n=h.getRootUrl()+e.replace(/^\/+/,""):r==="#"?n=h.getPageUrl().replace(/#.*/,"")+e:r==="?"?n=h.getPageUrl().replace(/[\?#].*/,"")+e:t?n=h.getBaseUrl()+e.replace(/^(\.\/)+/,""):n=h.getBasePageUrl()+e.replace(/^(\.\/)+/,"")),n.replace(/\#$/,"")},h.getShortUrl=function(e){var t=e,n=h.getBaseUrl(),r=h.getRootUrl();return h.emulated.pushState&&(t=t.replace(n,"")),t=t.replace(r,"/"),h.isTraditionalAnchor(t)&&(t="./"+t),t=t.replace(/^(\.\/)+/g,"./").replace(/\#$/,""),t},h.getLocationHref=function(e){return e=e||r,e.URL===e.location.href?e.location.href:e.location.href===decodeURIComponent(e.URL)?e.URL:e.location.hash&&decodeURIComponent(e.location.href.replace(/^[^#]+/,""))===e.location.hash?e.location.href:e.URL.indexOf("#")==-1&&e.location.href.indexOf("#")!=-1?e.location.href:e.URL||e.location.href},h.store={},h.idToState=h.idToState||{},h.stateToId=h.stateToId||{},h.urlToId=h.urlToId||{},h.storedStates=h.storedStates||[],h.savedStates=h.savedStates||[],h.normalizeStore=function(){h.store.idToState=h.store.idToState||{},h.store.urlToId=h.store.urlToId||{},h.store.stateToId=h.store.stateToId||{}},h.getState=function(e,t){typeof e=="undefined"&&(e=!0),typeof t=="undefined"&&(t=!0);var n=h.getLastSavedState();return!n&&t&&(n=h.createStateObject()),e&&(n=h.cloneObject(n),n.url=n.cleanUrl||n.url),n},h.getIdByState=function(e){var t=h.extractId(e.url),n;if(!t){n=h.getStateString(e);if(typeof h.stateToId[n]!="undefined")t=h.stateToId[n];else if(typeof h.store.stateToId[n]!="undefined")t=h.store.stateToId[n];else{for(;;){t=(new Date).getTime()+String(Math.random()).replace(/\D/g,"");if(typeof h.idToState[t]=="undefined"&&typeof h.store.idToState[t]=="undefined")break}h.stateToId[n]=t,h.idToState[t]=e}}return t},h.normalizeState=function(e){var t,n;if(!e||typeof e!="object")e={};if(typeof e.normalized!="undefined")return e;if(!e.data||typeof e.data!="object")e.data={};return t={},t.normalized=!0,t.title=e.title||"",t.url=h.getFullUrl(e.url?e.url:h.getLocationHref()),t.hash=h.getShortUrl(t.url),t.data=h.cloneObject(e.data),t.id=h.getIdByState(t),t.cleanUrl=t.url.replace(/\??\&_suid.*/,""),t.url=t.cleanUrl,n=!h.isEmptyObject(t.data),(t.title||n)&&h.options.disableSuid!==!0&&(t.hash=h.getShortUrl(t.url).replace(/\??\&_suid.*/,""),/\?/.test(t.hash)||(t.hash+="?"),t.hash+="&_suid="+t.id),t.hashedUrl=h.getFullUrl(t.hash),(h.emulated.pushState||h.bugs.safariPoll)&&h.hasUrlDuplicate(t)&&(t.url=t.hashedUrl),t},h.createStateObject=function(e,t,n){var r={data:e,title:t,url:n};return r=h.normalizeState(r),r},h.getStateById=function(e){e=String(e);var n=h.idToState[e]||h.store.idToState[e]||t;return n},h.getStateString=function(e){var t,n,r;return t=h.normalizeState(e),n={data:t.data,title:e.title,url:e.url},r=l.stringify(n),r},h.getStateId=function(e){var t,n;return t=h.normalizeState(e),n=t.id,n},h.getHashByState=function(e){var t,n;return t=h.normalizeState(e),n=t.hash,n},h.extractId=function(e){var t,n,r,i;return e.indexOf("#")!=-1?i=e.split("#")[0]:i=e,n=/(.*)\&_suid=([0-9]+)$/.exec(i),r=n?n[1]||e:e,t=n?String(n[2]||""):"",t||!1},h.isTraditionalAnchor=function(e){var t=!/[\/\?\.]/.test(e);return t},h.extractState=function(e,t){var n=null,r,i;return t=t||!1,r=h.extractId(e),r&&(n=h.getStateById(r)),n||(i=h.getFullUrl(e),r=h.getIdByUrl(i)||!1,r&&(n=h.getStateById(r)),!n&&t&&!h.isTraditionalAnchor(e)&&(n=h.createStateObject(null,null,i))),n},h.getIdByUrl=function(e){var n=h.urlToId[e]||h.store.urlToId[e]||t;return n},h.getLastSavedState=function(){return h.savedStates[h.savedStates.length-1]||t},h.getLastStoredState=function(){return h.storedStates[h.storedStates.length-1]||t},h.hasUrlDuplicate=function(e){var t=!1,n;return n=h.extractState(e.url),t=n&&n.id!==e.id,t},h.storeState=function(e){return h.urlToId[e.url]=e.id,h.storedStates.push(h.cloneObject(e)),e},h.isLastSavedState=function(e){var t=!1,n,r,i;return h.savedStates.length&&(n=e.id,r=h.getLastSavedState(),i=r.id,t=n===i),t},h.saveState=function(e){return h.isLastSavedState(e)?!1:(h.savedStates.push(h.cloneObject(e)),!0)},h.getStateByIndex=function(e){var t=null;return typeof e=="undefined"?t=h.savedStates[h.savedStates.length-1]:e<0?t=h.savedStates[h.savedStates.length+e]:t=h.savedStates[e],t},h.getCurrentIndex=function(){var e=null;return h.savedStates.length<1?e=0:e=h.savedStates.length-1,e},h.getHash=function(e){var t=h.getLocationHref(e),n;return n=h.getHashByUrl(t),n},h.unescapeHash=function(e){var t=h.normalizeHash(e);return t=decodeURIComponent(t),t},h.normalizeHash=function(e){var t=e.replace(/[^#]*#/,"").replace(/#.*/,"");return t},h.setHash=function(e,t){var n,i;return t!==!1&&h.busy()?(h.pushQueue({scope:h,callback:h.setHash,args:arguments,queue:t}),!1):(h.busy(!0),n=h.extractState(e,!0),n&&!h.emulated.pushState?h.pushState(n.data,n.title,n.url,!1):h.getHash()!==e&&(h.bugs.setHash?(i=h.getPageUrl(),h.pushState(null,null,i+"#"+e,!1)):r.location.hash=e),h)},h.escapeHash=function(t){var n=h.normalizeHash(t);return n=e.encodeURIComponent(n),h.bugs.hashEscape||(n=n.replace(/\%21/g,"!").replace(/\%26/g,"&").replace(/\%3D/g,"=").replace(/\%3F/g,"?")),n},h.getHashByUrl=function(e){var t=String(e).replace(/([^#]*)#?([^#]*)#?(.*)/,"$2");return t=h.unescapeHash(t),t},h.setTitle=function(e){var t=e.title,n;t||(n=h.getStateByIndex(0),n&&n.url===e.url&&(t=n.title||h.options.initialTitle));try{r.getElementsByTagName("title")[0].innerHTML=t.replace("<","&lt;").replace(">","&gt;").replace(" & "," &amp; ")}catch(i){}return r.title=t,h},h.queues=[],h.busy=function(e){typeof e!="undefined"?h.busy.flag=e:typeof h.busy.flag=="undefined"&&(h.busy.flag=!1);if(!h.busy.flag){u(h.busy.timeout);var t=function(){var e,n,r;if(h.busy.flag)return;for(e=h.queues.length-1;e>=0;--e){n=h.queues[e];if(n.length===0)continue;r=n.shift(),h.fireQueueItem(r),h.busy.timeout=o(t,h.options.busyDelay)}};h.busy.timeout=o(t,h.options.busyDelay)}return h.busy.flag},h.busy.flag=!1,h.fireQueueItem=function(e){return e.callback.apply(e.scope||h,e.args||[])},h.pushQueue=function(e){return h.queues[e.queue||0]=h.queues[e.queue||0]||[],h.queues[e.queue||0].push(e),h},h.queue=function(e,t){return typeof e=="function"&&(e={callback:e}),typeof t!="undefined"&&(e.queue=t),h.busy()?h.pushQueue(e):h.fireQueueItem(e),h},h.clearQueue=function(){return h.busy.flag=!1,h.queues=[],h},h.stateChanged=!1,h.doubleChecker=!1,h.doubleCheckComplete=function(){return h.stateChanged=!0,h.doubleCheckClear(),h},h.doubleCheckClear=function(){return h.doubleChecker&&(u(h.doubleChecker),h.doubleChecker=!1),h},h.doubleCheck=function(e){return h.stateChanged=!1,h.doubleCheckClear(),h.bugs.ieDoubleCheck&&(h.doubleChecker=o(function(){return h.doubleCheckClear(),h.stateChanged||e(),!0},h.options.doubleCheckInterval)),h},h.safariStatePoll=function(){var t=h.extractState(h.getLocationHref()),n;if(!h.isLastSavedState(t))return n=t,n||(n=h.createStateObject()),h.Adapter.trigger(e,"popstate"),h;return},h.back=function(e){return e!==!1&&h.busy()?(h.pushQueue({scope:h,callback:h.back,args:arguments,queue:e}),!1):(h.busy(!0),h.doubleCheck(function(){h.back(!1)}),p.go(-1),!0)},h.forward=function(e){return e!==!1&&h.busy()?(h.pushQueue({scope:h,callback:h.forward,args:arguments,queue:e}),!1):(h.busy(!0),h.doubleCheck(function(){h.forward(!1)}),p.go(1),!0)},h.go=function(e,t){var n;if(e>0)for(n=1;n<=e;++n)h.forward(t);else{if(!(e<0))throw new Error("History.go: History.go requires a positive or negative integer passed.");for(n=-1;n>=e;--n)h.back(t)}return h};if(h.emulated.pushState){var v=function(){};h.pushState=h.pushState||v,h.replaceState=h.replaceState||v}else h.onPopState=function(t,n){var r=!1,i=!1,s,o;return h.doubleCheckComplete(),s=h.getHash(),s?(o=h.extractState(s||h.getLocationHref(),!0),o?h.replaceState(o.data,o.title,o.url,!1):(h.Adapter.trigger(e,"anchorchange"),h.busy(!1)),h.expectedStateId=!1,!1):(r=h.Adapter.extractEventData("state",t,n)||!1,r?i=h.getStateById(r):h.expectedStateId?i=h.getStateById(h.expectedStateId):i=h.extractState(h.getLocationHref()),i||(i=h.createStateObject(null,null,h.getLocationHref())),h.expectedStateId=!1,h.isLastSavedState(i)?(h.busy(!1),!1):(h.storeState(i),h.saveState(i),h.setTitle(i),h.Adapter.trigger(e,"statechange"),h.busy(!1),!0))},h.Adapter.bind(e,"popstate",h.onPopState),h.pushState=function(t,n,r,i){if(h.getHashByUrl(r)&&h.emulated.pushState)throw new Error("History.js does not support states with fragement-identifiers (hashes/anchors).");if(i!==!1&&h.busy())return h.pushQueue({scope:h,callback:h.pushState,args:arguments,queue:i}),!1;h.busy(!0);var s=h.createStateObject(t,n,r);return h.isLastSavedState(s)?h.busy(!1):(h.storeState(s),h.expectedStateId=s.id,p.pushState(s.id,s.title,s.url),h.Adapter.trigger(e,"popstate")),!0},h.replaceState=function(t,n,r,i){if(h.getHashByUrl(r)&&h.emulated.pushState)throw new Error("History.js does not support states with fragement-identifiers (hashes/anchors).");if(i!==!1&&h.busy())return h.pushQueue({scope:h,callback:h.replaceState,args:arguments,queue:i}),!1;h.busy(!0);var s=h.createStateObject(t,n,r);return h.isLastSavedState(s)?h.busy(!1):(h.storeState(s),h.expectedStateId=s.id,p.replaceState(s.id,s.title,s.url),h.Adapter.trigger(e,"popstate")),!0};if(s){try{h.store=l.parse(s.getItem("History.store"))||{}}catch(m){h.store={}}h.normalizeStore()}else h.store={},h.normalizeStore();h.Adapter.bind(e,"unload",h.clearAllIntervals),h.saveState(h.storeState(h.extractState(h.getLocationHref(),!0))),s&&(h.onUnload=function(){var e,t,n;try{e=l.parse(s.getItem("History.store"))||{}}catch(r){e={}}e.idToState=e.idToState||{},e.urlToId=e.urlToId||{},e.stateToId=e.stateToId||{};for(t in h.idToState){if(!h.idToState.hasOwnProperty(t))continue;e.idToState[t]=h.idToState[t]}for(t in h.urlToId){if(!h.urlToId.hasOwnProperty(t))continue;e.urlToId[t]=h.urlToId[t]}for(t in h.stateToId){if(!h.stateToId.hasOwnProperty(t))continue;e.stateToId[t]=h.stateToId[t]}h.store=e,h.normalizeStore(),n=l.stringify(e);try{s.setItem("History.store",n)}catch(i){if(i.code!==DOMException.QUOTA_EXCEEDED_ERR)throw i;s.length&&(s.removeItem("History.store"),s.setItem("History.store",n))}},h.intervalList.push(a(h.onUnload,h.options.storeInterval)),h.Adapter.bind(e,"beforeunload",h.onUnload),h.Adapter.bind(e,"unload",h.onUnload));if(!h.emulated.pushState){h.bugs.safariPoll&&h.intervalList.push(a(h.safariStatePoll,h.options.safariPollInterval));if(i.vendor==="Apple Computer, Inc."||(i.appCodeName||"")==="Mozilla")h.Adapter.bind(e,"hashchange",function(){h.Adapter.trigger(e,"popstate")}),h.getHash()&&h.Adapter.onDomLoad(function(){h.Adapter.trigger(e,"hashchange")})}},(!h.options||!h.options.delayInit)&&h.init()}(window)
+;(function(){
+
+/**
+ * Require the given path.
+ *
+ * @param {String} path
+ * @return {Object} exports
+ * @api public
+ */
+
+function require(path, parent, orig) {
+  var resolved = require.resolve(path);
+
+  // lookup failed
+  if (null == resolved) {
+    orig = orig || path;
+    parent = parent || 'root';
+    var err = new Error('Failed to require "' + orig + '" from "' + parent + '"');
+    err.path = orig;
+    err.parent = parent;
+    err.require = true;
+    throw err;
+  }
+
+  var module = require.modules[resolved];
+
+  // perform real require()
+  // by invoking the module's
+  // registered function
+  if (!module._resolving && !module.exports) {
+    var mod = {};
+    mod.exports = {};
+    mod.client = mod.component = true;
+    module._resolving = true;
+    module.call(this, mod.exports, require.relative(resolved), mod);
+    delete module._resolving;
+    module.exports = mod.exports;
+  }
+
+  return module.exports;
+}
+
+/**
+ * Registered modules.
+ */
+
+require.modules = {};
+
+/**
+ * Registered aliases.
+ */
+
+require.aliases = {};
+
+/**
+ * Resolve `path`.
+ *
+ * Lookup:
+ *
+ *   - PATH/index.js
+ *   - PATH.js
+ *   - PATH
+ *
+ * @param {String} path
+ * @return {String} path or null
+ * @api private
+ */
+
+require.resolve = function(path) {
+  if (path.charAt(0) === '/') path = path.slice(1);
+
+  var paths = [
+    path,
+    path + '.js',
+    path + '.json',
+    path + '/index.js',
+    path + '/index.json'
+  ];
+
+  for (var i = 0; i < paths.length; i++) {
+    var path = paths[i];
+    if (require.modules.hasOwnProperty(path)) return path;
+    if (require.aliases.hasOwnProperty(path)) return require.aliases[path];
+  }
+};
+
+/**
+ * Normalize `path` relative to the current path.
+ *
+ * @param {String} curr
+ * @param {String} path
+ * @return {String}
+ * @api private
+ */
+
+require.normalize = function(curr, path) {
+  var segs = [];
+
+  if ('.' != path.charAt(0)) return path;
+
+  curr = curr.split('/');
+  path = path.split('/');
+
+  for (var i = 0; i < path.length; ++i) {
+    if ('..' == path[i]) {
+      curr.pop();
+    } else if ('.' != path[i] && '' != path[i]) {
+      segs.push(path[i]);
+    }
+  }
+
+  return curr.concat(segs).join('/');
+};
+
+/**
+ * Register module at `path` with callback `definition`.
+ *
+ * @param {String} path
+ * @param {Function} definition
+ * @api private
+ */
+
+require.register = function(path, definition) {
+  require.modules[path] = definition;
+};
+
+/**
+ * Alias a module definition.
+ *
+ * @param {String} from
+ * @param {String} to
+ * @api private
+ */
+
+require.alias = function(from, to) {
+  if (!require.modules.hasOwnProperty(from)) {
+    throw new Error('Failed to alias "' + from + '", it does not exist');
+  }
+  require.aliases[to] = from;
+};
+
+/**
+ * Return a require function relative to the `parent` path.
+ *
+ * @param {String} parent
+ * @return {Function}
+ * @api private
+ */
+
+require.relative = function(parent) {
+  var p = require.normalize(parent, '..');
+
+  /**
+   * lastIndexOf helper.
+   */
+
+  function lastIndexOf(arr, obj) {
+    var i = arr.length;
+    while (i--) {
+      if (arr[i] === obj) return i;
+    }
+    return -1;
+  }
+
+  /**
+   * The relative require() itself.
+   */
+
+  function localRequire(path) {
+    var resolved = localRequire.resolve(path);
+    return require(resolved, parent, path);
+  }
+
+  /**
+   * Resolve relative to the parent.
+   */
+
+  localRequire.resolve = function(path) {
+    var c = path.charAt(0);
+    if ('/' == c) return path.slice(1);
+    if ('.' == c) return require.normalize(p, path);
+
+    // resolve deps by returning
+    // the dep in the nearest "deps"
+    // directory
+    var segs = parent.split('/');
+    var i = lastIndexOf(segs, 'deps') + 1;
+    if (!i) i = 0;
+    path = segs.slice(0, i + 1).join('/') + '/deps/' + path;
+    return path;
+  };
+
+  /**
+   * Check if module is defined at `path`.
+   */
+
+  localRequire.exists = function(path) {
+    return require.modules.hasOwnProperty(localRequire.resolve(path));
+  };
+
+  return localRequire;
+};
+require.register("component-classes/index.js", function(exports, require, module){
+/**
+ * Module dependencies.
+ */
+
+var index = require('indexof');
+
+/**
+ * Whitespace regexp.
+ */
+
+var re = /\s+/;
+
+/**
+ * toString reference.
+ */
+
+var toString = Object.prototype.toString;
+
+/**
+ * Wrap `el` in a `ClassList`.
+ *
+ * @param {Element} el
+ * @return {ClassList}
+ * @api public
+ */
+
+module.exports = function(el){
+  return new ClassList(el);
+};
+
+/**
+ * Initialize a new ClassList for `el`.
+ *
+ * @param {Element} el
+ * @api private
+ */
+
+function ClassList(el) {
+  if (!el) throw new Error('A DOM element reference is required');
+  this.el = el;
+  this.list = el.classList;
+}
+
+/**
+ * Add class `name` if not already present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.add = function(name){
+  // classList
+  if (this.list) {
+    this.list.add(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (!~i) arr.push(name);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove class `name` when present, or
+ * pass a regular expression to remove
+ * any which match.
+ *
+ * @param {String|RegExp} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.remove = function(name){
+  if ('[object RegExp]' == toString.call(name)) {
+    return this.removeMatching(name);
+  }
+
+  // classList
+  if (this.list) {
+    this.list.remove(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (~i) arr.splice(i, 1);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove all classes matching `re`.
+ *
+ * @param {RegExp} re
+ * @return {ClassList}
+ * @api private
+ */
+
+ClassList.prototype.removeMatching = function(re){
+  var arr = this.array();
+  for (var i = 0; i < arr.length; i++) {
+    if (re.test(arr[i])) {
+      this.remove(arr[i]);
+    }
+  }
+  return this;
+};
+
+/**
+ * Toggle class `name`, can force state via `force`.
+ *
+ * For browsers that support classList, but do not support `force` yet,
+ * the mistake will be detected and corrected.
+ *
+ * @param {String} name
+ * @param {Boolean} force
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.toggle = function(name, force){
+  // classList
+  if (this.list) {
+    if ("undefined" !== typeof force) {
+      if (force !== this.list.toggle(name, force)) {
+        this.list.toggle(name); // toggle again to correct
+      }
+    } else {
+      this.list.toggle(name);
+    }
+    return this;
+  }
+
+  // fallback
+  if ("undefined" !== typeof force) {
+    if (!force) {
+      this.remove(name);
+    } else {
+      this.add(name);
+    }
+  } else {
+    if (this.has(name)) {
+      this.remove(name);
+    } else {
+      this.add(name);
+    }
+  }
+
+  return this;
+};
+
+/**
+ * Return an array of classes.
+ *
+ * @return {Array}
+ * @api public
+ */
+
+ClassList.prototype.array = function(){
+  var str = this.el.className.replace(/^\s+|\s+$/g, '');
+  var arr = str.split(re);
+  if ('' === arr[0]) arr.shift();
+  return arr;
+};
+
+/**
+ * Check if class `name` is present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.has =
+ClassList.prototype.contains = function(name){
+  return this.list
+    ? this.list.contains(name)
+    : !! ~index(this.array(), name);
+};
+
+});
+require.register("segmentio-extend/index.js", function(exports, require, module){
+
+module.exports = function extend (object) {
+    // Takes an unlimited number of extenders.
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    // For each extender, copy their properties on our object.
+    for (var i = 0, source; source = args[i]; i++) {
+        if (!source) continue;
+        for (var property in source) {
+            object[property] = source[property];
+        }
+    }
+
+    return object;
+};
+});
+require.register("component-indexof/index.js", function(exports, require, module){
+module.exports = function(arr, obj){
+  if (arr.indexOf) return arr.indexOf(obj);
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+};
+});
+require.register("component-event/index.js", function(exports, require, module){
+var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
+    unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
+    prefix = bind !== 'addEventListener' ? 'on' : '';
+
+/**
+ * Bind `el` event `type` to `fn`.
+ *
+ * @param {Element} el
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {Function}
+ * @api public
+ */
+
+exports.bind = function(el, type, fn, capture){
+  el[bind](prefix + type, fn, capture || false);
+  return fn;
+};
+
+/**
+ * Unbind `el` event `type`'s callback `fn`.
+ *
+ * @param {Element} el
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {Function}
+ * @api public
+ */
+
+exports.unbind = function(el, type, fn, capture){
+  el[unbind](prefix + type, fn, capture || false);
+  return fn;
+};
+});
+require.register("timoxley-to-array/index.js", function(exports, require, module){
+/**
+ * Convert an array-like object into an `Array`.
+ * If `collection` is already an `Array`, then will return a clone of `collection`.
+ *
+ * @param {Array | Mixed} collection An `Array` or array-like object to convert e.g. `arguments` or `NodeList`
+ * @return {Array} Naive conversion of `collection` to a new `Array`.
+ * @api public
+ */
+
+module.exports = function toArray(collection) {
+  if (typeof collection === 'undefined') return []
+  if (collection === null) return [null]
+  if (collection === window) return [window]
+  if (typeof collection === 'string') return [collection]
+  if (isArray(collection)) return collection
+  if (typeof collection.length != 'number') return [collection]
+  if (typeof collection === 'function' && collection instanceof Function) return [collection]
+
+  var arr = []
+  for (var i = 0; i < collection.length; i++) {
+    if (Object.prototype.hasOwnProperty.call(collection, i) || i in collection) {
+      arr.push(collection[i])
+    }
+  }
+  if (!arr.length) return []
+  return arr
+}
+
+function isArray(arr) {
+  return Object.prototype.toString.call(arr) === "[object Array]";
+}
+
+});
+require.register("javve-events/index.js", function(exports, require, module){
+var events = require('event'),
+  toArray = require('to-array');
+
+/**
+ * Bind `el` event `type` to `fn`.
+ *
+ * @param {Element} el, NodeList, HTMLCollection or Array
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @api public
+ */
+
+exports.bind = function(el, type, fn, capture){
+  el = toArray(el);
+  for ( var i = 0; i < el.length; i++ ) {
+    events.bind(el[i], type, fn, capture);
+  }
+};
+
+/**
+ * Unbind `el` event `type`'s callback `fn`.
+ *
+ * @param {Element} el, NodeList, HTMLCollection or Array
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @api public
+ */
+
+exports.unbind = function(el, type, fn, capture){
+  el = toArray(el);
+  for ( var i = 0; i < el.length; i++ ) {
+    events.unbind(el[i], type, fn, capture);
+  }
+};
+
+});
+require.register("javve-get-by-class/index.js", function(exports, require, module){
+/**
+ * Find all elements with class `className` inside `container`.
+ * Use `single = true` to increase performance in older browsers
+ * when only one element is needed.
+ *
+ * @param {String} className
+ * @param {Element} container
+ * @param {Boolean} single
+ * @api public
+ */
+
+module.exports = (function() {
+  if (document.getElementsByClassName) {
+    return function(container, className, single) {
+      if (single) {
+        return container.getElementsByClassName(className)[0];
+      } else {
+        return container.getElementsByClassName(className);
+      }
+    };
+  } else if (document.querySelector) {
+    return function(container, className, single) {
+      className = '.' + className;
+      if (single) {
+        return container.querySelector(className);
+      } else {
+        return container.querySelectorAll(className);
+      }
+    };
+  } else {
+    return function(container, className, single) {
+      var classElements = [],
+        tag = '*';
+      if (container == null) {
+        container = document;
+      }
+      var els = container.getElementsByTagName(tag);
+      var elsLen = els.length;
+      var pattern = new RegExp("(^|\\s)"+className+"(\\s|$)");
+      for (var i = 0, j = 0; i < elsLen; i++) {
+        if ( pattern.test(els[i].className) ) {
+          if (single) {
+            return els[i];
+          } else {
+            classElements[j] = els[i];
+            j++;
+          }
+        }
+      }
+      return classElements;
+    };
+  }
+})();
+
+});
+require.register("javve-get-attribute/index.js", function(exports, require, module){
+/**
+ * Return the value for `attr` at `element`.
+ *
+ * @param {Element} el
+ * @param {String} attr
+ * @api public
+ */
+
+module.exports = function(el, attr) {
+  var result = (el.getAttribute && el.getAttribute(attr)) || null;
+  if( !result ) {
+    var attrs = el.attributes;
+    var length = attrs.length;
+    for(var i = 0; i < length; i++) {
+      if (attr[i] !== undefined) {
+        if(attr[i].nodeName === attr) {
+          result = attr[i].nodeValue;
+        }
+      }
+    }
+  }
+  return result;
+}
+});
+require.register("javve-natural-sort/index.js", function(exports, require, module){
+/*
+ * Natural Sort algorithm for Javascript - Version 0.7 - Released under MIT license
+ * Author: Jim Palmer (based on chunking idea from Dave Koelle)
+ */
+
+module.exports = function(a, b, options) {
+  var re = /(^-?[0-9]+(\.?[0-9]*)[df]?e?[0-9]?$|^0x[0-9a-f]+$|[0-9]+)/gi,
+    sre = /(^[ ]*|[ ]*$)/g,
+    dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
+    hre = /^0x[0-9a-f]+$/i,
+    ore = /^0/,
+    options = options || {},
+    i = function(s) { return options.insensitive && (''+s).toLowerCase() || ''+s },
+    // convert all to strings strip whitespace
+    x = i(a).replace(sre, '') || '',
+    y = i(b).replace(sre, '') || '',
+    // chunk/tokenize
+    xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+    yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+    // numeric, hex or date detection
+    xD = parseInt(x.match(hre)) || (xN.length != 1 && x.match(dre) && Date.parse(x)),
+    yD = parseInt(y.match(hre)) || xD && y.match(dre) && Date.parse(y) || null,
+    oFxNcL, oFyNcL,
+    mult = options.desc ? -1 : 1;
+  // first try and sort Hex codes or Dates
+  if (yD)
+    if ( xD < yD ) return -1 * mult;
+    else if ( xD > yD ) return 1 * mult;
+  // natural sorting through split numeric strings and default strings
+  for(var cLoc=0, numS=Math.max(xN.length, yN.length); cLoc < numS; cLoc++) {
+    // find floats not starting with '0', string or 0 if not defined (Clint Priest)
+    oFxNcL = !(xN[cLoc] || '').match(ore) && parseFloat(xN[cLoc]) || xN[cLoc] || 0;
+    oFyNcL = !(yN[cLoc] || '').match(ore) && parseFloat(yN[cLoc]) || yN[cLoc] || 0;
+    // handle numeric vs string comparison - number < string - (Kyle Adams)
+    if (isNaN(oFxNcL) !== isNaN(oFyNcL)) { return (isNaN(oFxNcL)) ? 1 : -1; }
+    // rely on string comparison if different types - i.e. '02' < 2 != '02' < '2'
+    else if (typeof oFxNcL !== typeof oFyNcL) {
+      oFxNcL += '';
+      oFyNcL += '';
+    }
+    if (oFxNcL < oFyNcL) return -1 * mult;
+    if (oFxNcL > oFyNcL) return 1 * mult;
+  }
+  return 0;
+};
+
+/*
+var defaultSort = getSortFunction();
+
+module.exports = function(a, b, options) {
+  if (arguments.length == 1) {
+    options = a;
+    return getSortFunction(options);
+  } else {
+    return defaultSort(a,b);
+  }
+}
+*/
+});
+require.register("javve-to-string/index.js", function(exports, require, module){
+module.exports = function(s) {
+    s = (s === undefined) ? "" : s;
+    s = (s === null) ? "" : s;
+    s = s.toString();
+    return s;
+};
+
+});
+require.register("component-type/index.js", function(exports, require, module){
+/**
+ * toString ref.
+ */
+
+var toString = Object.prototype.toString;
+
+/**
+ * Return the type of `val`.
+ *
+ * @param {Mixed} val
+ * @return {String}
+ * @api public
+ */
+
+module.exports = function(val){
+  switch (toString.call(val)) {
+    case '[object Date]': return 'date';
+    case '[object RegExp]': return 'regexp';
+    case '[object Arguments]': return 'arguments';
+    case '[object Array]': return 'array';
+    case '[object Error]': return 'error';
+  }
+
+  if (val === null) return 'null';
+  if (val === undefined) return 'undefined';
+  if (val !== val) return 'nan';
+  if (val && val.nodeType === 1) return 'element';
+
+  return typeof val.valueOf();
+};
+
+});
+require.register("list.js/index.js", function(exports, require, module){
+/*
+ListJS with beta 1.0.0
+By Jonny Strömberg (www.jonnystromberg.com, www.listjs.com)
+*/
+(function( window, undefined ) {
+"use strict";
+
+var document = window.document,
+    getByClass = require('get-by-class'),
+    extend = require('extend'),
+    indexOf = require('indexof');
+
+var List = function(id, options, values) {
+
+    var self = this,
+		init,
+        Item = require('./src/item')(self),
+        addAsync = require('./src/add-async')(self),
+        parse = require('./src/parse')(self);
+
+    init = {
+        start: function() {
+            self.listClass      = "list";
+            self.searchClass    = "search";
+            self.sortClass      = "sort";
+            self.page           = 200;
+            self.i              = 1;
+            self.items          = [];
+            self.visibleItems   = [];
+            self.matchingItems  = [];
+            self.searched       = false;
+            self.filtered       = false;
+            self.handlers       = { 'updated': [] };
+            self.plugins        = {};
+            self.helpers        = {
+                getByClass: getByClass,
+                extend: extend,
+                indexOf: indexOf
+            };
+
+            extend(self, options);
+
+            self.listContainer = (typeof(id) === 'string') ? document.getElementById(id) : id;
+            if (!self.listContainer) { return; }
+            self.list           = getByClass(self.listContainer, self.listClass, true);
+
+            self.templater      = require('./src/templater')(self);
+            self.search         = require('./src/search')(self);
+            self.filter         = require('./src/filter')(self);
+            self.sort           = require('./src/sort')(self);
+
+            this.items();
+            self.update();
+            this.plugins();
+        },
+        items: function() {
+            parse(self.list);
+            if (values !== undefined) {
+                self.add(values);
+            }
+        },
+        plugins: function() {
+            for (var i = 0; i < self.plugins.length; i++) {
+                var plugin = self.plugins[i];
+                self[plugin.name] = plugin;
+                plugin.init(self);
+            }
+        }
+    };
+
+
+    /*
+    * Add object to list
+    */
+    this.add = function(values, callback) {
+        if (callback) {
+            addAsync(values, callback);
+            return;
+        }
+        var added = [],
+            notCreate = false;
+        if (values[0] === undefined){
+            values = [values];
+        }
+        for (var i = 0, il = values.length; i < il; i++) {
+            var item = null;
+            if (values[i] instanceof Item) {
+                item = values[i];
+                item.reload();
+            } else {
+                notCreate = (self.items.length > self.page) ? true : false;
+                item = new Item(values[i], undefined, notCreate);
+            }
+            self.items.push(item);
+            added.push(item);
+        }
+        self.update();
+        return added;
+    };
+
+	this.show = function(i, page) {
+		this.i = i;
+		this.page = page;
+		self.update();
+        return self;
+	};
+
+    /* Removes object from list.
+    * Loops through the list and removes objects where
+    * property "valuename" === value
+    */
+    this.remove = function(valueName, value, options) {
+        var found = 0;
+        for (var i = 0, il = self.items.length; i < il; i++) {
+            if (self.items[i].values()[valueName] == value) {
+                self.templater.remove(self.items[i], options);
+                self.items.splice(i,1);
+                il--;
+                i--;
+                found++;
+            }
+        }
+        self.update();
+        return found;
+    };
+
+    /* Gets the objects in the list which
+    * property "valueName" === value
+    */
+    this.get = function(valueName, value) {
+        var matchedItems = [];
+        for (var i = 0, il = self.items.length; i < il; i++) {
+            var item = self.items[i];
+            if (item.values()[valueName] == value) {
+                matchedItems.push(item);
+            }
+        }
+        return matchedItems;
+    };
+
+    /*
+    * Get size of the list
+    */
+    this.size = function() {
+        return self.items.length;
+    };
+
+    /*
+    * Removes all items from the list
+    */
+    this.clear = function() {
+        self.templater.clear();
+        self.items = [];
+        return self;
+    };
+
+    this.on = function(event, callback) {
+        self.handlers[event].push(callback);
+        return self;
+    };
+
+    this.off = function(event, callback) {
+        var e = self.handlers[event];
+        var index = indexOf(e, callback);
+        if (index > -1) {
+            e.splice(index, 1);
+        }
+        return self;
+    };
+
+    this.trigger = function(event) {
+        var i = self.handlers[event].length;
+        while(i--) {
+            self.handlers[event][i](self);
+        }
+        return self;
+    };
+
+    this.reset = {
+        filter: function() {
+            var is = self.items,
+                il = is.length;
+            while (il--) {
+                is[il].filtered = false;
+            }
+            return self;
+        },
+        search: function() {
+            var is = self.items,
+                il = is.length;
+            while (il--) {
+                is[il].found = false;
+            }
+            return self;
+        }
+    };
+
+    this.update = function() {
+        var is = self.items,
+			il = is.length;
+
+        self.visibleItems = [];
+        self.matchingItems = [];
+        self.templater.clear();
+        for (var i = 0; i < il; i++) {
+            if (is[i].matching() && ((self.matchingItems.length+1) >= self.i && self.visibleItems.length < self.page)) {
+                is[i].show();
+                self.visibleItems.push(is[i]);
+                self.matchingItems.push(is[i]);
+			} else if (is[i].matching()) {
+                self.matchingItems.push(is[i]);
+                is[i].hide();
+			} else {
+                is[i].hide();
+			}
+        }
+        self.trigger('updated');
+        return self;
+    };
+
+    init.start();
+};
+
+module.exports = List;
+
+})(window);
+
+});
+require.register("list.js/src/search.js", function(exports, require, module){
+var events = require('events'),
+    getByClass = require('get-by-class'),
+    toString = require('to-string');
+
+module.exports = function(list) {
+    var item,
+        text,
+        columns,
+        searchString,
+        customSearch;
+
+    var prepare = {
+        resetList: function() {
+            list.i = 1;
+            list.templater.clear();
+            customSearch = undefined;
+        },
+        setOptions: function(args) {
+            if (args.length == 2 && args[1] instanceof Array) {
+                columns = args[1];
+            } else if (args.length == 2 && typeof(args[1]) == "function") {
+                customSearch = args[1];
+            } else if (args.length == 3) {
+                columns = args[1];
+                customSearch = args[2];
+            }
+        },
+        setColumns: function() {
+            columns = (columns === undefined) ? prepare.toArray(list.items[0].values()) : columns;
+        },
+        setSearchString: function(s) {
+            s = toString(s).toLowerCase();
+            s = s.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&"); // Escape regular expression characters
+            searchString = s;
+        },
+        toArray: function(values) {
+            var tmpColumn = [];
+            for (var name in values) {
+                tmpColumn.push(name);
+            }
+            return tmpColumn;
+        }
+    };
+    var search = {
+        list: function() {
+            for (var k = 0, kl = list.items.length; k < kl; k++) {
+                search.item(list.items[k]);
+            }
+        },
+        item: function(item) {
+            item.found = false;
+            for (var j = 0, jl = columns.length; j < jl; j++) {
+                if (search.values(item.values(), columns[j])) {
+                    item.found = true;
+                    return;
+                }
+            }
+        },
+        values: function(values, column) {
+            if (values.hasOwnProperty(column)) {
+                text = toString(values[column]).toLowerCase();
+                if ((searchString !== "") && (text.search(searchString) > -1)) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        reset: function() {
+            list.reset.search();
+            list.searched = false;
+        }
+    };
+
+    var searchMethod = function(str) {
+        list.trigger('searchStart');
+
+        prepare.resetList();
+        prepare.setSearchString(str);
+        prepare.setOptions(arguments); // str, cols|searchFunction, searchFunction
+        prepare.setColumns();
+
+        if (searchString === "" ) {
+            search.reset();
+        } else {
+            list.searched = true;
+            if (customSearch) {
+                customSearch(searchString, columns);
+            } else {
+                search.list();
+            }
+        }
+
+        list.update();
+        list.trigger('searchComplete');
+        return list.visibleItems;
+    };
+
+    list.handlers.searchStart = list.handlers.searchStart || [];
+    list.handlers.searchComplete = list.handlers.searchComplete || [];
+
+    events.bind(getByClass(list.listContainer, list.searchClass), 'keyup', function(e) {
+        var target = e.target || e.srcElement, // IE have srcElement
+            alreadyCleared = (target.value === "" && !list.searched);
+        if (!alreadyCleared) { // If oninput already have resetted the list, do nothing
+            searchMethod(target.value);
+        }
+    });
+
+    // Used to detect click on HTML5 clear button
+    events.bind(getByClass(list.listContainer, list.searchClass), 'input', function(e) {
+        var target = e.target || e.srcElement;
+        if (target.value === "") {
+            searchMethod('');
+        }
+    });
+
+    list.helpers.toString = toString;
+    return searchMethod;
+};
+
+});
+require.register("list.js/src/sort.js", function(exports, require, module){
+var naturalSort = require('natural-sort'),
+    classes = require('classes'),
+    events = require('events'),
+    getByClass = require('get-by-class'),
+    getAttribute = require('get-attribute');
+
+module.exports = function(list) {
+    list.sortFunction = list.sortFunction || function(itemA, itemB, options) {
+        options.desc = options.order == "desc" ? true : false; // Natural sort uses this format
+        return naturalSort(itemA.values()[options.valueName], itemB.values()[options.valueName], options);
+    };
+
+    var buttons = {
+        els: undefined,
+        clear: function() {
+            for (var i = 0, il = buttons.els.length; i < il; i++) {
+                classes(buttons.els[i]).remove('asc');
+                classes(buttons.els[i]).remove('desc');
+            }
+        },
+        getOrder: function(btn) {
+            var predefinedOrder = getAttribute(btn, 'data-order');
+            if (predefinedOrder == "asc" || predefinedOrder == "desc") {
+                return predefinedOrder;
+            } else if (classes(btn).has('desc')) {
+                return "asc";
+            } else if (classes(btn).has('asc')) {
+                return "desc";
+            } else {
+                return "asc";
+            }
+        },
+        getInSensitive: function(btn, options) {
+            var insensitive = getAttribute(btn, 'data-insensitive');
+            if (insensitive === "true") {
+                options.insensitive = true;
+            } else {
+                options.insensitive = false;
+            }
+        },
+        setOrder: function(options) {
+            for (var i = 0, il = buttons.els.length; i < il; i++) {
+                var btn = buttons.els[i];
+                if (getAttribute(btn, 'data-sort') !== options.valueName) {
+                    continue;
+                }
+                var predefinedOrder = getAttribute(btn, 'data-order');
+                if (predefinedOrder == "asc" || predefinedOrder == "desc") {
+                    if (predefinedOrder == options.order) {
+                        classes(btn).add(options.order);
+                    }
+                } else {
+                    classes(btn).add(options.order);
+                }
+            }
+        }
+    };
+    var sort = function() {
+        list.trigger('sortStart');
+        options = {};
+
+        var target = arguments[0].currentTarget || arguments[0].srcElement || undefined;
+
+        if (target) {
+            options.valueName = getAttribute(target, 'data-sort');
+            buttons.getInSensitive(target, options);
+            options.order = buttons.getOrder(target);
+        } else {
+            options = arguments[1] || options;
+            options.valueName = arguments[0];
+            options.order = options.order || "asc";
+            options.insensitive = (typeof options.insensitive == "undefined") ? true : options.insensitive;
+        }
+        buttons.clear();
+        buttons.setOrder(options);
+
+        options.sortFunction = options.sortFunction || list.sortFunction;
+        list.items.sort(function(a, b) {
+            return options.sortFunction(a, b, options);
+        });
+        list.update();
+        list.trigger('sortComplete');
+    };
+
+    // Add handlers
+    list.handlers.sortStart = list.handlers.sortStart || [];
+    list.handlers.sortComplete = list.handlers.sortComplete || [];
+
+    buttons.els = getByClass(list.listContainer, list.sortClass);
+    events.bind(buttons.els, 'click', sort);
+    list.on('searchStart', buttons.clear);
+    list.on('filterStart', buttons.clear);
+
+    // Helpers
+    list.helpers.classes = classes;
+    list.helpers.naturalSort = naturalSort;
+    list.helpers.events = events;
+    list.helpers.getAttribute = getAttribute;
+
+    return sort;
+};
+
+});
+require.register("list.js/src/item.js", function(exports, require, module){
+module.exports = function(list) {
+    return function(initValues, element, notCreate) {
+        var item = this;
+
+        this._values = {};
+
+        this.found = false; // Show if list.searched == true and this.found == true
+        this.filtered = false;// Show if list.filtered == true and this.filtered == true
+
+        var init = function(initValues, element, notCreate) {
+            if (element === undefined) {
+                if (notCreate) {
+                    item.values(initValues, notCreate);
+                } else {
+                    item.values(initValues);
+                }
+            } else {
+                item.elm = element;
+                var values = list.templater.get(item, initValues);
+                item.values(values);
+            }
+        };
+        this.values = function(newValues, notCreate) {
+            if (newValues !== undefined) {
+                for(var name in newValues) {
+                    item._values[name] = newValues[name];
+                }
+                if (notCreate !== true) {
+                    list.templater.set(item, item.values());
+                }
+            } else {
+                return item._values;
+            }
+        };
+        this.show = function() {
+            list.templater.show(item);
+        };
+        this.hide = function() {
+            list.templater.hide(item);
+        };
+        this.matching = function() {
+            return (
+                (list.filtered && list.searched && item.found && item.filtered) ||
+                (list.filtered && !list.searched && item.filtered) ||
+                (!list.filtered && list.searched && item.found) ||
+                (!list.filtered && !list.searched)
+            );
+        };
+        this.visible = function() {
+            return (item.elm.parentNode == list.list) ? true : false;
+        };
+        init(initValues, element, notCreate);
+    };
+};
+
+});
+require.register("list.js/src/templater.js", function(exports, require, module){
+var getByClass = require('get-by-class');
+
+var Templater = function(list) {
+    var itemSource = getItemSource(list.item),
+        templater = this;
+
+    function getItemSource(item) {
+        if (item === undefined) {
+            var nodes = list.list.childNodes,
+                items = [];
+
+            for (var i = 0, il = nodes.length; i < il; i++) {
+                // Only textnodes have a data attribute
+                if (nodes[i].data === undefined) {
+                    return nodes[i];
+                }
+            }
+            return null;
+        } else if (item.indexOf("<") !== -1) { // Try create html element of list, do not work for tables!!
+            var div = document.createElement('div');
+            div.innerHTML = item;
+            return div.firstChild;
+        } else {
+            return document.getElementById(list.item);
+        }
+    }
+
+    /* Get values from element */
+    this.get = function(item, valueNames) {
+        templater.create(item);
+        var values = {};
+        for(var i = 0, il = valueNames.length; i < il; i++) {
+            var elm = getByClass(item.elm, valueNames[i], true);
+            values[valueNames[i]] = elm ? elm.innerHTML : "";
+        }
+        return values;
+    };
+
+    /* Sets values at element */
+    this.set = function(item, values) {
+        if (!templater.create(item)) {
+            for(var v in values) {
+                if (values.hasOwnProperty(v)) {
+                    // TODO speed up if possible
+                    var elm = getByClass(item.elm, v, true);
+                    if (elm) {
+                        /* src attribute for image tag & text for other tags */
+                        if (elm.tagName === "IMG" && values[v] !== "") {
+                            elm.src = values[v];
+                        } else {
+                            elm.innerHTML = values[v];
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    this.create = function(item) {
+        if (item.elm !== undefined) {
+            return false;
+        }
+        /* If item source does not exists, use the first item in list as
+        source for new items */
+        var newItem = itemSource.cloneNode(true);
+        newItem.removeAttribute('id');
+        item.elm = newItem;
+        templater.set(item, item.values());
+        return true;
+    };
+    this.remove = function(item) {
+        list.list.removeChild(item.elm);
+    };
+    this.show = function(item) {
+        templater.create(item);
+        list.list.appendChild(item.elm);
+    };
+    this.hide = function(item) {
+        if (item.elm !== undefined && item.elm.parentNode === list.list) {
+            list.list.removeChild(item.elm);
+        }
+    };
+    this.clear = function() {
+        /* .innerHTML = ''; fucks up IE */
+        if (list.list.hasChildNodes()) {
+            while (list.list.childNodes.length >= 1)
+            {
+                list.list.removeChild(list.list.firstChild);
+            }
+        }
+    };
+};
+
+module.exports = function(list) {
+    return new Templater(list);
+};
+
+});
+require.register("list.js/src/filter.js", function(exports, require, module){
+module.exports = function(list) {
+
+    // Add handlers
+    list.handlers.filterStart = list.handlers.filterStart || [];
+    list.handlers.filterComplete = list.handlers.filterComplete || [];
+
+    return function(filterFunction) {
+        list.trigger('filterStart');
+        list.i = 1; // Reset paging
+        list.reset.filter();
+        if (filterFunction === undefined) {
+            list.filtered = false;
+        } else {
+            list.filtered = true;
+            var is = list.items;
+            for (var i = 0, il = is.length; i < il; i++) {
+                var item = is[i];
+                if (filterFunction(item)) {
+                    item.filtered = true;
+                } else {
+                    item.filtered = false;
+                }
+            }
+        }
+        list.update();
+        list.trigger('filterComplete');
+        return list.visibleItems;
+    };
+};
+
+});
+require.register("list.js/src/add-async.js", function(exports, require, module){
+module.exports = function(list) {
+    return function(values, callback, items) {
+        var valuesToAdd = values.splice(0, 100);
+        items = items || [];
+        items = items.concat(list.add(valuesToAdd));
+        if (values.length > 0) {
+            setTimeout(function() {
+                addAsync(values, callback, items);
+            }, 10);
+        } else {
+            list.update();
+            callback(items);
+        }
+    };
+};
+});
+require.register("list.js/src/parse.js", function(exports, require, module){
+module.exports = function(list) {
+
+    var Item = require('./item')(list);
+
+    var getChildren = function(parent) {
+        var nodes = parent.childNodes,
+            items = [];
+        for (var i = 0, il = nodes.length; i < il; i++) {
+            // Only textnodes have a data attribute
+            if (nodes[i].data === undefined) {
+                items.push(nodes[i]);
+            }
+        }
+        return items;
+    };
+
+    var parse = function(itemElements, valueNames) {
+        for (var i = 0, il = itemElements.length; i < il; i++) {
+            list.items.push(new Item(valueNames, itemElements[i]));
+        }
+    };
+    var parseAsync = function(itemElements, valueNames) {
+        var itemsToIndex = itemElements.splice(0, 100); // TODO: If < 100 items, what happens in IE etc?
+        parse(itemsToIndex, valueNames);
+        if (itemElements.length > 0) {
+            setTimeout(function() {
+                init.items.indexAsync(itemElements, valueNames);
+            }, 10);
+        } else {
+            list.update();
+            // TODO: Add indexed callback
+        }
+    };
+
+    return function() {
+        var itemsToIndex = getChildren(list.list),
+            valueNames = list.valueNames;
+
+        if (list.indexAsync) {
+            parseAsync(itemsToIndex, valueNames);
+        } else {
+            parse(itemsToIndex, valueNames);
+        }
+    };
+};
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+require.alias("component-classes/index.js", "list.js/deps/classes/index.js");
+require.alias("component-classes/index.js", "classes/index.js");
+require.alias("component-indexof/index.js", "component-classes/deps/indexof/index.js");
+
+require.alias("segmentio-extend/index.js", "list.js/deps/extend/index.js");
+require.alias("segmentio-extend/index.js", "extend/index.js");
+
+require.alias("component-indexof/index.js", "list.js/deps/indexof/index.js");
+require.alias("component-indexof/index.js", "indexof/index.js");
+
+require.alias("javve-events/index.js", "list.js/deps/events/index.js");
+require.alias("javve-events/index.js", "events/index.js");
+require.alias("component-event/index.js", "javve-events/deps/event/index.js");
+
+require.alias("timoxley-to-array/index.js", "javve-events/deps/to-array/index.js");
+
+require.alias("javve-get-by-class/index.js", "list.js/deps/get-by-class/index.js");
+require.alias("javve-get-by-class/index.js", "get-by-class/index.js");
+
+require.alias("javve-get-attribute/index.js", "list.js/deps/get-attribute/index.js");
+require.alias("javve-get-attribute/index.js", "get-attribute/index.js");
+
+require.alias("javve-natural-sort/index.js", "list.js/deps/natural-sort/index.js");
+require.alias("javve-natural-sort/index.js", "natural-sort/index.js");
+
+require.alias("javve-to-string/index.js", "list.js/deps/to-string/index.js");
+require.alias("javve-to-string/index.js", "list.js/deps/to-string/index.js");
+require.alias("javve-to-string/index.js", "to-string/index.js");
+require.alias("javve-to-string/index.js", "javve-to-string/index.js");
+require.alias("component-type/index.js", "list.js/deps/type/index.js");
+require.alias("component-type/index.js", "type/index.js");
+if (typeof exports == "object") {
+  module.exports = require("list.js");
+} else if (typeof define == "function" && define.amd) {
+  define(function(){ return require("list.js"); });
+} else {
+  this["List"] = require("list.js");
+}})();

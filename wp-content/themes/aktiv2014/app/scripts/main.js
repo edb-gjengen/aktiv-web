@@ -1,10 +1,11 @@
 'use strict';
-/*global moment, jQuery, document, _, $, window */
+/*global moment, jQuery, document, _, $, window, List */
 var program_endpoint = 'https://studentersamfundet.no/api/events/get_today/';
 var inside_url = 'https://inside.studentersamfundet.no';
 var inside_groups_url = inside_url + '/api/groups.php';
 var user_search_endpoint = '/inside-api/';
-var email_search_endpoint = '/email-api/';
+var email_endpoint = '/email-api/';
+var user_profile_url = '/profil/';
 var query_params = {
     //meta_key: '_neuf_events_starttime',
     //meta_value: moment().add('days', 1).format('X'),
@@ -55,7 +56,7 @@ function format_results(data) {
 
     var list = '<tbody><% _.each(results, function(u) { %>' +
         '<tr>' +
-        '<td><a href="'+ inside_url +'/?page=display-user&userid=<%= u.id %>"><%= u.firstname %> <%= u.lastname %></a></td>' +
+        '<td><a href="'+ user_profile_url +'?username=<%= u.username %>"><%= u.firstname %> <%= u.lastname %></a></td>' +
         '<td><%= u.username %></td>' +
         '<td><a href="mailto:<%= u.email %>"><%= u.email %></a></td>' +
         '<td><a href="tlf:<%= u.number %>"><%= u.number %></a></td>' +
@@ -95,7 +96,7 @@ function do_search() {
     );
 }
 
-function load_initial_values() {
+function user_search_load_initial_values() {
     var param_set = false;
     var q = getParameterByName('q');
     if(q && q.length > 0) {
@@ -185,9 +186,35 @@ function get_user_meta(key, callback) {
         callback(data);
     });
 }
+function mailinglist_show(q) {
+    $.getJSON(
+        email_endpoint,
+        {
+            'do': 'list',
+            q: q,
+            _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
+        },
+        function(data) {
+            var list = '<h5 class="list-members-title">Medlemmer på ' + data.meta.list +'</h5><span class="list-num-members"><%= members.length %> stk</span><ul id="members-result"><% _.each(members, function(m) { %>' +
+                '<li><a href="mailto:<%= m %>"><span class="dashicons dashicons-email"></span> <%= m %></a></li>' +
+                '<% }); %></ul>';
+            var html = _.template(list, data);
+            $('.list-members').html(html);
+            $('.lists-list-wrap .meta').html('<a href="#members-result" class="button radius list-members-button">Vis medlemmer på '+ data.meta.list +'</a>');
 
+            /* Highlight selected list */
+            $('[data-list-name=\''+q+'\']').addClass('selected');
+        }
+    );
+}
+function mailinglists_load_initial() {
+    var q = getParameterByName('q');
+    if(q && q.length > 0) {
+        mailinglist_show(q);
+     }
+}
 jQuery(document).ready(function() {
-    moment.lang('nb');
+    moment.locale('nb');
 
     var $ = jQuery;
 
@@ -257,7 +284,7 @@ jQuery(document).ready(function() {
             });
 
             /* Load intial values from url query */
-            load_initial_values();
+            user_search_load_initial_values();
         });
         $('.search-field').on('keyup keypress', function(e) {
             // No <enter>
@@ -277,6 +304,39 @@ jQuery(document).ready(function() {
         });
     }
 
+    /* Mailinglists page */
+    if( $('.page-mailinglists').length ) {
+        // TODO: better mobile layout
+        // TODO: dynamic show/hide of members
+
+        /* Load list of lists*/
+        $.getJSON(
+            email_endpoint,
+            {
+                'do': 'list',
+                _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
+            },
+            function(data) {
+                var list = '<% _.each(lists, function(l) { %>' +
+                    '<li data-list-name="<%= l.name %>"><a href="'+ window.location.pathname + '?q=<%= l.name %>" class="list-name"><%= l.name %></a><br>' +
+                    '<span class="list-num-members"><%= l.num %> medlemmer</span>'+
+                    '<a href="<%= l.admin_url %>" class="email-<%= l.type %> button-alt" title="<%= l.type %>"> '+
+                    '<span class="dashicons dashicons-<% if( l.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"> </span>Endre'+
+                    '</a></li>' +
+                    '<% }); %>';
+                var html = _.template(list, data);
+                $('.lists-list').html(html);
+
+                /* Index list and make searchable and sortable */
+                var options = {
+                    valueNames: [ 'list-name', 'list-num-members' ]
+                };
+                new List('mailinglists', options);
+                mailinglists_load_initial();
+            }
+        );
+    }
+
     /* Profile page */
     if( $('.profile').length ) {
         /* Load groups and memberships */
@@ -285,6 +345,9 @@ jQuery(document).ready(function() {
             exact: true,
             _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
         };
+        if(getParameterByName('username') !== '') {
+            params.q = getParameterByName('username');
+        }
 
         $.getJSON(
             user_search_endpoint,
@@ -301,8 +364,10 @@ jQuery(document).ready(function() {
                     if(u.is_member === '1') {
                         is_member_field.html('Gyldig medlemskap.');
                     } else {
-                        is_member_field.html('Du har ikke et gyldig medlemskap. Du kan forny medlemskapet ditt via SMS, via <a href="http://snapporder.com">SnappOrder</a> eller via nettbutikken i <a href="https://inside.studentersamfundet.no">Inside</a>.');
+                        is_member_field.html('Du har ikke et gyldig medlemskap. Du kan forny medlemskapet ditt via SMS, via <a href="http://snappordel.com">SnappOrder</a> eller via nettbutikken i <a href="https://inside.studentersamfundet.no">Inside</a>.');
                     }
+                    // if other profile, add link to profile
+                    $('.js-inside-link').attr('href', 'https://inside.studentersamfundet.no/?page=display-user&userid='+u.id);
                 }
             }
         );
@@ -310,7 +375,7 @@ jQuery(document).ready(function() {
         params.q = $('.profile-details .user-email').text();
         params.inherited = true;
         $.getJSON(
-            email_search_endpoint,
+            email_endpoint,
             params,
             function(data) {
                 var list = '<% _.each(results, function(r) { %>' +

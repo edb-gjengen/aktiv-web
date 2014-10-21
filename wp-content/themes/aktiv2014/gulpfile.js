@@ -32,7 +32,6 @@ gulp.task('diststyles', function () {
 
 gulp.task('vendorscripts', function () {
     var wiredep = require('wiredep')();
-    
     return gulp.src(wiredep.js)
         .pipe($.concat('vendor.js'))
         .pipe(gulp.dest('dist/scripts'))
