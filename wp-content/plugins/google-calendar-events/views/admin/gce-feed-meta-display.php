@@ -80,13 +80,13 @@
 		</td>
 	</tr>
 	<tr>
-		<th scope="row"><label for="gce_feed_url"><?php _e( 'GCal Feed URL', 'gce' ); ?></label></th>
+		<th scope="row"><label for="gce_feed_url"><?php _e( 'Google Calendar ID', 'gce' ); ?></label></th>
 		<td>
-			<input type="text" class="large-text" name="gce_feed_url" id="gce_feed_url" value="<?php echo $gce_feed_url; ?>" />
+			<input type="text" class="regular-text" style="width: 30em;" name="gce_feed_url" id="gce_feed_url" value="<?php echo $gce_feed_url; ?>" />
 			<p class="description">
-				<?php _e( 'The Google Calendar feed URL.', 'gce' ); ?> <?php _e( 'Example', 'gce' ); ?>:<br/>
-				<code>https://www.google.com/calendar/feeds/em3luo1919fjcjum4j874j5ejg%40group.calendar.google.com/public/basic</code><br/>
-				<a href="http://wpdocs.philderksen.com/google-calendar-events/getting-started/find-feed-url/" target="_blank"><?php _e( 'How to find your GCal feed URL', 'gce' ); ?></a>
+				<?php _e( 'The Google Calendar ID.', 'gce' ); ?> <?php _e( 'Example', 'gce' ); ?>:<br/>
+				<code>umsb0ekhivs1a2ubtq6vlqvcjk@group.calendar.google.com</code><br/>
+				<a href="<?php echo gce_ga_campaign_url( 'http://wpdocs.philderksen.com/google-calendar-events/getting-started/find-calendar-id/', 'gce_lite', 'settings_link', 'docs' ); ?>" target="_blank"><?php _e( 'How to find your GCal calendar ID', 'gce' ); ?></a>
 			</p>
 		</td>
 	</tr>
@@ -113,7 +113,7 @@
 			<input type="text" class="" name="gce_date_format" id="gce_date_format" value="<?php echo $gce_date_format; ?>" />
 			<p class="description">
 				<?php printf( __( 'Use %sPHP date formatting%s.', 'gce' ), '<a href="http://php.net/manual/en/function.date.php" target="_blank">', '</a>' ); ?>
-				<?php echo _x( 'Leave blank to use the default.', 'References the Date Format option', 'gce' ); ?>
+				<?php _e( 'Leave blank to use the default.', 'gce' ); ?>
 			</p>
 		</td>
 	</tr>
@@ -124,7 +124,7 @@
 			<input type="text" class="" name="gce_time_format" id="gce_time_format" value="<?php echo $gce_time_format; ?>" />
 			<p class="description">
 				<?php printf( __( 'Use %sPHP date formatting%s.', 'gce' ), '<a href="http://php.net/manual/en/function.date.php" target="_blank">', '</a>' ); ?>
-				<?php echo _x( 'Leave blank to use the default.', 'References the Time Format option', 'gce' ); ?>
+				<?php _e( 'Leave blank to use the default.', 'gce' ); ?>
 			</p>
 		</td>
 	</tr>
