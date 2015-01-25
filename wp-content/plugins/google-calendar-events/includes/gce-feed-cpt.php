@@ -136,6 +136,10 @@ function gce_save_meta( $post_id ) {
 	if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
 			return $post_id;
 	}
+	
+	if( isset( $_REQUEST['bulk_edit'] ) ) {
+		return $post_id;
+	}
 
 	// An array to hold all of our post meta ids so we can run them through a loop
 	$post_meta_fields = array(
@@ -190,7 +194,7 @@ function gce_save_meta( $post_id ) {
 					$id = str_replace( '/public/basic', '', $id );
 					$id = str_replace( '%40', '@', $id );
 					
-					update_post_meta( $post_id, $pmf, $id );
+					update_post_meta( $post_id, $pmf, trim( $id ) );
 				} else {
 					update_post_meta( $post_id, $pmf, stripslashes( $_POST[$pmf] ) );
 				}
