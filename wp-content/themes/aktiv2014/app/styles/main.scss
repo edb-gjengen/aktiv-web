@@ -1,8 +1,9 @@
 @import 'normalize';
 @import 'chosen';
 @import 'mixins';
+@import "foundation/components/global";
 
-/* Colors */
+/* Colors and type */
 $body-bg: #fafafa;
 $body-font-color: #000;
 $body-font-family: "Open Sans", sans-serif;
@@ -12,9 +13,6 @@ $secondary-color: #008CBA;
 
 $label-bg-color: lighten(#FF1F00, 10%);
 $site-header-bg-color: #333;
-
-
-@import "foundation/components/global";
 
 /* Misc */
 $table-head-padding: rem-calc(10 16 9);
