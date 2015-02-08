@@ -490,4 +490,13 @@ function get_feed_url() {
 
 remove_action( 'wp_head', 'feed_links_extra', 3 ); // Display the links to the extra feeds such as category feeds
 remove_action( 'wp_head', 'feed_links', 2 ); // Display the links to the general feeds: Post and Comment Feed
+
+function get_category_formatted() {
+    if( count(get_the_category()) >= 1 ) {
+        $cat = get_the_category();
+        $cat = $cat[0];
+        return '<a href="'. get_category_link($cat->term_id) .'" class="label-category"><span class="dashicons dashicons-tag"></span>'. $cat->name .'</a>';
+    }
+    return "";
+}
 ?>

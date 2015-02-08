@@ -42,214 +42,7 @@ body {
 }
 
 /* Header and menu */
-$menu-padding: rem-calc(18);
-
-#site-header {
-    background-color: $site-header-bg-color;
-    box-shadow: rgba(0,0,0,0.3) 0px 1px 2px 0px;
-
-    #header-container {
-        @include grid-row();
-        position: relative;
-        z-index: 1;
-    }
-    .site-title {
-        @include grid-column(3);
-        a {
-            display: block;
-            padding-top: $menu-padding;
-            padding-bottom: $menu-padding;
-            color: white;
-            line-height: 1;
-            &:hover {
-                color: darken(white, 10%);
-            }
-        }
-    }
-}
-#menu {
-    @include grid-column(9);
-
-    a {
-        color: white;
-        &:hover {
-            color: darken(white, 10%);
-        }
-    }
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        line-height: 1;
-        li a {
-            display: block;
-        }
-    }
-    .main-menu {
-        text-align: right;
-        display: none;
-        padding-top: $menu-padding * 2 + rem-calc(6);
-
-        @media #{$large-up} {
-            display: block;
-            padding-top: 0;
-        }
-
-        li {
-            @media #{$large-up} { float: left; }
-
-            a {
-                display: block;
-                padding-left: rem-calc(10);
-                padding-right: rem-calc(10);
-                padding-top: $menu-padding;
-                padding-bottom: $menu-padding;
-
-            }
-            &.menu-item-has-children:hover .sub-menu {
-                display: block;
-            }
-        }
-    }
-    @media #{$large-up} {
-        .sub-menu {
-            display: none;
-            position: absolute;
-            background-color: $site-header-bg-color;
-            li {
-                float: none;
-                a {
-                    text-align: left;
-                    padding-right: rem-calc(10);
-                    border-left: 4px solid transparent;
-                    &:hover {
-                        border-left: 4px solid $secondary-color;
-                    }
-                }
-                &:first-child a {
-                    padding-left: rem-calc(10);
-                }
-            }
-        }
-    }
-    /* User Menu */
-    .user-menu-wrap {
-        display: none;
-
-        @media #{$large-up} {
-            display: block;
-            font-size: rem-calc(14);
-            position: absolute;
-            top: 0;
-            right: rem-calc(16);
-            margin-top: rem-calc(6);
-
-            &:hover .profile-badge {
-                background-color: darken(white, 3%);
-            }
-        }
-
-        .profile-badge {
-            display: block;
-            height: rem-calc(40);
-            text-align: right;
-            padding: 4px;
-
-            @media #{$large-up} {
-                background-color: #fff;
-                border-radius: rem-calc(50);
-                box-shadow: rgba(0,0,0,0.14902) 0px 1px 0px 0px, rgba(0,0,0,0.09804) 0px 1px 2px 0px;
-            }
-
-            img {
-                max-height: 100%;
-                border-radius: 50%;
-            }
-        }
-
-        .user-menu {
-            @extend .radius;
-            text-align: right;
-            position: relative;
-            z-index: 1;
-
-            @media #{$large-up} {
-                display: none;
-                background-color: white;
-                overflow: hidden;
-                font-size: rem-calc(14);
-                margin-top: rem-calc(7);
-                box-shadow: rgba(0,0,0,0.14902) 0px 1px 0px 0px, rgba(0,0,0,0.09804) 0px 1px 2px 0px;
-
-                a {
-                    color: #333;
-                    border-left: 4px solid transparent;
-                    &:hover {
-                        background-color: darken(white, 3%);
-                        border-left: 4px solid lighten($secondary-color, 50%);
-                    }
-                }
-            }
-
-            li a {
-                padding-top: $menu-padding;
-                padding-bottom: $menu-padding;
-
-                padding-left: rem-calc(10);
-                padding-right: rem-calc(10);
-                @media #{$large-up} {
-                    padding-left: rem-calc(16);
-                    padding-right: rem-calc(16);
-                }
-            }
-        }
-        .icon-down {
-            display: none;
-            @media #{$large-up} { display: inline-block; }
-
-            font-size: rem-calc(12);
-            font-style: normal;
-            padding-left: rem-calc(6);
-            transform: rotate(90deg);
-            top: -3px;
-            position: relative;
-            color: #ccc;
-        }
-        .profile-inner {
-            display: inline-block;
-            padding-left: rem-calc(10);
-            padding-right: rem-calc(4);
-
-
-            @media #{$large-up} {
-                padding: 0 rem-calc(10);
-                color: #333;
-            }
-        }
-    }
-    .menu-toggle {
-        position: absolute;
-        right: rem-calc(16);
-        top: rem-calc(14);
-
-        @media #{$large-up} {
-            display: none;
-        }
-
-        svg {
-            width: 32px;
-            height: 24px;
-        }
-
-        g {
-            fill: white;
-        }
-
-        &:hover g {
-            fill: darken(white, 10%);
-        }
-    }
-}
+@import "header";
 
 /* Content */
 .container {
@@ -287,22 +80,21 @@ $menu-padding: rem-calc(18);
     position: relative;
 }
 .entry-title {
-    display: inline-block;
 }
 .entry-meta {
     display: inline-block;
     margin-bottom: rem-calc(10);
     font-weight: 300;
     color: #666;
-    clear: both;
 }
 .entry-content {
-    margin-top: rem-calc(20);
+    margin-top: rem-calc(10);
     &.excerpt p {
         margin-bottom: 8px;
     }
 }
 .entry-category {
+    display: inline-block;
     font-weight: 300;
     color: #666;
 
@@ -323,6 +115,20 @@ $menu-padding: rem-calc(18);
         margin-bottom: 8px;
     }
 }
+.wp-post-image {
+    margin-top: rem-calc(10);
+    @media #{$medium-up} {
+        float: left;
+        max-width: 250px;
+        border-radius: 2px;
+        margin-right: 10px;
+    }
+}
+.single .wp-post-image {
+    float: none;
+    max-width: 100%;
+    margin-right: 0;
+}
 
 .read-more {
     padding: 10px 16px;
@@ -330,7 +136,7 @@ $menu-padding: rem-calc(18);
 }
 .actions-container {
     text-align: right;
-    @include clearfix();
+    clear: both;
 }
 .comments-link {
     float: left;

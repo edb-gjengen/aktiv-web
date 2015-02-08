@@ -17,7 +17,16 @@
     </div>
 
     <div class="activities-wrap">
-    <?php get_template_part( 'activities' ); ?>
+    <?php
+        // Load up some posts
+        $args = array(
+            'post_type'         => 'post',
+            'posts_per_page'    => 25,
+            'order'             => 'DESC'
+        );
+        query_posts($args);
+        get_template_part( 'entries' );
+    ?>
     </div>
 
 </div> <!-- #content -->
