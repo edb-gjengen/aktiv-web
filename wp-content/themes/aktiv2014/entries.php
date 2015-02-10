@@ -4,20 +4,20 @@
     
     <article <?php post_class(); ?>>
     <div class="text-body">
-    <div>
-    <?php if( !is_page() ): ?>
-        <h3 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-    <?php endif; ?>
+        <div>
+            <?php if( !is_page() ): ?>
+                <h3 class="entry-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+            <?php endif; ?>
 
 
-    <?php if(  !is_page() ): ?>
-        <div class="entry-meta byline"><span class="meta-prep meta-prep-author">av </span><span class="author vcard"><?php the_author_link(); ?></span>, <span class="entry-date"><?php the_time( get_option( 'date_format' ) ." ". get_option( 'time_format' ) ); ?></span></div>
-    <?php endif; ?>
+            <?php if(  !is_page() ): ?>
+                <div class="entry-meta byline"><span class="meta-prep meta-prep-author">av </span><span class="author vcard"><?php the_author_link(); ?></span>, <span class="entry-date"><?php the_time( get_option( 'date_format' ) ." ". get_option( 'time_format' ) ); ?></span></div>
+            <?php endif; ?>
 
-    <?php if( !is_page() ): ?>
-        <span class="entry-category"><?php echo $post_category; ?></span>
-    <?php endif; ?>
-    </div>
+            <?php if( !is_page() ): ?>
+                <span class="entry-category"><?php echo $post_category; ?></span>
+            <?php endif; ?>
+        </div>
 
     <a href="<?php the_permalink(); ?>"><?php the_post_thumbnail('feed'); ?></a>
 

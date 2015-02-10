@@ -12,7 +12,7 @@
 
 <div id="content">
     <div class="introduction" style="display: none;">
-        <?php the_post(); the_content(); ?>
+        <?php echo get_theme_mod( 'home_introduction_text',""); ?>
         <a href="#dismiss-introduction" data-toggle-introduction class="button dismiss-button" title="Lukk">Oki doki!</a>
     </div>
 
@@ -21,7 +21,7 @@
         // Load up some posts
         $args = array(
             'post_type'         => 'post',
-            'posts_per_page'    => 25,
+            'posts_per_page'    => 10,
             'order'             => 'DESC'
         );
         query_posts($args);

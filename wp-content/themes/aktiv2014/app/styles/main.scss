@@ -56,7 +56,7 @@ body {
 }
 
 /* Front page */
-.front-page {
+.home {
     .introduction {
         position: relative;
         @extend .card;
@@ -65,7 +65,7 @@ body {
         .introduction {
             padding-left: rem-calc(16);
         }
-        .activities-wrap .post {
+        .post {
             padding-left: 0;
         }
     }
@@ -141,6 +141,9 @@ body {
 .comments-link {
     float: left;
     padding-top: rem-calc(20);
+}
+.navigation {
+    text-align: center;
 }
 
 /* Login */
@@ -493,6 +496,21 @@ input[type=submit]{
     }
 }
 
+/* Footer */
+footer {
+    @include grid-row();
+    .footer-wrap {
+        @include grid-column(12);
+    }
+    .credits {
+        margin-top: 25px;
+        margin-bottom: 25px;
+        text-align: center;
+        color: #666;
+        font-size: rem-calc(12);
+    }
+}
+
 /* Reusable styles */
 .card {
     padding-top: rem-calc(10);
@@ -510,18 +528,6 @@ input[type=submit]{
 }
 .love {
     color: #faafba;
-}
-.credits-wrap {
-    @include grid-row();
-
-    .credits {
-        margin-top: 25px;
-        margin-bottom: 25px;
-        @include grid-column(12);
-        text-align: center;
-        color: #666;
-        font-size: rem-calc(12);
-    }
 }
 
 /* Animations */

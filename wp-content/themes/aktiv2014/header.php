@@ -11,7 +11,7 @@
     <meta name="x-user-id" content="<?php echo $user->ID; ?>" />
 
     <meta name="x-siteurl" content="<?php echo get_option('siteurl'); ?>" />
-    <?php neuf_doctitle(); ?>
+    <title><?php wp_title(); ?></title>
     <link rel="icon" type="image/png" href="favicon.ico" />
     <link rel="alternate" type="application/rss+xml" href="<?php echo get_feed_url(); ?>" title="aktiv.neuf.no - Nyheter" />
 
