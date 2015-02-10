@@ -20,7 +20,7 @@ class NeufTodaysEventsWidget extends WP_Widget {
         '<h2>'.$title.'</h2>' .
         '<div class="events-today">' .
         '    <ul class="program-list"><!-- JS magic --></ul>' .
-        '    <a href="https://studentersamfundet.no/program/">Vis hele programmet</a>' .
+        '    <a class="events-today-link-all" href="https://studentersamfundet.no/program/">Vis hele programmet</a>' .
         '</div>' .
     	'</div>';
     	echo $html;;

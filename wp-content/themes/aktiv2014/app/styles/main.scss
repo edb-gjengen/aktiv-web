@@ -1,7 +1,7 @@
 @import 'normalize';
 @import 'chosen';
-@import 'mixins';
 @import "foundation/components/global";
+@import 'mixins';
 
 /* Colors and type */
 $body-bg: #fafafa;
@@ -396,41 +396,53 @@ input[type=submit]{
 
 /* Sidebar */
 .sidebar {
-    @include grid-column(12, $collapse:true);
+    @include grid-column(12);
 
     @media #{$large-up} {
         @include grid-column(4);
         font-weight: 300;
+        padding-top: rem-calc(68);
     }
     font-weight: 500;
-    padding-top: rem-calc(16);
+
+    .widget {
+        @include card;
+        padding-bottom: 0;
+        margin-bottom: rem-calc(10);
+        @media #{$large-up} {
+            padding-bottom: rem-calc(10);
+        }
+    }
 
     h2 {
         padding-left: rem-calc(16);
         padding-right: rem-calc(16);
-        @media #{$large-up} {
-            padding-left: rem-calc(0);
-            padding-right: rem-calc(0);
-        }
     }
     h2,
     h2 a.rsswidget {
-        font-size: rem-calc(20);
+        font-size: rem-calc(18);
         margin-bottom: 0;
     }
-    h2 a.rsswidget {
-        font-weight: normal;
+    .widgettitle a.rsswidget {
+        color: black;
+        font-weight: 800;
     }
-    ul {
+    .searchform-wrap {
         margin-bottom: rem-calc(16);
+        &:after {
+            content: '';
+            clear: both;
+            display: table;
+        }
     }
     .searchform {
 
         padding-left: rem-calc(16);
         padding-right: rem-calc(16);
+
         @media #{$large-up} {
-            padding-left: rem-calc(0);
-            padding-right: rem-calc(0);
+            padding: 0;
+            margin-bottom: 10px;
         }
 
         input[type=text] {
@@ -453,19 +465,13 @@ input[type=submit]{
             width: 25%;
         }
     }
+
     .widgettitle {
         clear: both;
 
     }
-    .rsswidget {
-        img {
-            display: none;
-        }
-    }
-    a.rsswidget,
-    .rss-date,
-    li.recentcomments a {
-        font-size: rem-calc(14);
+    .rsswidget img {
+        display: none;
     }
 
     ul {
@@ -474,6 +480,7 @@ input[type=submit]{
         margin: 0;
         @media #{$large-up} {
             list-style: disc outside none;
+            padding-left: rem-calc(12);
 
         }
         li {
@@ -494,8 +501,20 @@ input[type=submit]{
             }
         }
     }
-}
+    .screen-reader-text {
+        display: none;
+    }
+    .events-today-link-all {
+        padding: rem-calc(16);
+        padding-bottom: rem-calc(8);
+        display: block;
+        @media #{$large-up} {
+            padding-bottom: 0;
+            padding-top: 8;
+        }
+    }
 
+}
 /* Footer */
 footer {
     @include grid-row();
