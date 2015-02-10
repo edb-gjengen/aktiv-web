@@ -304,5 +304,6 @@ function neuf_customize_register( $wp_customize ) {
 }
 add_action( 'customize_register', 'neuf_customize_register' );
 
+require_once('neuf_widgets.php');
 
 ?>
