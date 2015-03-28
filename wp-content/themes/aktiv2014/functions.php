@@ -1,7 +1,8 @@
 <?php
-add_theme_support( 'menus' );
-add_theme_support( 'post-thumbnails');
-add_theme_support( 'automatic-feed-links' );
+add_theme_support('menus');
+add_theme_support('post-thumbnails');
+add_theme_support('automatic-feed-links');
+add_theme_support('title-tag');
 
 $content_width = 770;
 
@@ -107,7 +108,7 @@ function linkify($subject, $pattern, $link) {
  * Original author: Justin Tadlock (theme Hybrid).
  */
 function neuf_get_term_name() {
-    $term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) ); 
+    $term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
     return $term->name;
 }
 
@@ -264,7 +265,7 @@ function get_category_formatted() {
 if (class_exists('WP_Customize_Control')) {
     class Customize_Textarea_Control extends WP_Customize_Control {
         public $type = 'textarea';
-     
+
         public function render_content() {
             ?>
             <label>

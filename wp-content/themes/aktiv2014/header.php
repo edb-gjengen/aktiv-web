@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="no" lang="no">
 <head>
-	<meta charset="utf-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index,follow" />
     <meta name="x-stylesheet-directory" content="<?php bloginfo( 'stylesheet_directory' ); ?>" />
@@ -11,7 +11,7 @@
     <meta name="x-user-id" content="<?php echo $user->ID; ?>" />
 
     <meta name="x-siteurl" content="<?php echo get_option('siteurl'); ?>" />
-    <title><?php wp_title(); ?></title>
+    <title><?php wp_title('|', true, true); ?></title>
     <link rel="icon" type="image/png" href="favicon.ico" />
     <link rel="alternate" type="application/rss+xml" href="<?php echo get_feed_url(); ?>" title="aktiv.neuf.no - Nyheter" />
 
