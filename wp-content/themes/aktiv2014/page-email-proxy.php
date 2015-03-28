@@ -20,9 +20,13 @@ if(!wp_verify_nonce($_GET['_wpnonce'], $nonce_action)) {
 $args = array(
     'domain__name' => 'studentersamfundet.no',
 );
-if(isset($_GET['q'])) {
-    $args['source_regex'] = $_GET['q'];
+if(isset($_GET['source'])) {
+    $args['source_regex'] = '^'.$_GET['source'].'$';
 }
+if(isset($_GET['destination'])) {
+    $args['destination_regex'] = '^'.$_GET['destination'].'$';
+}
+
 // FIXME on error
 //wp_mail( $to, $subject, $message, $headers);
 $ch = curl_init(EMAIL_URL."aliases/".'?'.http_build_query($args));
@@ -42,7 +46,7 @@ foreach ($aliases as $alias) {
     } else {
         $result[$alias->source] = array(
             'name' => $alias->source,
-            'href' => '&q=' . $alias->source,
+            'href' => '&source=' . $alias->source,
             'num' => 1,
             'type' => 'aliases',
             'admin_url' => 'https://lister.neuf.no',

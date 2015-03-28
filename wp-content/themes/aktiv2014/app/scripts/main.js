@@ -186,11 +186,11 @@ function get_user_meta(key, callback) {
         callback(data);
     });
 }
-function mailing_list_show(q) {
+function mailing_list_show(source) {
     $.getJSON(
         email_endpoint,
         {
-            q: q,
+            source: source,
             _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
         },
         function(data) {
@@ -205,14 +205,14 @@ function mailing_list_show(q) {
             $('.lists-list-wrap .meta').html('<a href="#members-result" class="button radius list-members-button">Vis medlemmer på ' + _list_data.name + '</a>');
 
             /* Highlight selected list */
-            $('[data-list-name=\''+q+'\']').addClass('selected');
+            $('[data-list-name=\''+source+'\']').addClass('selected');
         }
     );
 }
 function mailing_lists_load_initial() {
-    var q = getParameterByName('q');
-    if(q && q.length > 0) {
-        mailing_list_show(q);
+    var source = getParameterByName('source');
+    if(source && source.length > 0) {
+        mailing_list_show(source);
      }
 }
 jQuery(document).ready(function() {
@@ -323,7 +323,7 @@ jQuery(document).ready(function() {
                 data.lists = _.filter(data.lists, function(l) { return l.num > 1; }); //{ lists: _.groupBy(data, function(x){ return x.source; }) };
                 console.log(data);
                 var list_template = '<% _.each(lists, function(l) { %>' +
-                    '<li data-list-name="<%= l.name %>"><a href="'+ window.location.pathname + '?q=<%= l.name %>" class="list-name"><%= l.name %></a><br>' +
+                    '<li data-list-name="<%= l.name %>"><a href="'+ window.location.pathname + '?source=<%= l.name %>" class="list-name"><%= l.name %></a><br>' +
                     '<span class="list-num-members"><%= l.num %> medlemmer</span>'+
                     '<a href="<%= l.admin_url %>" class="email-<%= l.type %> button-alt" title="<%= l.type %>"> '+
                     '<span class="dashicons dashicons-<% if( l.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"> </span>Endre'+
@@ -377,22 +377,22 @@ jQuery(document).ready(function() {
             }
         );
         /* Load email aliases */
-        params.q = $('.profile-details .user-email').text();
-        params.inherited = true;
+        params.destination = $('.profile-details .user-email').text();
+        //params.inherited = true; // TODO
         $.getJSON(
             email_endpoint,
             params,
             function(data) {
-                var list = '<% _.each(results, function(r) { %>' +
+                var list = '<% _.each(lists, function(r) { %>' +
                     '<li><%= r.name %> <a href="<%= r.admin_url %>" class="email-<%= r.type %>" title="<%= r.type %>"><span class="dashicons dashicons-<% if( r.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"></span></a></li>' +
                     '<% }); %>';
                 var html = _.template(list, data);
                 $('.account-details .email-list').html(html);
-                if( params.inherited ) {
+                /*if( params.inherited ) {
                     data.results = data.inherited_results; // reuse template
                     html = _.template(list, data);
                     $('.account-details .email-list-inherited').html(html);
-                }
+                }*/
             }
         );
     }

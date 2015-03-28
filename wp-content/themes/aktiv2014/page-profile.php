@@ -56,8 +56,8 @@ get_header();
         <h5>Epostlistemedlemskap</h5>
         <ul class="email-list">
         </ul>
-        <strong>Arvede epostlistemedlemskap</strong>
-        <ul class="email-list-inherited">
+        <!--<strong>Arvede epostlistemedlemskap</strong>
+        <ul class="email-list-inherited">-->
         </ul>
     </div>
 </div>
