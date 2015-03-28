@@ -80,7 +80,7 @@ function do_search() {
     }
     var params = {
         q: $('.search-field').val(),
-        filter_groups: groupString,
+        filter_groups: groupString
     };
     if(validMembershipToggle.hasClass('active')) {
         params.has_valid_membership = true;
@@ -186,36 +186,38 @@ function get_user_meta(key, callback) {
         callback(data);
     });
 }
-function mailinglist_show(q) {
+function mailing_list_show(q) {
     $.getJSON(
         email_endpoint,
         {
-            'do': 'list',
             q: q,
             _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
         },
         function(data) {
-            var list = '<h5 class="list-members-title">Medlemmer på ' + data.meta.list +'</h5><span class="list-num-members"><%= members.length %> stk</span><ul id="members-result"><% _.each(members, function(m) { %>' +
-                '<li><a href="mailto:<%= m %>"><span class="dashicons dashicons-email"></span> <%= m %></a></li>' +
+            var _list_data = data.lists[0];
+            console.log(_list_data);
+            var list = '<h5 class="list-members-title">Medlemmer på <%= name %></h5><span class="list-num-members">' +
+                '<%= destinations.length %> stk</span><ul id="members-result"><% _.each(destinations, function(d) { %>' +
+                '<li><a href="mailto:<%= d %>"><span class="dashicons dashicons-email"></span> <%= d %></a></li>' +
                 '<% }); %></ul>';
-            var html = _.template(list, data);
+            var html = _.template(list, _list_data);
             $('.list-members').html(html);
-            $('.lists-list-wrap .meta').html('<a href="#members-result" class="button radius list-members-button">Vis medlemmer på '+ data.meta.list +'</a>');
+            $('.lists-list-wrap .meta').html('<a href="#members-result" class="button radius list-members-button">Vis medlemmer på ' + _list_data.name + '</a>');
 
             /* Highlight selected list */
             $('[data-list-name=\''+q+'\']').addClass('selected');
         }
     );
 }
-function mailinglists_load_initial() {
+function mailing_lists_load_initial() {
     var q = getParameterByName('q');
     if(q && q.length > 0) {
-        mailinglist_show(q);
+        mailing_list_show(q);
      }
 }
 jQuery(document).ready(function() {
-    moment.locale('nb');
 
+    moment.locale('nb');
     var $ = jQuery;
 
     /* Menu toggle */
@@ -249,8 +251,8 @@ jQuery(document).ready(function() {
     }
 
     /* Program page */
-    var program_entrypoint = '.program-list';
-    if( $(program_entrypoint).length ) {
+    var program_entry_point = '.program-list';
+    if( $(program_entry_point).length ) {
         /* Load program */
         $.getJSON(
             program_endpoint+'?callback=?',
@@ -259,7 +261,7 @@ jQuery(document).ready(function() {
                 if(data && data.events) {
                     // render template
                     var html = format_posts(data.events);
-                    $(program_entrypoint).html(html);
+                    $(program_entry_point).html(html);
                 }
             }
         );
@@ -312,19 +314,22 @@ jQuery(document).ready(function() {
         /* Load list of lists*/
         $.getJSON(
             email_endpoint,
-            {
-                'do': 'list',
-                _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content')
-            },
+            { _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content') },
             function(data) {
-                var list = '<% _.each(lists, function(l) { %>' +
+                if(data.error) {
+                    $('.lists-list').html(data.error);
+                    return;
+                }
+                data.lists = _.filter(data.lists, function(l) { return l.num > 1; }); //{ lists: _.groupBy(data, function(x){ return x.source; }) };
+                console.log(data);
+                var list_template = '<% _.each(lists, function(l) { %>' +
                     '<li data-list-name="<%= l.name %>"><a href="'+ window.location.pathname + '?q=<%= l.name %>" class="list-name"><%= l.name %></a><br>' +
                     '<span class="list-num-members"><%= l.num %> medlemmer</span>'+
                     '<a href="<%= l.admin_url %>" class="email-<%= l.type %> button-alt" title="<%= l.type %>"> '+
                     '<span class="dashicons dashicons-<% if( l.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"> </span>Endre'+
                     '</a></li>' +
                     '<% }); %>';
-                var html = _.template(list, data);
+                var html = _.template(list_template, data);
                 $('.lists-list').html(html);
 
                 /* Index list and make searchable and sortable */
@@ -332,7 +337,7 @@ jQuery(document).ready(function() {
                     valueNames: [ 'list-name', 'list-num-members' ]
                 };
                 new List('mailinglists', options);
-                mailinglists_load_initial();
+                mailing_lists_load_initial();
             }
         );
     }

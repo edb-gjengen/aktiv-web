@@ -18,8 +18,8 @@
     <link href="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/styles/main.css" rel="stylesheet" type="text/css" />
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,700,800,600' rel='stylesheet' type='text/css'>
     <?php wp_head(); ?>
-
     <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/vendor.js"></script>
+    <script>jQuery.migrateMute = true;</script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.js"></script>
 
     <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/main.js"></script>
@@ -28,6 +28,7 @@
 </head>
 
 <body <?php neuf_body_class(); ?>>
+    <!-- Google analytics -->
     <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -47,6 +48,6 @@
 
             <?php get_template_part( 'menu' ); ?>
 
-        </div> 
+        </div>
     </header><!--  #site-header -->
 
