@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Development package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-02-18 11:28:22+0000\n"
+"PO-Revision-Date: 2015-03-26 09:27:31+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -10,7 +10,39 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1000\n"
 "Project-Id-Version: Development\n"
 
-#: views/config.php:97
+#: views/config.php:95
+msgid "All systems functional."
+msgstr "Alle systemer fungerer."
+
+#: views/config.php:95
+msgid "Enabled."
+msgstr "Aktivert."
+
+#: views/config.php:92
+msgid "Akismet encountered a problem with a previous SSL request and disabled it temporarily. It will begin using SSL for requests again shortly."
+msgstr "Akismet støtte på et problem med en SSL-forespørsel og deaktiverte det midlertidig. Det vil begynne å bruke SSL for forespørsler igjen snart."
+
+#: views/config.php:92
+msgid "Temporarily disabled."
+msgstr "Midlertidig deaktivert."
+
+#: views/config.php:86
+msgid "Your Web server cannot make SSL requests; contact your Web host and ask them to add support for SSL requests."
+msgstr "Din webserver kan ikke foreta SSL-forespørsler. Kontakt din webadmin og be dem legge til støtte for «SSL requests»."
+
+#: views/config.php:83 views/config.php:86
+msgid "Disabled."
+msgstr "Deaktivert."
+
+#: views/config.php:76
+msgid "SSL Status"
+msgstr "SSL-status"
+
+#: views/notice.php:96
+msgid "Your Pro subscription allows the use of Akismet on only one site. Please <a href=\"http://docs.akismet.com/billing/add-more-sites/\">purchase additional Pro subscriptions</a> or upgrade to an Enterprise subscription that allows the use of Akismet on unlimited sites.<br /><br />If you have any questions, please get in touch with our support team."
+msgstr "Ditt «Pro»-abonnement lar deg kun bruke Akismet på ett nettsted. Vennligst <a href=\"http://docs.akismet.com/billing/add-more-sites/\">kjøp flere Pro-abonnementer</a> eller oppgrader til en Enterprise-konto som lar deg bruke Akismet på et ubegrenset antall nettsteder.<br /><br />Hvis du har noen spørsmål, vennligst ta kontakt med vårt support-team."
+
+#: views/config.php:127
 msgid "Spam in the <a href=\"%1$s\">spam folder</a> older than 1 day is deleted automatically."
 msgid_plural "Spam in the <a href=\"%1$s\">spam folder</a> older than %2$d days is deleted automatically."
 msgstr[0] "Useriøse innlegg i <a href=\"%1$s\">Useriøs-mappen</a> som er eldre enn 1 dag, slettes automatisk."
@@ -60,23 +92,23 @@ msgstr "Ditt abonnement på %s er avbrutt"
 msgid "Reactivate Akismet"
 msgstr "Reaktiver Akismet"
 
-#: views/config.php:152
+#: views/config.php:182
 msgid "Cancelled"
 msgstr "Avbrutt"
 
-#: views/config.php:154
+#: views/config.php:184
 msgid "Suspended"
 msgstr "Suspendert"
 
-#: views/config.php:156
+#: views/config.php:186
 msgid "Missing"
 msgstr "Savnes"
 
-#: views/config.php:158
+#: views/config.php:188
 msgid "No Subscription Found"
 msgstr "Ikke noe abonnement funnet"
 
-#: views/config.php:160
+#: views/config.php:190
 msgid "Active"
 msgstr "Aktiv"
 
@@ -88,7 +120,7 @@ msgstr "Det er et problem med din nøkkel."
 msgid "Since 2012, Akismet began using subscriptions for all accounts (even free ones). It looks like a subscription has not been assigned to your account, and we’d appreciate it if you’d <a href=\"%s\" target=\"_blank\">sign into your account</a> and choose one. Please <a href=\"%s\" target=\"_blank\">contact our support team</a> with any questions."
 msgstr "Siden 2012 har Akismet begynt å bruke abonnementer for alle kontoer (også gratiskontoer). Det ser ikke ut til at et abonnement har blitt knyttet til din konto, og vi setter pris på om du <a href=\"%s\" target=\"_blank\">logger inn i din konto</a> og velger en. Vennligst <a href=\"%s\" target=\"_blank\">kontakt vårt support-team</a> hvis du har noen spørsmål."
 
-#: class.akismet-admin.php:196 views/config.php:84
+#: class.akismet-admin.php:196 views/config.php:114
 msgid "Strictness"
 msgstr "Strenghet"
 
@@ -96,15 +128,15 @@ msgstr "Strenghet"
 msgid "Choose to either discard the worst spam automatically or to always put all spam in spam folder."
 msgstr "Velg om du skal slette den verste spammen automatisk eller alltid putte all spam i spam-mappen."
 
-#: views/config.php:88
+#: views/config.php:118
 msgid "Silently discard the worst and most pervasive spam so I never see it."
 msgstr "Forkast de verste og mest utbredte useriøse innholdet i bakgrunnen slik at jeg aldri ser det."
 
-#: views/config.php:89
+#: views/config.php:119
 msgid "Always put spam in the Spam folder for review."
 msgstr "Legg alltid useriøst innhold for gjennomgang i mappen Useriøse."
 
-#: class.akismet-admin.php:195 views/config.php:75
+#: class.akismet-admin.php:195 views/config.php:105
 msgid "Comments"
 msgstr "Kommentarer"
 
@@ -188,7 +220,7 @@ msgstr "Ditt abonnement er avsluttet."
 msgid "Strict: silently discard the worst and most pervasive spam."
 msgstr "Strengt: forkast det verste og mest utbredte useriøse innholdet."
 
-#: views/config.php:87 views/strict.php:2 views/strict.php:3
+#: views/config.php:117 views/strict.php:2 views/strict.php:3
 msgid "Akismet anti-spam strictness"
 msgstr "Strenghet for filtrering i Akismet "
 
@@ -278,11 +310,11 @@ msgstr "Aktiver din Akismet-konto"
 msgid "<strong>Almost done</strong> - activate your account and say goodbye to comment spam"
 msgstr "<strong>Nesten ferdig</strong> - Akriver din konto og si farvel til useriøse kommentarer"
 
-#: views/config.php:79
+#: views/config.php:109
 msgid "Show approved comments"
 msgstr "Vis godkjente kommentarer"
 
-#: views/config.php:122
+#: views/config.php:152
 msgid "Save Changes"
 msgstr "Lagre endringer"
 
@@ -346,39 +378,39 @@ msgid_plural "%s approved"
 msgstr[0] "%s godkjent"
 msgstr[1] "%s godkjente"
 
-#: class.akismet.php:533
+#: class.akismet.php:537
 msgid "%s reported this comment as not spam"
 msgstr "%s rapporterte denne kommentaren som ikke useriøs"
 
-#: class.akismet.php:227
+#: class.akismet.php:231
 msgid "Akismet caught this comment as spam"
 msgstr "Akismet fanget denne kommentaren som useriøs"
 
-#: class.akismet.php:487
+#: class.akismet.php:491
 msgid "%s reported this comment as spam"
 msgstr "%s rapporterte denne kommentaren som useriøs"
 
-#: class.akismet.php:573
+#: class.akismet.php:578
 msgid "Akismet caught this comment as spam during an automatic retry."
 msgstr "Akismet fanget denne kommentaren som useriøs i løpet av en automatisk re-sjekk."
 
-#: class.akismet.php:229 class.akismet.php:238
+#: class.akismet.php:233 class.akismet.php:242
 msgid "Comment status was changed to %s"
 msgstr "Status for kommentaren ble endret til %s"
 
-#: class.akismet.php:575
+#: class.akismet.php:580
 msgid "Akismet cleared this comment during an automatic retry."
 msgstr "Akismet godkjente denne kommentaren ved en ny automatisk kontroll."
 
-#: class.akismet.php:233
+#: class.akismet.php:237
 msgid "Akismet cleared this comment"
 msgstr "Akismet godkjente denne kommentaren"
 
-#: class.akismet.php:236
+#: class.akismet.php:240
 msgid "Comment was caught by wp_blacklist_check"
 msgstr "Kommentaren ble fanget opp av wp_blacklist_check"
 
-#: class.akismet.php:243
+#: class.akismet.php:247
 msgid "Akismet was unable to check this comment (response: %s), will automatically retry again later."
 msgstr "Akismet var ikke i stand til å sjekke denne kommentaren (respons: %s), men vil automatisk prøve på nytt igjen senere."
 
@@ -386,7 +418,7 @@ msgstr "Akismet var ikke i stand til å sjekke denne kommentaren (respons: %s), 
 msgid "View comment history"
 msgstr "Se kommentarhistorikk"
 
-#. #-#-#-#-#  akismet.pot (Akismet 3.0.5b1)  #-#-#-#-#
+#. #-#-#-#-#  akismet.pot (Akismet 3.1.2a1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: class.akismet-admin.php:76 class.akismet-admin.php:78
 #: class.akismet-admin.php:757 views/config.php:3
@@ -462,7 +494,7 @@ msgstr "(angre)"
 msgid "Re-adding..."
 msgstr "Legger til igjen..."
 
-#: views/config.php:91
+#: views/config.php:121
 msgid "Note:"
 msgstr "Merk:"
 
@@ -470,7 +502,7 @@ msgstr "Merk:"
 msgid "Accuracy"
 msgstr "Treffsikkerhet"
 
-#: class.akismet-admin.php:206 views/config.php:140
+#: class.akismet-admin.php:206 views/config.php:170
 msgid "Subscription Type"
 msgstr "Type abonnement"
 
@@ -497,7 +529,7 @@ msgstr "Oversikt"
 msgid "All time"
 msgstr "Til alle tider"
 
-#: class.akismet.php:923
+#: class.akismet.php:991
 msgid "Akismet %s requires WordPress %s or higher."
 msgstr "Akismet %s krever WordPress %s eller nyere."
 
@@ -513,7 +545,7 @@ msgstr "<a href=\"%s\">Akismet</a> hindrer useriøst innhold fra å komme inn i 
 msgid "Enter/remove an API key."
 msgstr "Legg til eller fjern en API-nøkkel."
 
-#: views/config.php:116
+#: views/config.php:146
 msgid "Disconnect this account"
 msgstr "Koble fra denne kontoen"
 
@@ -537,7 +569,7 @@ msgstr "Skriv inn en API-nøkkel"
 msgid "If you already have an API key"
 msgstr "Du har allerede en API-nøkkel"
 
-#: class.akismet-admin.php:203 views/config.php:135
+#: class.akismet-admin.php:203 views/config.php:165
 msgid "Account"
 msgstr "Konto"
 
@@ -545,7 +577,7 @@ msgstr "Konto"
 msgid "Spam blocked"
 msgstr "Useriøst innhold blokkert"
 
-#: views/config.php:178
+#: views/config.php:208
 msgid "Upgrade"
 msgstr "Oppgrader"
 
@@ -578,7 +610,7 @@ msgstr "Siden du ble med har Akismet spart deg for %d timer!"
 msgid "Signup for an account on %s to get an API Key."
 msgstr "Registrer deg for en konto på %s og få en API-nøkkel."
 
-#: views/config.php:178
+#: views/config.php:208
 msgid "Change"
 msgstr "Endre"
 
@@ -586,7 +618,7 @@ msgstr "Endre"
 msgid "The subscription status - active, cancelled or suspended"
 msgstr "Abonnementets status - aktivt, avbrutt eller avsluttet."
 
-#: class.akismet.php:442
+#: class.akismet.php:446
 msgid "%1$s changed the comment status to %2$s"
 msgstr "%1$s endret kommentarens status til %2$s"
 
@@ -596,11 +628,11 @@ msgid_plural "<a href=\"%1$s\">Akismet</a> has protected your site from <a href=
 msgstr[0] "<a href=\"%1$s\">Akismet</a> har beskyttet ditt nettsted fra <a href=\"%2$s\">%3$s useriøs kommentar</a>."
 msgstr[1] "<a href=\"%1$s\">Akismet</a> har beskyttet dit nettsted fra <a href=\"%2$s\">%3$s useriøse kommentarer</a>."
 
-#: views/config.php:79
+#: views/config.php:109
 msgid "Show the number of approved comments beside each comment author"
 msgstr "Vis antall godkjente kommentarer ved siden av hver kommentarforfatter"
 
-#: class.akismet-admin.php:207 views/config.php:147
+#: class.akismet-admin.php:207 views/config.php:177
 msgid "Status"
 msgstr "Status"
 
@@ -647,10 +679,10 @@ msgstr "API-nøkkel"
 msgid "The Akismet subscription plan"
 msgstr "Akismet abonnementer"
 
-#: class.akismet.php:923 views/notice.php:27
+#: class.akismet.php:991 views/notice.php:27
 msgid "Please <a href=\"%1$s\">upgrade WordPress</a> to a current version, or <a href=\"%2$s\">downgrade to version 2.4 of the Akismet plugin</a>."
 msgstr "Vennligst <a href=\"%1$s\">oppgrader WordPress</a> til en nyere versjon eller <a href=\"%2$s\">nedgrader til versjon 2.4 av utvidelsen Akismet</a>.."
 
-#: views/config.php:166
+#: views/config.php:196
 msgid "Next Billing Date"
 msgstr "Neste fakturadato"
