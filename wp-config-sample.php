@@ -70,6 +70,15 @@ $table_prefix  = 'wp_';
  */
 define('WP_DEBUG', false);
 
+//define('INSIDE_API_KEY', '');
+//define('INSIDE_URL', 'https://inside.dev/api/');
+//define('EMAIL_API_USERNAME', '');
+//define('EMAIL_API_PASSWORD', '');
+//define('EMAIL_URL', 'https://127.0.0.1:8000/api/');
+//define('MAILMAN_URL', 'https://127.0.0.1:5000/');
+//define('MAILMAN_USERNAME', '');
+//define('MAILMAN_PASSWORD', '');
+
 /* That's all, stop editing! Happy blogging. */
 
 /** Absolute path to the WordPress directory. */
