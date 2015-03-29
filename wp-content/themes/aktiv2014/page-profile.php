@@ -22,7 +22,7 @@ get_header();
 ?>
 <div class="container profile">
 
-<h1 class="page-title"><?php echo $logged_in_user ? "Min": $user->display_name." sin" ;?> aktivprofil</h1>
+<h2 class="page-title"><?php echo $logged_in_user ? "Min": $user->display_name." sin" ;?> aktivprofil</h2>
 
 <div class="profile-details">
     <div class="inner">

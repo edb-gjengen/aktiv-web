@@ -8,8 +8,8 @@
                 <a href="#dismiss-introduction" data-toggle-introduction class="button dismiss-button" title="Lukk">Oki doki!</a>
             </div>
             <h2>Siste nytt</h2>
-        <?php elseif( !is_single() ): ?>
-            <h1 class="page-title"><?php wp_title("", true); ?></h1>
+        <?php elseif( is_page() ): ?>
+            <h2 class="page-title"><?php the_title(); ?></h2>
         <?php endif; ?>
 
         <?php get_template_part('entries'); ?>

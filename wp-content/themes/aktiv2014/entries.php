@@ -1,7 +1,6 @@
 <?php if( have_posts() ) : while( have_posts() ) : the_post();
     $post_category = get_category_formatted();
     ?>
-    
     <article <?php post_class(); ?>>
     <div class="text-body">
         <div>

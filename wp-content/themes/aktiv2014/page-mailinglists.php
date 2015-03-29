@@ -8,7 +8,7 @@
 
 <div class="container page-mailinglists">
 
-    <h1 class="page-title"><?php wp_title("", true); ?></h1>
+    <h2 class="page-title"><?php the_title(); ?></h2>
 
     <div class="search-about">
         <?php the_post(); the_content(); ?>

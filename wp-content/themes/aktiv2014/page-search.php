@@ -9,7 +9,7 @@
 <div class="container page-user-search">
 
 <div id="content">
-    <h1 class="page-title"><?php wp_title("", true); ?></h1>
+    <h2 class="page-title"><?php the_title(); ?></h2>
     <div class="search-form">
         <form method="get">
             <input type="text" id="id_user_query" class="search-field" name="q" placeholder="Søk på navn, epost, eller brukernavn" autofocus />
