@@ -374,7 +374,7 @@ function restricted_image($image){
     // get URLs for each image
     $image = array();
     foreach ( $image_ids as $id ) {
-        $thumbnail = wp_get_attachment_image_src( $id, 'full');
+        $thumbnail = wp_get_attachment_image_src( $id, 'medium');
         if ($thumbnail) {
             $image[] = $thumbnail[0];
         }
@@ -395,5 +395,25 @@ function restricted_url($url){
     return $url;
 }
 add_filter('opengraph_url', 'restricted_url');
+
+function restricted_description( $description ) {
+    $post = get_restricted_post();
+    if($post == null) {
+        return $description;
+    }
+
+    if (is_singular()) {
+        if (!empty($post->post_excerpt)) {
+            $description = $post->post_excerpt;
+        } else {
+            $description = $post->post_content;
+        }
+    }
+
+    $description =  wp_trim_words($description);
+
+    return $description;
+}
+add_filter('opengraph_description', 'restricted_description');
 
 ?>
