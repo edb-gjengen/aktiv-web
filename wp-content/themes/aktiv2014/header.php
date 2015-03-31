@@ -11,7 +11,6 @@
     <meta name="x-user-id" content="<?php echo $user->ID; ?>" />
 
     <meta name="x-siteurl" content="<?php echo get_option('siteurl'); ?>" />
-    <title><?php wp_title('|', true, true); ?></title>
     <link rel="icon" type="image/png" href="favicon.ico" />
     <link rel="alternate" type="application/rss+xml" href="<?php echo get_feed_url(); ?>" title="aktiv.neuf.no - Nyheter" />
 
@@ -19,8 +18,6 @@
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,700,800,600' rel='stylesheet' type='text/css'>
     <?php wp_head(); ?>
     <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/vendor.js"></script>
-    <script>jQuery.migrateMute = true;</script>
-    <script src="//code.jquery.com/jquery-migrate-1.2.1.js"></script>
 
     <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/main.js"></script>
 

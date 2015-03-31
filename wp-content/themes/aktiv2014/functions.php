@@ -171,8 +171,6 @@ add_filter( 'excerpt_more', 'neuf_excerpt_more' );
 
 /* Save user meta options */
 function neuf_save_user_meta() {
-    global $wpdb;
-
     $user_id = (int) $_POST['user_id'];
     $meta_key = $_POST['meta_key']; // TODO: sanitize
     $meta_value = $_POST['meta_value']; // TODO: sanitize
@@ -202,8 +200,6 @@ add_action( 'wp_ajax_neuf_save_user_meta', 'neuf_save_user_meta' );
 
 /* Save user meta options */
 function neuf_get_user_meta() {
-    global $wpdb;
-
     $user_id = (int) $_GET['user_id'];
     $meta_key = $_GET['meta_key']; // TODO: sanitize
     $single = (bool) $_GET['single'];
@@ -241,7 +237,7 @@ function get_feed_url() {
 
     if(is_user_logged_in()) {
         $user = wp_get_current_user();
-        $feedkey = get_usermeta($user->ID, 'feed_key');
+        $feedkey = get_user_meta($user->ID, 'feed_key', true);
         $feedurl .= "?feedkey=$feedkey";
     }
     return $feedurl;
@@ -306,5 +302,98 @@ function neuf_customize_register( $wp_customize ) {
 add_action( 'customize_register', 'neuf_customize_register' );
 
 require_once('neuf_widgets.php');
+
+
+/* The following allows the Facebook bot and the login page to leak
+   the title, excerpt and image info to users that are not logged in.
+*/
+add_action( 'restrict_site_access_handling', 'my_restrict_site_access_handling' );
+
+function my_restrict_site_access_handling( $rsa_restrict_approach) {
+    global $wp;
+    $rsa_options = (array) get_option( 'rsa_options' );
+    if( $rsa_restrict_approach == 4 && !empty($rsa_options['page']) && ($page_id = get_post_field('ID', $rsa_options['page']))) {
+        $wp->query_vars_restricted = $wp->query_vars; // Backup for later
+    }
+}
+function get_restricted_post() {
+    global $wp;
+
+    if( $wp->query_vars_restricted == null ) {
+        return null;
+    }
+    $q = new WP_Query($wp->query_vars_restricted);
+    if (!$q->have_posts()) {
+        return null;
+    }
+
+    return $q->posts[0];
+}
+
+function restricted_title($title){
+    $post = get_restricted_post();
+    if($post == null) {
+        return $title;
+    }
+    return $post->post_title;
+}
+add_filter('wp_title', 'restricted_title');
+add_filter('opengraph_title', 'restricted_title');
+
+/* Mostly copied from opengraph plugin */
+function restricted_image($image){
+    $post = get_restricted_post();
+    if($post == null) {
+        return $image;
+    }
+
+    $id = $post->ID;
+    $image_ids = array();
+
+    // As of July 2014, Facebook seems to only let you select from the first 3 images
+    $max_images = 3;
+
+    // list post thumbnail first if this post has one
+    if ( has_post_thumbnail($id) ) {
+        $image_ids[] = get_post_thumbnail_id($id);
+    }
+
+    // then list any image attachments
+    $attachments = get_children( array('post_parent' => $id, 'post_status' => 'inherit',
+        'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => 'ASC',
+        'orderby' => 'menu_order ID') );
+    foreach ( $attachments as $attachment ) {
+        if ( !in_array($attachment->ID, $image_ids) ) {
+            $image_ids[] = $attachment->ID;
+            if (sizeof($image_ids) >= $max_images) {
+                break;
+            }
+        }
+    }
+
+    // get URLs for each image
+    $image = array();
+    foreach ( $image_ids as $id ) {
+        $thumbnail = wp_get_attachment_image_src( $id, 'full');
+        if ($thumbnail) {
+            $image[] = $thumbnail[0];
+        }
+    }
+    return $image;
+}
+add_filter('opengraph_image', 'restricted_image');
+
+function restricted_url($url){
+    $post = get_restricted_post();
+    if($post == null) {
+        return $url;
+    }
+
+    if ( is_singular() ) {
+        $url = get_permalink($post->ID);
+    }
+    return $url;
+}
+add_filter('opengraph_url', 'restricted_url');
 
 ?>
