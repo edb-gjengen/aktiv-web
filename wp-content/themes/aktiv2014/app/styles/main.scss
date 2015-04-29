@@ -35,6 +35,7 @@ $padding-base: rem-calc(16);
 
 /* General styles */
 body {
+    background-color: $body-bg;
 
     h1, h2, h3, h4, h5, h6 {
         font-weight: 800;
@@ -483,7 +484,7 @@ input[type=submit]{
         margin: 0;
         @media #{$large-up} {
             list-style: disc outside none;
-            padding-left: rem-calc(12);
+            padding: 0 rem-calc(12);
 
         }
         li {
