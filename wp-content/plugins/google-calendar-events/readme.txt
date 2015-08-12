@@ -3,9 +3,8 @@ Contributors: pderksen, nickyoung87, nekojira, rosshanney
 Tags: google calendar, google, calendar, events, gcal
 Requires at least: 3.9
 Tested up to: 4.3
-Stable tag: 2.2.6
+Stable tag: 2.2.8
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Parses Google Calendar feeds and displays the events as a calendar grid or list on a page, post or widget.
 
@@ -28,7 +27,7 @@ Parses Google Calendar feeds and displays the events as a calendar grid or list 
 ###Updates###
 
 * [Get notified when new features are released](http://eepurl.com/0_VsT)
-* [Follow this project on Github](https://github.com/pderksen/WP-Google-Calendar-Events)
+* [Follow this project on Github](https://github.com/moonstonemedia/WP-Google-Calendar-Events)
 
 This plugin was originally created by [Ross Hanney](http://www.rhanney.co.uk), a web developer based in the UK specialising in WordPress and PHP.
 
@@ -54,7 +53,7 @@ There are three ways to install this plugin.
 1. In your Admin, go to menu Plugins > Add.
 1. Search for `Google Calendar`.
 1. Find the plugin that's labeled `Google Calendar Events`.
-1. Look for the author name `Phil Derksen` on the plugin.
+1. Look for the author name `Moonstone Media` on the plugin.
 1. Click to install.
 1. Activate the plugin.
 1. A new menu item `GCal Events` will appear in the main menu.
@@ -89,6 +88,22 @@ There are three ways to install this plugin.
 1. Event display builder editor
 
 == Changelog ==
+
+= 2.2.8 - August 7, 2015 =
+
+* Fix: Improved security when saving plugin settings.
+* Fix: Added URL encoding to fix some issues with API keys containing special characters.
+* Tweak: Use calendar feed timezone or website timezone (default calendar).
+
+= 2.2.7 - July 31, 2015 =
+
+* Feature: Added an 'Add Calendar' button to quickly add a shortcode in posts.
+* Fix: Reverted register scripts hook to init.
+* Translations: Updated French translations
+* Tweak: Flush permalinks on plugin activation and deactivation.
+* Tweak: Added `[if-not-location]` event builder conditional shortcode.
+* Tweak: Added a 'gce_no_events_message_text' filter when no events are found.
+* Tweak: Added a clear cache bulk action for clearing caches of multiple feeds.
 
 = 2.2.6 - July 16, 2015 =
 
