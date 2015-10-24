@@ -111,19 +111,53 @@ class GCE_Feed {
 		$query .= '?key=' . $api_key;
 
 		// Timezone.
-		$timezone = esc_attr( get_post_meta( $this->id, '_feed_timezone_setting', true ) );
-		if ( 'use_site' == $timezone ) {
-			$args['timeZone'] = gce_get_wp_timezone();
+		$timezone_option = esc_attr( get_post_meta( $this->id, '_feed_timezone_setting', true ) );
+		$timezone = gce_get_wp_timezone();
+		if ( 'use_site' == $timezone_option ) {
+			$args['timeZone'] = $timezone;
 		}
-		$args['timeMin'] = urlencode( date( 'c', $this->feed_start ) );
-		$args['timeMax'] = urlencode( date( 'c', $this->feed_end ) );
 
+		// Time boundaries.
+		if ( version_compare( PHP_VERSION, '5.3.0' ) === -1 ) {
+
+			$ts = $this->feed_start;
+			$time = new DateTime( "@$ts" );
+			if ( 'use_site' == $timezone_option ) {
+				$time->setTimezone( new DateTimeZone( $timezone ) );
+			}
+			$args['timeMin'] = urlencode( $time->format( 'c' ) );
+
+			$ts = $this->feed_end;
+			$time = new DateTime( "@$ts" );
+			if ( 'use_site' == $timezone_option ) {
+				$time->setTimezone( new DateTimeZone( $timezone ) );
+			}
+			$args['timeMax'] = urlencode( $time->format( 'c' ) );
+
+		} else {
+
+			$time = new DateTime();
+
+			if ( 'use_site' == $timezone_option ) {
+				$time->setTimezone( new DateTimeZone( $timezone ) );
+			}
+
+			$time->setTimestamp( $this->feed_start );
+			$args['timeMin'] = urlencode( $time->format( 'c' ) );
+			$time->setTimestamp( $this->feed_end );
+			$args['timeMax'] = urlencode( $time->format( 'c' ) );
+
+		}
+
+		// Max no. of events.
 		$args['maxResults'] = 2500;
 
+		// Google search query terms.
 		if ( ! empty( $this->search_query ) ) {
 			$args['q'] = rawurlencode( $this->search_query );
 		}
 
+		// Show recurring.
 		if( ! empty( $this->expand_recurring ) ) {
 			$args['singleEvents'] = 'true';
 		}
@@ -164,7 +198,7 @@ class GCE_Feed {
 								foreach ( $raw_data['items'] as $event ) {
 									$id          = ( isset( $event['id'] ) ? esc_html( $event['id'] ) : '' );
 									$title       = ( isset( $event['summary'] ) ? esc_html( $event['summary'] ) : '' );
-									$description = ( isset( $event['description'] ) ? esc_html( $event['description'] ) : '' );
+									$description = ( isset( $event['description'] ) ? $event['description'] : '' );
 									$link        = ( isset( $event['htmlLink'] ) ? esc_url( $event['htmlLink'] ) : '' );
 									$location    = ( isset( $event['location'] ) ? esc_html( $event['location'] ) : '' );
 

@@ -357,27 +357,37 @@ class GCE_Event {
 				return $m[1] . $location . $m[6];
 
 			case 'description':
-				$description = esc_html( trim( $this->description ) );
 
-				//If a word limit has been set, trim the description to the required length
-				if ( 0 != $limit ) {
-					preg_match( '/([\S]+\s*){0,' . $limit . '}/', esc_html( $this->description ), $description );
-					$description = trim( $description[0] );
+				$description = trim( $this->description );
+
+				if ( $limit > 0 ) {
+					if ( str_word_count( $description, 0 ) > $limit ) {
+						$words = str_word_count( $description, 2 );
+						$pos = array_keys( $words );
+						$description = substr( $description, 0, $pos[ $limit ] ) . '...';
+					}
+					//preg_match( '/([\S]+\s*){0,' . $limit . '}/', $this->description, $description );
+					//$description = trim( $description[0] );
 				}
 
 				if ( $markdown || $html ) {
-					if ( $markdown && function_exists( 'Markdown' ) )
+
+					if ( $markdown && function_exists( 'Markdown' ) ) {
 						$description = Markdown( $description );
+					}
 
-					if ( $html )
-						$description = wp_kses_post( html_entity_decode( $description ) );
-				}else{
-					//Otherwise, preserve line breaks
-					$description = nl2br( $description );
+					if ( $html ) {
+						$description = wp_kses_post( $description );
+					}
 
-					//Make URLs clickable if required
-					if ( $autolink )
-						$description = make_clickable( $description );
+				} else {
+
+					$description = nl2br( esc_html( $description ) );
+
+				}
+
+				if ( $autolink ) {
+					$description = make_clickable( $description );
 				}
 
 				return $m[1] . $description . $m[6];

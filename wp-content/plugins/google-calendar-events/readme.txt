@@ -1,9 +1,9 @@
 === Google Calendar Events ===
-Contributors: pderksen, nickyoung87, nekojira, rosshanney
+Contributors: moonstonemedia, pderksen, nickyoung87, nekojira, rosshanney
 Tags: google calendar, google, calendar, events, gcal
 Requires at least: 3.9
 Tested up to: 4.3
-Stable tag: 2.2.91
+Stable tag: 2.4.0
 License: GPLv2 or later
 
 Parses Google Calendar feeds and displays the events as a calendar grid or list on a page, post or widget.
@@ -26,51 +26,52 @@ Parses Google Calendar feeds and displays the events as a calendar grid or list 
 
 ###Updates###
 
-* [Get notified when new features are released](http://eepurl.com/0_VsT)
+* [Get notified when new features are released](https://www.getdrip.com/forms/9434542/submissions/new)
 * [Follow this project on Github](https://github.com/moonstonemedia/WP-Google-Calendar-Events)
 
 This plugin was originally created by [Ross Hanney](http://www.rhanney.co.uk), a web developer based in the UK specialising in WordPress and PHP.
 
 ## Available Translations ##
 
-* Spanish - Provided by Eduardo Larequi of [educacion.navarra.es/web/pnte/](http://www.educacion.navarra.es/web/pnte/).
-* Italian - Provided by Francesco Paccagnella of [pacca.it](http://www.pacca.it/).
+* Catalan - Provided by Toni Ginard & Monica Grau of [agora.xtec.cat](http://agora.xtec.cat/).
+* Dutch - Provided by Henri van Werkhoven.
+* Finnish - Provided by Ville Myllymäki.
 * French - Provided by Vincent Bray.
 * German - Provided by Stefanie Drucker of [kreativhuhn.at](http://www.kreativhuhn.at/).
+* Italian - Provided by Francesco Paccagnella of [pacca.it](http://www.pacca.it/).
+* Lithuanian - Provided by Andrius Mazeika of [mazeika.info](http://mazeika.info/).
 * Norwegian - Provided by Tore Hjartland of [aliom.no](http://www.aliom.no/).
 * Polish - Provided by Michał Pasternak of [iplweb.pl](http://iplweb.pl/).
-* Lithuanian - Provided by Andrius Mazeika of [mazeika.info](http://mazeika.info/).
-* Dutch - Provided by Henri van Werkhoven.
-* Catalan - Provided by Toni Ginard & Monica Grau of [agora.xtec.cat](http://agora.xtec.cat/).
+* Portuguese (Brazilian) - Provided by CodeLayer.
 * Russian - Provided by Vadim Reutskiy.
+* Spanish - Provided by Eduardo Larequi of [educacion.navarra.es/web/pnte/](http://www.educacion.navarra.es/web/pnte/).
 * Swedish - Provided by Familjedaghemmet Chicos of [chicos.nu](http://www.chicos.nu/).
 
 == Installation ==
 
-There are three ways to install this plugin.
+There are several ways to install this plugin.
 
-= 1. Admin Search =
-1. In your Admin, go to menu Plugins > Add.
+= Admin Search =
+1. In your WordPress admin, go to `Plugins > Add`.
 1. Search for `Google Calendar`.
-1. Find the plugin that's labeled `Google Calendar Events`.
-1. Look for the author name `Moonstone Media` on the plugin.
-1. Click to install.
+1. Find the plugin that's labeled `Google Calendar Events` by `Moonstone Media`.
+1. Click `Install Now`.
 1. Activate the plugin.
 1. A new menu item `GCal Events` will appear in the main menu.
 
-= 2. Download & Upload =
-1. Download the plugin (a zip file) on the right column of this page.
-1. In your Admin, go to menu Plugins > Add.
-1. Select the tab "Upload".
-1. Upload the .zip file you just downloaded.
+= Admin Upload =
+1. Download the plugin zip file using the large orange button to the right.
+1. In your WordPress admin, go to `Plugins > Add`.
+1. Select `Upload Plugin` at the top.
+1. Find and upload the zip file you just downloaded.
 1. Activate the plugin.
 1. A new menu item `GCal Events` will appear in the main menu.
 
-= 3. FTP Upload =
-1. Download the plugin (.zip file) on the right column of this page.
+= FTP Upload =
+1. Download the plugin zip file using the large orange button to the right.
 1. Unzip the zip file contents.
 1. Upload the `google-calendar-events` folder to the `/wp-content/plugins/` directory of your site.
-1. Activate the plugin through the 'Plugins' menu in WordPress.
+1. Activate the plugin on the `Installed Plugins` listing.
 1. A new menu item `GCal Events` will appear in the main menu.
 
 == Frequently Asked Questions ==
@@ -89,10 +90,29 @@ There are three ways to install this plugin.
 
 == Changelog ==
 
-= 2.2.91 - August 16, 2015 =
+= 2.4.0 - September 29, 2015 =
+* Announcement: Simple Calendar is coming, changes ahead.
+* Deprecation: The bundled/default Google API key reached it's quota and was shut off. Using your own API key is now required.
+
+= 2.3.2 - September 1, 2015 =
+* Fix: Bug in HTML support in events description.
+
+= 2.3.1 - August 31, 2015 =
+* Fix: Fallback for DateTime::setTimestamp() for installations still using PHP 5.2.
+* Fix: Support HTML in events description when using `html="true"` attribute in shortcode.
+* Localization: Added Finnish translations, courtesy of Ville Myllymäki.
+
+= 2.3.0 - August 24, 2015 =
+
+* Fix: Improve timezone handling when sending a request to Google.
+* Tweak: Reintroduced imagesloaded library to improve compatibility with themes using Isotope and Masonry.
+
+= 2.2.91 - August 18, 2015 =
+
 * Fix: Calendar not working correctly with custom date range grid after 2.2.9 changes.
 
 = 2.2.9 - August 14, 2015 =
+
 * Fix: Event links pointing to Google Calendar have a timezone argument from feed setting.
 * Fix: Improved assets loading, only load scripts on posts and pages that have a calendar.
 * Localization: Updated Norwegian translations.
