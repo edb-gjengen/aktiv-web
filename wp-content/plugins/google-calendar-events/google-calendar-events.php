@@ -1,86 +1,64 @@
 <?php
 /**
- * Plugin Name: Google Calendar Events
- * Plugin URI: https://wordpress.org/plugins/google-calendar-events/
- * Description: Show off your Google calendar in grid (month) or list view, in a post, page or widget, and in a style that matches your site.
- * Author: Moonstone Media
- * Author URI: http://moonstonemediagroup.com
- * Version: 2.4.0
- * Text Domain: gce
- * Domain Path: /languages/
+ * Plugin Name: Simple Calendar
+ * Plugin URI:  https://simplecalendar.io
+ * Description: Add Google Calendar events to your WordPress site in minutes. Beautiful calendar displays. Fully responsive.
+ * Version:     3.0.10
+ * Author:      Moonstone Media
+ * Author URI:  https://simplecalendar.io
+ * Text Domain: google-calendar-events
+ * Domain Path: /i18n
  *
- * Copyright 2014 Moonstone Media/Phil Derksen. All rights reserved.
+ * @package     SimpleCalendar
+ * @copyright   2015 Moonstone Media/Phil Derksen. All rights reserved.
  */
 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die();
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-// Set the plugin PHP and WP requirements.
-$gce_requires = array( 'wp' => '3.9.0', 'php' => '5.2.4' );
-// Constants before PHP 5.6 can't store arrays.
-define( 'GCE_REQUIREMENTS', serialize( $gce_requires ) );
-// Checks if the requirements are met.
-require_once dirname( __FILE__ ) . '/gce-requirements.php';
-$gce_requirements = new GCE_Requirements( $gce_requires );
-if ( $gce_requirements->pass() === false ) {
+// Composer fallback for PHP < 5.3.0.
+if ( version_compare( PHP_VERSION, '5.3.0' ) === -1 ) {
+	include_once 'vendor/autoload_52.php';
+} else {
+	include_once 'vendor/autoload.php';
+}
 
-	// Display an admin notice explaining why the plugin can't work.
-	function gce_plugin_requirements() {
-		$required = unserialize( GCE_REQUIREMENTS );
-		if ( isset( $required['wp'] ) && isset( $required['php'] ) ) {
-			global $wp_version;
-			echo '<div class="error"><p>' . sprintf( __( 'Google Events Calendar requires PHP %1$s and WordPress %2$s to function properly. PHP version found: %3$s. WordPress installed version: %4$s. Please upgrade to meet the minimum requirements.', 'gce' ), $required['php'], $required['wp'], PHP_VERSION, $wp_version ) . '</p></div>';
-		}
+// Plugin constants.
+$this_plugin_path = trailingslashit( dirname( __FILE__ ) );
+$this_plugin_dir  = plugin_dir_url( __FILE__ );
+$this_plugin_constants = array(
+	'SIMPLE_CALENDAR_VERSION'   => '3.0.10',
+	'SIMPLE_CALENDAR_MAIN_FILE' => __FILE__,
+	'SIMPLE_CALENDAR_URL'       => $this_plugin_dir,
+	'SIMPLE_CALENDAR_ASSETS'    => $this_plugin_dir  . 'assets/',
+	'SIMPLE_CALENDAR_PATH'      => $this_plugin_path,
+	'SIMPLE_CALENDAR_INC'       => $this_plugin_path . 'includes/',
+);
+foreach ( $this_plugin_constants as $constant => $value ) {
+	if ( ! defined( $constant ) ) {
+		define( $constant, $value );
 	}
-	add_action( 'admin_notices', 'gce_plugin_requirements' );
-
-	$gce_fails = $gce_requirements->failures();
-	if ( isset( $gce_fails['php'] ) ) {
-		// Halt the rest of the plugin execution if PHP check fails.
-		return;
-	}
-
 }
 
-/*
- * Include the main plugin file
- *
- * @since 2.0.0
- */
-require_once( 'class-google-calendar-events.php' );
-
-/**
- * Define constant pointing to this file
- *
- * @since 2.0.0
- */
-if( ! defined( 'GCE_MAIN_FILE' ) ) {
-	define( 'GCE_MAIN_FILE', __FILE__ );
+// Check plugin requirements before loading plugin.
+$this_plugin_checks = new WP_Requirements(
+	'Simple Calendar',
+	plugin_basename( __FILE__ ),
+	array(
+		'PHP'       => '5.3.3',
+		'WordPress' => '4.0.0',
+		'Extensions' => array(
+			'curl',
+			'mbstring',
+		)
+	)
+);
+if ( $this_plugin_checks->pass() === false ) {
+	$this_plugin_checks->halt();
+	return;
 }
 
-/*
- * Get instance of our plugin
- *
- * @since 2.0.0
- */
-add_action( 'plugins_loaded', array( 'Google_Calendar_Events', 'get_instance' ) );
-
-/*
- * If we are in admin then load the Admin class
- *
- * @since 2.0.0
- */
-if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
-	require_once( 'class-google-calendar-events-admin.php' );
-
-	// Register hooks that are fired when the plugin is activated, deactivated, and uninstalled, respectively.
-	register_activation_hook( __FILE__, array( 'Google_Calendar_Events_Admin', 'activate' ) );
-	register_deactivation_hook( __FILE__, array( 'Google_Calendar_Events_Admin', 'deactivate' ) );
-
-	// Get plugin admin class instance
-	add_action( 'plugins_loaded', array( 'Google_Calendar_Events_Admin', 'get_instance' ) );
-}
-
-
+// Load plugin.
+include_once 'includes/main.php';
