@@ -481,6 +481,30 @@ class Settings implements Meta_Box {
 						?>
 					</td>
 				</tr>
+				<tr class="simcal-panel-field">
+					<th><label for="_event_formatting"><?php _e( 'Event Formatting', 'google-calendar-events' ); ?></label></th>
+					<td>
+						<?php
+
+						$event_formatting = get_post_meta( $post->ID, '_event_formatting', true );
+
+						simcal_print_field( array(
+							'type'    => 'select',
+							'name'    => '_event_formatting',
+							'id'      => '_event_formatting',
+							'tooltip' => __( 'How to preserve line breaks and paragraphs in the event template builder.', 'google-calendar-events' ),
+							'value'   => $event_formatting,
+							'default' => 'preserve_linebreaks',
+							'options' => array(
+								'preserve_linebreaks' => __( 'Preserve line breaks, auto paragraphs (default)', 'google-calendar-events' ),
+								'no_linebreaks'       => __( 'No line breaks, auto paragraphs', 'google-calendar-events' ),
+								'none'                => __( 'No line breaks, no auto paragraphs', 'google-calendar-events' ),
+							),
+						) );
+
+						?>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 		<?php
@@ -839,6 +863,10 @@ class Settings implements Meta_Box {
 		$message = isset( $_POST['_no_events_message'] ) ? wp_kses_post( $_POST['_no_events_message'] ) : '';
 		update_post_meta( $post_id, '_no_events_message', $message );
 
+		// _event_formatting
+		$event_formatting = isset( $_POST['_event_formatting'] ) ? sanitize_key( $_POST['_event_formatting'] ) : 'preserve_linebreaks';
+		update_post_meta( $post_id, '_event_formatting', $event_formatting );
+
 		/* ======================= *
 		 * Advanced settings panel *
 		 * ======================= */
@@ -884,7 +912,7 @@ class Settings implements Meta_Box {
 			$unit   = is_numeric( $_POST['_feed_cache_user_unit'] ) ? absint( $_POST['_feed_cache_user_unit'] ) : 3600;
 			update_post_meta( $post_id, '_feed_cache_user_amount', $amount );
 			update_post_meta( $post_id, '_feed_cache_user_unit', $unit );
-			$cache  = $amount * $unit;
+			$cache  = ( ( $amount * $unit ) > 0 ) ? $amount * $unit : 1;
 		}
 		update_post_meta( $post_id, '_feed_cache', $cache );
 

@@ -3,7 +3,7 @@ Contributors: moonstonemedia, pderksen, nickyoung87, nekojira, rosshanney
 Tags: calendar, calendars, calendar manager, custom calendar, custom calendars, event, events, events feed, google calendar, google
 Requires at least: 4.0
 Tested up to: 4.4
-Stable tag: 3.0.10
+Stable tag: 3.0.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,36 @@ We'd love your help! Here's a few things you can do:
 8. Attach a calendar to a post or page
 
 == Changelog ==
+
+= 3.0.13 - January 25, 2016 =
+
+* Tweak: Lists that start on a custom date will start at the beginning of the day now.
+* Tweak: Make it so grouped calendars are properly sorted by event time.
+* Tweak: Updated option for controlling multi-day events.
+* Tweak: Allow line breaks from Google calendar description to persist if not using the html attribute.
+* Tweak: Updated text output for human date times.
+* Fix: Multi-day events that span over to the first day of the month should now show correctly.
+* Feature: Added dropdown option on how to handle line breaks and paragraphs for the event template tags.
+* Dev: Removed WP Requirements from Composer.
+* Dev: Removed always enqueue and disable scripts options so scripts will load automatically on every page.
+
+= 3.0.12 - January 5, 2016 =
+
+* Fix: All-day events on the first day of the month will now show up correctly.
+* Fix: Calendar start dates using a variable number will now start on the correct date.
+* Fix: Disable scripts and disable styles advanced options should now work as intended.
+* Tweak: Added "before" and "after" text for human date event builder codes.
+* Dev: Added jquery.qtip.min.map file to vendor assets.
+
+= 3.0.11 - December 31, 2015 =
+
+* Fix: Custom date and time format settings should no longer override everything else when not selected.
+* Fix: Limiting description with HTML tags should now work better.
+* Fix: Events from different calendars not showing on a grouped calendar should display properly now.
+* Fix: Grouped calendars will now clear the cache of all attached calendars.
+* Fix: Cache was requiring a manual clear sometimes and should now work automatically.
+* Dev: Updated CSS class for [start-location] and [end-location] tags.
+* Tweak: Updated date and time preview to show properly escaped values.
 
 = 3.0.10 - December 21, 2015 =
 
