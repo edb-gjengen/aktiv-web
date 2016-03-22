@@ -11,7 +11,7 @@
 /**
  * This class contains general stuff for usage at WordPress plugins
  */
-class Ure_Lib extends Garvs_WP_Lib {
+class Ure_Lib extends URE_Base_Lib {
 
 	public $roles = null;     
 	public $notification = '';   // notification message to show on page
@@ -27,7 +27,7 @@ class Ure_Lib extends Garvs_WP_Lib {
 	protected $caps_readable = false;
 	protected $hide_pro_banner = false;	
 	protected $full_capabilities = false;
-	protected $ure_object = 'role';  // what to process, 'role' or 'user'  
+	public $ure_object = 'role';  // what to process, 'role' or 'user'  
 	public    $role_default_html = '';
 	protected $role_to_copy_html = '';
 	protected $role_select_html = '';
@@ -62,6 +62,21 @@ class Ure_Lib extends Garvs_WP_Lib {
     }
     // end of __construct()
 
+    
+    public static function get_instance($options_id = '') {
+        
+        if (self::$instance === null) {
+            if (empty($options_id)) {
+                throw new Exception('URE_Lib::get_inctance() - Error: plugin options ID string is required');
+            }
+            // new static() will work too
+            self::$instance = new URE_Lib($options_id);
+        }
+
+        return self::$instance;
+    }
+    // end of get_instance()
+    
     
     protected function upgrade() {
         
@@ -340,9 +355,16 @@ if ($this->multisite && !is_network_admin()) {
 </div>     
 
 <?php        
-        do_action('ure_dialogs_html');
+        
     }
     // end of output_role_edit_dialogs()
+    
+    
+    protected function output_user_caps_edit_dialogs() {
+    
+
+    }
+    // end of output_user_caps_edit_dialogs()
     
     
     protected function output_confirmation_dialog() {
@@ -391,7 +413,11 @@ if ($this->multisite && !is_network_admin()) {
 	
     if ($this->ure_object == 'role') {
         $this->output_role_edit_dialogs();
+    } else {
+        $this->output_user_caps_edit_dialogs();
     }
+    do_action('ure_dialogs_html');
+    
     $this->output_confirmation_dialog();
 ?>
         </div>          
@@ -647,14 +673,10 @@ if ($this->multisite && !is_network_admin()) {
     }
     // end of editor_init0()
 
-
+    
     public function editor_init1() {
 
-        if (!isset($this->roles) || !$this->roles) {
-            // get roles data from database
-            $this->roles = $this->get_user_roles();
-        }
-
+        $this->roles = $this->get_user_roles();
         $this->init_full_capabilities();
         if (empty($this->role_additional_options)) {
             $this->role_additional_options = URE_Role_Additional_Options::get_instance($this);
@@ -759,7 +781,7 @@ if ($this->multisite && !is_network_admin()) {
     public function get_user_roles() {
 
         global $wp_roles;
-
+        
         if (!isset($wp_roles)) {
             $wp_roles = new WP_Roles();
         }                
@@ -1709,7 +1731,7 @@ if ($this->multisite && !is_network_admin()) {
     
     
     protected function init_full_capabilities() {
-        
+                
         $this->built_in_wp_caps = $this->get_built_in_wp_caps();
         $this->full_capabilities = array();
         $this->add_roles_caps();
@@ -1840,7 +1862,7 @@ if ($this->multisite && !is_network_admin()) {
      * @global wpdb $wpdb
      * @return boolean
      */
-    function direct_network_roles_update() {
+    public function direct_network_roles_update() {
         global $wpdb;
 
         if (!$this->last_check_before_update()) {
@@ -1867,6 +1889,8 @@ if ($this->multisite && !is_network_admin()) {
                 $this->log_event($wpdb->last_error, true);
                 return false;
             }
+            // save role additional options
+            
         }
         
         return true;
@@ -1883,7 +1907,8 @@ if ($this->multisite && !is_network_admin()) {
         $GLOBALS['_wp_switched_stack'] = array();
         $GLOBALS['switched'] = ! empty( $GLOBALS['_wp_switched_stack'] );
     }
-    // end of restore_after_blog_switching(
+    // end of restore_after_blog_switching()
+    
     
     protected function wp_api_network_roles_update() {
         global $wpdb;
@@ -1942,7 +1967,6 @@ if ($this->multisite && !is_network_admin()) {
      * @return boolean
      */
     protected function update_roles() {
-        global $wpdb;
 
         if ($this->multisite && is_super_admin() && $this->apply_to_all) {  // update Role for the all blogs/sites in the network (permitted to superadmin only)
             if (!$this->multisite_update_roles()) {
@@ -1967,13 +1991,13 @@ if ($this->multisite && !is_network_admin()) {
      * @param boolean $show_message
      */
     protected function log_event($message, $show_message = false) {
-        global $wp_version;
+        global $wp_version, $wpdb;
 
         $file_name = URE_PLUGIN_DIR . 'user-role-editor.log';
         $fh = fopen($file_name, 'a');
         $cr = "\n";
         $s = $cr . date("d-m-Y H:i:s") . $cr .
-                'WordPress version: ' . $wp_version . ', PHP version: ' . phpversion() . ', MySQL version: ' . mysql_get_server_info() . $cr;
+                'WordPress version: ' . $wp_version . ', PHP version: ' . phpversion() . ', MySQL version: ' . $wpdb->db_version() . $cr;
         fwrite($fh, $s);
         fwrite($fh, $message . $cr);
         fclose($fh);
@@ -2422,6 +2446,33 @@ if ($this->multisite && !is_network_admin()) {
 
     
     /**
+     * Returns administrator role ID
+     * 
+     * @return string
+     */        
+    protected function get_admin_role() {
+        
+        if (isset($this->roles['administrator'])) {
+            $admin_role_id = 'administrator';
+        } else {        
+            // go through all roles and select one with max quant of capabilities included
+            $max_caps = -1;
+            $admin_role_id = '';
+            foreach(array_keys($this->roles) as $role_id) {
+                $caps = count($this->roles[$role_id]['capabilities']);
+                if ($caps>$max_caps) {
+                    $max_caps = $caps;
+                    $admin_role_id = $role_id;
+                }
+            }
+        }        
+        
+        return $admin_role_id;
+    }
+    // end get_admin_role()
+    
+    
+    /**
      * Add new capability
      * 
      * @global WP_Roles $wp_roles
@@ -2434,31 +2485,29 @@ if ($this->multisite && !is_network_admin()) {
             return esc_html__('Insufficient permissions to work with User Role Editor','user-role-editor');
         }
         $mess = '';
-        if (isset($_POST['capability_id']) && $_POST['capability_id']) {
-            $user_capability = $_POST['capability_id'];
-            // sanitize user input for security
-            $valid_name = preg_match('/[A-Za-z0-9_\-]*/', $user_capability, $match);
-            if (!$valid_name || ($valid_name && ($match[0] != $user_capability))) { // some non-alphanumeric charactes found!    
-                return 'Error! ' . esc_html__('Error: Capability name must contain latin characters and digits only!', 'user-role-editor');
-                ;
-            }
-
-            if ($user_capability) {
-                $user_capability = strtolower($user_capability);
-                if (!isset($wp_roles)) {
-                    $wp_roles = new WP_Roles();
-                }
-                $wp_roles->use_db = true;
-                $administrator = $wp_roles->get_role('administrator');
-                if (!$administrator->has_cap($user_capability)) {
-                    $wp_roles->add_cap('administrator', $user_capability);
-                    $mess = sprintf(esc_html__('Capability %s is added successfully', 'user-role-editor'), $user_capability);
-                } else {
-                    $mess = sprintf('Error! ' . esc_html__('Capability %s exists already', 'user-role-editor'), $user_capability);
-                }
-            }
+        if (!isset($_POST['capability_id']) || empty($_POST['capability_id'])) {
+            return 'Wrong Request';
+        }
+        
+        $user_capability = $_POST['capability_id'];
+        // sanitize user input for security
+        $valid_name = preg_match('/[A-Za-z0-9_\-]*/', $user_capability, $match);
+        if (!$valid_name || ($valid_name && ($match[0] != $user_capability))) { // some non-alphanumeric charactes found!    
+            return esc_html__('Error: Capability name must contain latin characters and digits only!', 'user-role-editor');
         }
 
+        $user_capability = strtolower($user_capability);                
+        $this->get_user_roles();
+        $this->init_full_capabilities();
+        if (!isset($this->full_capabilities[$user_capability])) {
+            $admin_role = $this->get_admin_role();            
+            $wp_roles->use_db = true;
+            $wp_roles->add_cap($admin_role, $user_capability);
+            $mess = sprintf(esc_html__('Capability %s is added successfully', 'user-role-editor'), $user_capability);
+        } else {
+            $mess = sprintf(esc_html__('Capability %s exists already', 'user-role-editor'), $user_capability);
+        }
+        
         return $mess;
     }
     // end of add_new_capability()

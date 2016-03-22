@@ -177,16 +177,19 @@ class Default_Calendar_Grid implements Calendar_View {
 		if ( $calendar instanceof Default_Calendar ) {
 
 			?>
+
+			<?php edit_post_link( __( 'Edit Calendar', 'google-calendar-events' ), '<p class="simcal-align-right"><small>', '</small></p>', $calendar->id ); ?>
+
 			<table class="simcal-calendar-grid"
 			       data-event-bubble-trigger="<?php echo $calendar->event_bubble_trigger; ?>">
 				<thead class="simcal-calendar-head">
 					<tr>
 						<?php if ( ! $calendar->static ) { ?>
-							<th class="simcal-nav simcal-prev-wrapper" colspan="1">
+							<th class="simcal-nav simcal-prev-wrapper" colspan=colspan="<?php echo apply_filters( 'simcal_prev_cols', '1' ); ?>">
 								<button class="simcal-nav-button simcal-month-nav simcal-prev" title="<?php _e( 'Previous Month', 'google-calendar-events' ); ?>"><i class="simcal-icon-left"></i></button>
 							</th>
 						<?php } ?>
-						<th colspan="<?php echo $calendar->static ? '7' : '5'; ?>"
+						<th colspan="<?php echo apply_filters( 'simcal_current_cols', $calendar->static ? '7' : '5' ); ?>"
 						    class="simcal-nav simcal-current"
 						    data-calendar-current="<?php echo $calendar->start; ?>">
 							<?php
@@ -213,7 +216,7 @@ class Default_Calendar_Grid implements Calendar_View {
 							?>
 						</th>
 						<?php if ( ! $calendar->static ) { ?>
-							<th class="simcal-nav simcal-next-wrapper" colspan="1">
+							<th class="simcal-nav simcal-next-wrapper" colspan="<?php echo apply_filters( 'simcal_next_cols', '1' ); ?>">
 								<button class="simcal-nav-button simcal-month-nav simcal-next" title="<?php _e( 'Next Month', 'google-calendar-events' ); ?>"><i class="simcal-icon-right"></i></button>
 							</th>
 						<?php } ?>
@@ -243,7 +246,7 @@ class Default_Calendar_Grid implements Calendar_View {
 
 								?>
 								<th class="simcal-week-day simcal-week-day-<?php echo $i ?>"
-								    data-screen-small="<?php echo substr( $week_days_short[ $i ], 0, 1 ); ?>"
+								    data-screen-small="<?php echo mb_substr( $week_days_short[ $i ], 0, 1, 'UTF-8' ); ?>"
 								    data-screen-medium="<?php echo $week_days_short[ $i ]; ?>"
 								    data-screen-large="<?php echo $week_days_full[ $i ]; ?>"><?php echo $week_days_short[ $i ]; ?></th>
 								<?php
@@ -258,6 +261,7 @@ class Default_Calendar_Grid implements Calendar_View {
 				<?php echo $this->draw_month( date( 'n', $calendar->start ), date( 'Y', $calendar->start ) ); ?>
 
 			</table>
+
 			<?php
 
 			echo '<div class="simcal-ajax-loader simcal-spinner-top" style="display: none;"><i class="simcal-icon-spinner simcal-icon-spin"></i></div>';
@@ -289,8 +293,11 @@ class Default_Calendar_Grid implements Calendar_View {
 				return '';
 			}
 		}
-		date_default_timezone_set( $calendar->timezone );
+
 		$events = $calendar->events;
+
+		$feed          = simcal_get_feed( $calendar );
+		$feed_timezone = get_post_meta( $feed->post_id, '_feed_timezone', true );
 
 		// Variables to cycle days in current month and find today in calendar.
 		$now         = $calendar->now;
@@ -397,6 +404,12 @@ class Default_Calendar_Grid implements Calendar_View {
 
 					if ( $event instanceof Event ) :
 
+						if ( $feed->type == 'grouped-calendars' ) {
+							date_default_timezone_set( $feed_timezone );
+						} else {
+							date_default_timezone_set( $event->timezone );
+						}
+
 						// Store the calendar id where the event belongs (useful in grouped calendar feeds)
 						$calendar_class  = 'simcal-events-calendar-' . strval( $event->calendar );
 						$calendar_classes[] = $calendar_class ;
@@ -426,7 +439,7 @@ class Default_Calendar_Grid implements Calendar_View {
 						}
 
 						// Event contents.
-						$list_events .= "\t" . '<li class="' . $event_classes . '"' . $event_visibility . ' itemprop="event" itemscope itemtype="http://schema.org/Event">' . "\n";
+						$list_events .= "\t" . '<li class="' . $event_classes . '"' . $event_visibility . ' itemscope itemtype="http://schema.org/Event">' . "\n";
 						$list_events .= "\t\t" . '<span class="simcal-event-title">' . $bullet . $title . '</span>' . "\n";
 						$list_events .= "\t\t" . '<div class="simcal-event-details simcal-tooltip-content" style="display: none;">' . $calendar->get_event_html( $event ) . '</div>' . "\n";
 						$list_events .= "\t" . '</li>' . "\n";

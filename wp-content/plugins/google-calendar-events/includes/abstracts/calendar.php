@@ -263,7 +263,7 @@ abstract class Calendar {
 						$this->set_events( $feed->events );
 						if ( 'use_calendar' == get_post_meta( $this->id, '_feed_timezone_setting', true ) ) {
 							$this->timezone = $feed->timezone;
-							$this->set_start( $feed->timezone );
+							$this->set_start();
 						}
 					} elseif ( is_string( $feed->events ) ) {
 						$this->errors[] = $feed->events;
@@ -478,6 +478,11 @@ abstract class Calendar {
 
 		$site_tz = esc_attr( simcal_get_wp_timezone() );
 
+		if ( $this->feed === 'grouped-calendars' ) {
+			$this->timezone = $site_tz;
+			return;
+		}
+
 		if ( empty( $tz ) ) {
 
 			$timezone_setting = get_post_meta( $this->id, '_feed_timezone_setting', true );
@@ -648,7 +653,7 @@ abstract class Calendar {
 			$this->start = Carbon::today( $this->timezone )->addYears( $nth )->startOfYear()->getTimeStamp();
 		} elseif ( 'custom_date' == $calendar_begins ) {
 			if ( $date = get_post_meta( $this->id, '_calendar_begins_custom_date', true ) ) {
-				$this->start = Carbon::createFromFormat( 'Y-m-d', esc_attr( $date ) )->setTimezone( $this->timezone )->startOfDay()->getTimestamp();
+				$this->start = Carbon::createFromFormat( 'Y-m-d', esc_attr( $date ), $this->timezone )->setTimezone( $this->timezone )->startOfDay()->getTimestamp();
 			}
 		}
 	}
