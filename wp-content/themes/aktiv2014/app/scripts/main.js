@@ -64,11 +64,11 @@ function format_results(data) {
         '<td class="groups"><% _.each(u.groups, function(g, i) { %><%= g.name %><% if(u.groups.length !== i +1){ %>, <% } %><% }); %></td>'+
         '</tr> <% }); %>' +
         '</tbody></table>';
-    var html = header_template + _.template(list, data);
+    var html = header_template + _.template(list)(data);
     $('.search-result-list').html(html);
 
     var search_meta = 'Antall treff: <%= meta.num_results %>';
-    $('.search-results .meta').html(_.template(search_meta, data));
+    $('.search-results .meta').html(_.template(search_meta)(data));
 }
 
 function do_search() {
@@ -216,7 +216,6 @@ function mailing_lists_load_initial() {
      }
 }
 jQuery(document).ready(function() {
-
     moment.locale('nb');
     var $ = jQuery;
 
@@ -275,7 +274,7 @@ jQuery(document).ready(function() {
                 '<option value="<%=g.group_id %>"><%= g.group_name %></option>' +
                 '<% }); %></select>';
 
-            var html = _.template(list, data);
+            var html = _.template(list)(data);
             $('.groups-select-wrap').html(html);
             // run chosen
             $('.groups-select').chosen({
@@ -311,7 +310,7 @@ jQuery(document).ready(function() {
         // TODO: better mobile layout
         // TODO: dynamic show/hide of members
 
-        /* Load list of lists*/
+        /* Load list of lists */
         $.getJSON(
             email_endpoint,
             { _wpnonce: $('meta[name=x-inside-api-nonce]').attr('content') },
@@ -386,7 +385,7 @@ jQuery(document).ready(function() {
                 var list = '<% _.each(lists, function(r) { %>' +
                     '<li><%= r.name %> <a href="<%= r.admin_url %>" class="email-<%= r.type %>" title="<%= r.type %>"><span class="dashicons dashicons-<% if( r.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"></span></a></li>' +
                     '<% }); %>';
-                var html = _.template(list, data);
+                var html = _.template(list)(data);
                 $('.account-details .email-list').html(html);
                 /*if( params.inherited ) {
                     data.results = data.inherited_results; // reuse template

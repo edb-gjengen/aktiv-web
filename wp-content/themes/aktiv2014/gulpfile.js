@@ -6,6 +6,7 @@ var gulp = require('gulp');
 // load plugins
 var $ = require('gulp-load-plugins')();
 var bowerFiles = require('main-bower-files');
+var autoprefixer = require('autoprefixer');
 
 gulp.task('styles', function () {
     return gulp.src('app/styles/main.scss')
@@ -13,10 +14,10 @@ gulp.task('styles', function () {
             includePaths: ['app/bower_components/foundation/scss'],
             outputStyle: 'nested',
             precision: 10,
-            onError: console.error.bind(console, 'Sass error:') 
+            onError: console.error.bind(console, 'Sass error:')
         }))
         .pipe($.postcss([
-            require('autoprefixer-core')({browsers: ['last 1 version']})
+            autoprefixer({browsers: ['last 1 version']})
         ]))
         .pipe(gulp.dest('dist/styles'));
 });
@@ -26,10 +27,10 @@ gulp.task('diststyles', function () {
         .pipe($.sass({
             includePaths: ['app/bower_components/foundation/scss'],
             precision: 10,
-            onError: console.error.bind(console, 'Sass error:') 
+            onError: console.error.bind(console, 'Sass error:')
         }))
         .pipe($.postcss([
-            require('autoprefixer-core')({browsers: ['last 1 version']})
+            autoprefixer({browsers: ['last 1 version']})
         ]))
 	.pipe($.csso())
         .pipe(gulp.dest('dist/styles'));

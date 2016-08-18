@@ -7,9 +7,9 @@
     "foundation": "zurb/bower-foundation#~5.5.1",
     "moment": "~2.8.3",
     "underscore": "~1.7.0",
-    "chosen-bower": "~1.1.0",
     "history.js": "~1.8.0",
-    "list.js": "~1.1.1"
+    "list.js": "~1.1.1",
+    "chosen": "^1.6.2"
   },
   "devDependencies": {},
   "overrides": {
