@@ -200,7 +200,7 @@ function mailing_list_show(source) {
                 '<%= destinations.length %> stk</span><ul id="members-result"><% _.each(destinations, function(d) { %>' +
                 '<li><a href="mailto:<%= d %>"><span class="dashicons dashicons-email"></span> <%= d %></a></li>' +
                 '<% }); %></ul>';
-            var html = _.template(list, _list_data);
+            var html = _.template(list)(_list_data);
             $('.list-members').html(html);
             $('.lists-list-wrap .meta').html('<a href="#members-result" class="button radius list-members-button">Vis medlemmer på ' + _list_data.name + '</a>');
 
@@ -320,7 +320,7 @@ jQuery(document).ready(function() {
                     return;
                 }
                 data.lists = _.filter(data.lists, function(l) { return l.num > 1; }); //{ lists: _.groupBy(data, function(x){ return x.source; }) };
-                console.log(data);
+
                 var list_template = '<% _.each(lists, function(l) { %>' +
                     '<li data-list-name="<%= l.name %>"><a href="'+ window.location.pathname + '?source=<%= l.name %>" class="list-name"><%= l.name %></a><br>' +
                     '<span class="list-num-members"><%= l.num %> medlemmer</span>'+
@@ -328,7 +328,7 @@ jQuery(document).ready(function() {
                     '<span class="dashicons dashicons-<% if( l.admin_type == "selfservice" ) { %>edit<% } else { %>email<% } %>"> </span>Endre'+
                     '</a></li>' +
                     '<% }); %>';
-                var html = _.template(list_template, data);
+                var html = _.template(list_template)(data);
                 $('.lists-list').html(html);
 
                 /* Index list and make searchable and sortable */
@@ -389,7 +389,7 @@ jQuery(document).ready(function() {
                 $('.account-details .email-list').html(html);
                 /*if( params.inherited ) {
                     data.results = data.inherited_results; // reuse template
-                    html = _.template(list, data);
+                    html = _.template(list)(data);
                     $('.account-details .email-list-inherited').html(html);
                 }*/
             }
