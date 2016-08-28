@@ -1,0 +1,14 @@
+{
+    "name": "ryanbagwell/wordpress-sentry",
+    "description": "A plugin that sends error messages to the Sentry error logging system.",
+    "license": "GPLv2 or later",
+    "authors": [
+        {
+            "name": "Ryan Bagwell",
+            "email": "ryan@ryanbagwell.com"
+        }
+    ],
+    "require": {
+        "raven/raven": "0.10.0"
+    }
+}
