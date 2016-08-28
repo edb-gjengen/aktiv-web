@@ -332,7 +332,7 @@ function feedkey_init()
 		}
 	}
 	
-	$submitted_feedkey = $_GET['feedkey'];
+	$submitted_feedkey = isset($_GET['feedkey']) ? $_GET['feedkey'] : '';
 	
 	if (!empty($submitted_feedkey))
 	{
@@ -372,7 +372,8 @@ function feedkey_init()
 	}
 	
 	//WordPress Feed Queries
-	switch ($_GET['feed'])
+	$feed_type = isset($_GET['feed']) ? $_GET['feed'] : '';
+	switch ($feed_type)
 	{
 		case 'rss':
 		case 'rss2':

@@ -319,7 +319,7 @@ function my_restrict_site_access_handling( $rsa_restrict_approach) {
 function get_restricted_post() {
     global $wp;
 
-    if( $wp->query_vars_restricted == null ) {
+    if( !property_exists($wp, 'query_vars_restricted') || $wp->query_vars_restricted == null ) {
         return null;
     }
     $q = new WP_Query($wp->query_vars_restricted);
