@@ -5,8 +5,9 @@ var gulp = require('gulp');
 
 // load plugins
 var $ = require('gulp-load-plugins')();
-var bowerFiles = require('main-bower-files');
 var autoprefixer = require('autoprefixer');
+var bowerFiles = require('main-bower-files');
+var browserSync = require('browser-sync');
 var cssnano = require('cssnano');
 
 gulp.task('styles', function () {
@@ -20,7 +21,8 @@ gulp.task('styles', function () {
         .pipe($.postcss([
             autoprefixer({browsers: ['last 1 version']})
         ]))
-        .pipe(gulp.dest('dist/styles'));
+        .pipe(gulp.dest('dist/styles'))
+        .pipe(browserSync.stream());
 });
 
 gulp.task('diststyles', function () {
@@ -91,17 +93,17 @@ gulp.task('default', ['clean'], function () {
 });
 
 gulp.task('watch', ['styles'], function () {
-    // FIXME(nikolark): replace with browsersync
-    $.livereload.listen();
+    browserSync.init({
+        proxy: "aktiv-www.dev"
+    });
 
     // watch for changes
-
     gulp.watch([
         '*.php',
         'dist/styles/**/*.css',
         'dist/scripts/**/*.js',
         'dist/images/**/*'
-    ]).on('change', $.livereload.changed);
+    ]).on('change', browserSync.reload);
 
     gulp.watch('app/styles/**/*.scss', ['styles']);
     gulp.watch('app/scripts/**/*.js', ['scripts']);
