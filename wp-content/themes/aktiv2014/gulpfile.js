@@ -7,6 +7,7 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var bowerFiles = require('main-bower-files');
 var autoprefixer = require('autoprefixer');
+var cssnano = require('cssnano');
 
 gulp.task('styles', function () {
     return gulp.src('app/styles/main.scss')
@@ -30,9 +31,9 @@ gulp.task('diststyles', function () {
             onError: console.error.bind(console, 'Sass error:')
         }))
         .pipe($.postcss([
-            autoprefixer({browsers: ['last 1 version']})
+            autoprefixer({browsers: ['last 1 version']}),
+            cssnano()
         ]))
-	.pipe($.csso())
         .pipe(gulp.dest('dist/styles'));
 });
 
@@ -90,6 +91,7 @@ gulp.task('default', ['clean'], function () {
 });
 
 gulp.task('watch', ['styles'], function () {
+    // FIXME(nikolark): replace with browsersync
     $.livereload.listen();
 
     // watch for changes
