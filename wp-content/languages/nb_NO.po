@@ -285,7 +285,7 @@ msgstr "I dag"
 msgid "Edit Menu"
 msgstr "Rediger meny"
 
-#: wp-includes/wp-db.php:1782 wp-includes/wp-db.php:1788
+#: wp-includes/wp-db.php:1792 wp-includes/wp-db.php:1798
 msgid "Unable to retrieve the error message from MySQL"
 msgstr "Greier ikke å hente feilmeldingen fra MySQL"
 
@@ -594,11 +594,11 @@ msgstr "Velg logo"
 
 #. translators: 1: PHP class name, 2: PHP parent class name, 3: version number,
 #. 4: __construct() method
-#: wp-includes/functions.php:3765
+#: wp-includes/functions.php:3766
 msgid "The called constructor method for %1$s in %2$s is <strong>deprecated</strong> since version %3$s! Use %4$s instead."
 msgstr "Den oppkalte constructor-metoden for %1$s i %2$s er <strong>utgått</strong> siden versjon %3$s! Bruk %4$s isteden."
 
-#: wp-includes/functions.php:5122
+#: wp-includes/functions.php:5123
 msgid "Close dialog"
 msgstr "Lukk dialog"
 
@@ -733,11 +733,11 @@ msgid "https://codex.wordpress.org/Debugging_a_WordPress_Network"
 msgstr "https://codex.wordpress.org/Debugging_a_WordPress_Network"
 
 #. translators: %s: Codex URL
-#: wp-includes/functions.php:3992
+#: wp-includes/functions.php:3993
 msgid "Please see <a href=\"%s\">Debugging in WordPress</a> for more information."
 msgstr "Vennligst se <a href=\"%s\">Feilsøking i WordPress</a> for mer informasjon."
 
-#: wp-includes/functions.php:3993
+#: wp-includes/functions.php:3994
 msgid "https://codex.wordpress.org/Debugging_in_WordPress"
 msgstr "https://codex.wordpress.org/Debugging_in_WordPress"
 
@@ -946,66 +946,66 @@ msgstr "Publisert tittel:"
 msgid "Author:"
 msgstr "Forfatter:"
 
-#: wp-includes/wp-db.php:1575
+#: wp-includes/wp-db.php:1585
 msgid "Are you sure that you have typed the correct hostname?"
 msgstr "Er du sikker på at du har skrevet inn det korrekte vertsnavnet?"
 
-#: wp-includes/wp-db.php:1576 wp-includes/wp-db.php:1679
+#: wp-includes/wp-db.php:1586 wp-includes/wp-db.php:1689
 msgid "Are you sure that the database server is running?"
 msgstr "Er du sikker på at databasetjeneren kjører?"
 
-#: wp-includes/wp-db.php:1670
+#: wp-includes/wp-db.php:1680
 msgid "Error reconnecting to the database"
 msgstr "En feil oppsto under gjenoppkobling mot databasen"
 
 #. translators: %s: database host
-#: wp-includes/wp-db.php:1674
+#: wp-includes/wp-db.php:1684
 msgid "This means that we lost contact with the database server at %s. This could mean your host&#8217;s database server is down."
 msgstr "Dette betyr at vi mistet kontakt med databasetjeneren på %s. Det kan bety at databasetjeneren er nede."
 
-#: wp-includes/wp-db.php:1680
+#: wp-includes/wp-db.php:1690
 msgid "Are you sure that the database server is not under particularly heavy load?"
 msgstr "Er du sikker på at databasetjeneren ikke er under spesielt høy belastning?"
 
 #. translators: %s: support forums URL
-#: wp-includes/wp-db.php:1581 wp-includes/wp-db.php:1685
+#: wp-includes/wp-db.php:1591 wp-includes/wp-db.php:1695
 msgid "If you&#8217;re unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href=\"%s\">WordPress Support Forums</a>."
 msgstr "Hvis du ikke er sikker på hva dette betyr, bør du kontakte din serveradmin. Hvis du fortsatt trenger hjelp, kan du alltid besøke <a href=\"%s\">WordPress Support Forums</a>."
 
-#: wp-includes/wp-db.php:1574
+#: wp-includes/wp-db.php:1584
 msgid "Are you sure you have the correct username and password?"
 msgstr "Er du sikker på at du har korrekt brukernavn og passord?"
 
 #. translators: 1: wp-config.php. 2: database host
-#: wp-includes/wp-db.php:1568
+#: wp-includes/wp-db.php:1578
 msgid "This either means that the username and password information in your %1$s file is incorrect or we can&#8217;t contact the database server at %2$s. This could mean your host&#8217;s database server is down."
 msgstr "Dette betyr enten at brukernavnet eller passordet er feil i din %1$s-fil, eller vi kan ikke kontakte databaseserveren på %2$s. Dette kan bety at din databaseserver er nede."
 
 #. translators: %s: support forums URL
-#: wp-includes/wp-db.php:1113
+#: wp-includes/wp-db.php:1123
 msgid "If you don&#8217;t know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href=\"%s\">WordPress Support Forums</a>."
 msgstr "Hvis du ikke vet hvordan du setter opp en database bør du <strong>kontakte din serveradmin</strong>. Hvis alt feiler kan du finne hjelp i <a href=\"%s\">WordPress Support Forums</a>."
 
-#: wp-includes/wp-db.php:1085
+#: wp-includes/wp-db.php:1095
 msgid "Can&#8217;t select database"
 msgstr "Kan ikke velge database"
 
-#: wp-includes/wp-db.php:1094
+#: wp-includes/wp-db.php:1104
 msgid "Are you sure it exists?"
 msgstr "Er du sikker på at den eksisterer?"
 
 #. translators: %s: database name
-#: wp-includes/wp-db.php:1089
+#: wp-includes/wp-db.php:1099
 msgid "We were able to connect to the database server (which means your username and password is okay) but not able to select the %s database."
 msgstr "Vi klarte å koble til databasetjeneren (noe som betyr at brukernavnet og passordet stemmer), men kunne ikke velge databasen %s."
 
 #. translators: 1: database user, 2: database name
-#: wp-includes/wp-db.php:1098
+#: wp-includes/wp-db.php:1108
 msgid "Does the user %1$s have permission to use the %2$s database?"
 msgstr "Har brukeren %1$s tilgang til å bruke databasen %2$s?"
 
 #. translators: %s: database name
-#: wp-includes/wp-db.php:1105
+#: wp-includes/wp-db.php:1115
 msgid "On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1$s</code>. Could that be the problem?"
 msgstr "På noen systemer legges ditt brukernavn foran navnet på databasen, så det ville bli som <code>username_%1$s</code>. Kan det være problemet?"
 
@@ -1551,7 +1551,7 @@ msgstr "Din lenke for å tilbakestille passordet ser ut til å være ugyldig. Ve
 msgid "Your password reset link has expired. Please request a new link below."
 msgstr "Din lenke for å tilbakestille passord har utløpt. Vennligst spør om en ny lenke nedenfor."
 
-#: wp-includes/wp-db.php:1366 wp-includes/wp-db.php:1383
+#: wp-includes/wp-db.php:1376 wp-includes/wp-db.php:1393
 msgid "WordPress database error:"
 msgstr "WordPress database error:"
 
@@ -1564,7 +1564,7 @@ msgid "Username may not be longer than 60 characters."
 msgstr "Brukernavnet kan ikke være lengre enn 60 tegn."
 
 #. translators: 1: PHP class name, 2: version number, 3: __construct() method
-#: wp-includes/functions.php:3769
+#: wp-includes/functions.php:3770
 msgid "The called constructor method for %1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead."
 msgstr "Den kalte constructor-metoden for %1$s er <strong>foreldet</strong> siden versjon %2$s! Bruk %3$s isteden."
 
@@ -2034,7 +2034,7 @@ msgstr "Lenkeforhold (XFN)"
 msgid "CSS Classes"
 msgstr "CSS-klasser"
 
-#: wp-includes/class-wp-editor.php:1431
+#: wp-includes/class-wp-editor.php:1439
 #: wp-includes/customize/class-wp-customize-nav-menu-item-control.php:105
 #: wp-includes/media-template.php:1001
 msgid "Open link in a new tab"
@@ -2342,7 +2342,7 @@ msgid "The %1$s option is deprecated for the family of %2$s functions. Use the %
 msgstr "Valget %1$s er foreldet for familien av %2$s-funksjoner. Bruk funksjonen %3$s istedet."
 
 #: wp-includes/class-wp-customize-nav-menus.php:788
-#: wp-includes/class-wp-editor.php:1426 wp-includes/media-template.php:813
+#: wp-includes/class-wp-editor.php:1434 wp-includes/media-template.php:813
 msgid "Link Text"
 msgstr "Lenketekst"
 
@@ -2457,7 +2457,7 @@ msgstr "Følgende verdier beskriver ikke en gyldig dato: måned %1$s, dag %2$s."
 
 #. translators: %s: database access abstraction class, usually wpdb or a class
 #. extending wpdb
-#: wp-includes/wp-db.php:1165
+#: wp-includes/wp-db.php:1175
 msgid "%s must set a database connection for use with escaping."
 msgstr "%s må sette en databasetilkobling til bruk for filtrering."
 
@@ -2894,7 +2894,7 @@ msgstr "Lukk opplaster"
 msgid "Maximum upload file size: %s."
 msgstr "Maksimal filstørrelse for opplasting: %s."
 
-#: wp-includes/class-wp-editor.php:1452
+#: wp-includes/class-wp-editor.php:1460
 msgid "Search or use up and down arrow keys to select an item."
 msgstr "Søk eller bruk opp- og ned-pilene på tastaturet for å velge."
 
@@ -3488,7 +3488,7 @@ msgstr "Beskjær bildet ditt"
 msgid "Drag and drop to reorder videos."
 msgstr "Dra og slipp for å omorganisere videoer."
 
-#: wp-includes/wp-db.php:1281
+#: wp-includes/wp-db.php:1291
 msgid "The query argument of %s must have a placeholder."
 msgstr "Søkeargumentet %s må ha en plassholder."
 
@@ -3681,8 +3681,8 @@ msgstr "Erstatt"
 msgid "Paste as text"
 msgstr "Lim inn som tekst"
 
-#: wp-includes/admin-bar.php:147 wp-includes/wp-db.php:1114
-#: wp-includes/wp-db.php:1582 wp-includes/wp-db.php:1686 wp-login.php:801
+#: wp-includes/admin-bar.php:147 wp-includes/wp-db.php:1124
+#: wp-includes/wp-db.php:1592 wp-includes/wp-db.php:1696 wp-login.php:801
 msgid "https://wordpress.org/support/"
 msgstr "https://wordpress.org/support/"
 
@@ -4109,7 +4109,7 @@ msgstr "%2$s. %1$s %3$s kl. %4$s:%5$s"
 msgid "The site you were looking for, %s, does not exist, but you can create it now!"
 msgstr "Nettstedet du ser etter, %s, finnes ikke. Men, du kan opprette det nå!"
 
-#: wp-includes/functions.php:5135
+#: wp-includes/functions.php:5136
 msgid "The login page will open in a new window. After logging in you can close it and return to this page."
 msgstr "Innloggingssiden vil åpnes i et nytt vindu. Etter at du har logget inn kan du lukke det vinduet og gå tilbake til denne siden."
 
@@ -4139,7 +4139,7 @@ msgctxt "submit button"
 msgid "Search"
 msgstr "Søk"
 
-#: wp-includes/functions.php:5133 wp-includes/script-loader.php:461
+#: wp-includes/functions.php:5134 wp-includes/script-loader.php:461
 msgid "Session expired"
 msgstr "Sesjon utløpt"
 
@@ -5220,12 +5220,12 @@ msgstr "Supportforum"
 msgid "&hellip;"
 msgstr "&hellip;"
 
-#: wp-includes/functions.php:3646 wp-includes/ms-load.php:471
-#: wp-includes/wp-db.php:1564
+#: wp-includes/functions.php:3647 wp-includes/ms-load.php:471
+#: wp-includes/wp-db.php:1574
 msgid "Error establishing a database connection"
 msgstr "Feil: klarte ikke å etablere databasetilkobling"
 
-#: wp-includes/functions.php:3642
+#: wp-includes/functions.php:3643
 msgid "Database Error"
 msgstr "Database Error"
 
@@ -5359,7 +5359,7 @@ msgstr "Forhåndslast"
 msgid "Destination directory for file streaming does not exist or is not writable."
 msgstr "Nedlastingsmappen for filer finnes ikke eller er ikke skrivbar."
 
-#: wp-includes/class-http.php:532
+#: wp-includes/class-http.php:535
 msgid "There are no HTTP transports available which can complete the requested request."
 msgstr "Det er ingen HTTP transportør tilgjengelig som kan fullføre den forespurte forespørselen."
 
@@ -5368,11 +5368,11 @@ msgctxt "post format"
 msgid "Format"
 msgstr "Format"
 
-#: wp-includes/class-wp-editor.php:1420
+#: wp-includes/class-wp-editor.php:1428
 msgid "Enter the destination URL"
 msgstr "Skriv inn URL-en"
 
-#: wp-includes/class-wp-editor.php:1434
+#: wp-includes/class-wp-editor.php:1442
 msgid "Or link to existing content"
 msgstr "Eller lag lenke til eksisterende innhold"
 
@@ -5396,11 +5396,11 @@ msgstr "Betingede spørringer fungerer ikke fungerer ikke før spørringen er ut
 msgid "The user is already active."
 msgstr "Brukeren er allerede aktiv."
 
-#: wp-includes/functions.php:3995
+#: wp-includes/functions.php:3996
 msgid "%1$s was called <strong>incorrectly</strong>. %2$s %3$s"
 msgstr "%1$s ble kalt <strong>feil</strong>. %2$s %3$s"
 
-#: wp-includes/functions.php:3990
+#: wp-includes/functions.php:3991
 msgid "(This message was added in version %s.)"
 msgstr "(Denne meldingen ble lagt i versjon %s.)"
 
@@ -5432,7 +5432,7 @@ msgstr "Lyd"
 msgid "Invalid post format"
 msgstr "Ugyldig innleggsformat"
 
-#: wp-includes/class-wp-editor.php:1451
+#: wp-includes/class-wp-editor.php:1459
 msgid "No search term specified. Showing recent items."
 msgstr "Ingen søkeord spesifisert. Viser nye elementer."
 
@@ -6387,11 +6387,11 @@ msgstr "Beklager, du har ikke lov til å endre forfatter på innlegget som denne
 msgid "Sorry, you are not allowed to change the page author as this user."
 msgstr "Beklager, du har ikke lov til å endre forfatter på siden som denne brukeren."
 
-#: wp-includes/wp-db.php:1352
+#: wp-includes/wp-db.php:1362
 msgid "WordPress database error %1$s for query %2$s made by %3$s"
 msgstr "WordPress database error %1$s for query %2$s made by %3$s"
 
-#: wp-includes/wp-db.php:1354
+#: wp-includes/wp-db.php:1364
 msgid "WordPress database error %1$s for query %2$s"
 msgstr "WordPress database error %1$s for query %2$s"
 
@@ -6403,7 +6403,7 @@ msgstr "Bakgrunn"
 msgid "User has blocked requests through HTTP."
 msgstr "Bruker har blokkert for forespørseler igjennom HTTP."
 
-#: wp-includes/class-http.php:963 wp-includes/class-wp-http-curl.php:232
+#: wp-includes/class-http.php:966 wp-includes/class-wp-http-curl.php:232
 #: wp-includes/class-wp-http-curl.php:271
 msgid "Too many redirects."
 msgstr "For mange redirigeringer."
@@ -6669,15 +6669,15 @@ msgstr "&laquo; Tilbake"
 msgid "WordPress &rsaquo; Error"
 msgstr "WordPress &rsaquo; Feil"
 
-#: wp-includes/functions.php:4484
+#: wp-includes/functions.php:4485
 msgid "Select a city"
 msgstr "Velg en by"
 
-#: wp-includes/functions.php:4529 wp-includes/functions.php:4533
+#: wp-includes/functions.php:4530 wp-includes/functions.php:4534
 msgid "UTC"
 msgstr "UTC"
 
-#: wp-includes/functions.php:4537
+#: wp-includes/functions.php:4538
 msgid "Manual Offsets"
 msgstr "Manuelle offset"
 
@@ -6912,7 +6912,7 @@ msgstr "Skriv ut"
 msgid "Insert/edit image"
 msgstr "Sett inn/rediger bilde"
 
-#: wp-includes/class-wp-editor.php:936 wp-includes/class-wp-editor.php:1416
+#: wp-includes/class-wp-editor.php:936 wp-includes/class-wp-editor.php:1424
 #: wp-includes/script-loader.php:419
 msgid "Insert/edit link"
 msgstr "Sett inn/rediger lenke"
@@ -7492,7 +7492,7 @@ msgstr "<strong>Feil</strong>: Brukernavnfeltet er tomt."
 msgid "<strong>ERROR</strong>: The password field is empty."
 msgstr "<strong>Feil</strong>: Passordfeltet er tomt."
 
-#: wp-includes/functions.php:5134 wp-includes/user.php:280
+#: wp-includes/functions.php:5135 wp-includes/user.php:280
 msgid "Please log in again."
 msgstr "Vennligst logg inn igjen."
 
@@ -7500,7 +7500,7 @@ msgstr "Vennligst logg inn igjen."
 msgid "Sidebar %d"
 msgstr "Sidekolonne %d"
 
-#: wp-includes/wp-db.php:3197
+#: wp-includes/wp-db.php:3207
 msgid "<strong>ERROR</strong>: WordPress %1$s requires MySQL %2$s or higher"
 msgstr "<strong>FEIL</strong>: WordPress %1$s krever MySQL %2$s eller høyere"
 
@@ -7735,21 +7735,21 @@ msgstr "Rel-attributt for lenke"
 msgid "[%s] Your username and password info"
 msgstr "[%s] Info om ditt nye brukernavn og passord"
 
-#: wp-includes/functions.php:3892
+#: wp-includes/functions.php:3893
 msgid "%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s with no alternative available."
 msgstr "%1$s ble forespurt med et argument som er <strong>foreldet</strong> siden versjon %2$s med ingen alternativer tilgjengelige."
 
-#: wp-includes/functions.php:3890
+#: wp-includes/functions.php:3891
 msgid "%1$s was called with an argument that is <strong>deprecated</strong> since version %2$s! %3$s"
 msgstr "%1$s ble forespurt med et argument som er <strong>foreldet</strong> siden versjon %2$s! %3$s"
 
-#: wp-includes/functions.php:3708 wp-includes/functions.php:3832
-#: wp-includes/functions.php:3947
+#: wp-includes/functions.php:3709 wp-includes/functions.php:3833
+#: wp-includes/functions.php:3948
 msgid "%1$s is <strong>deprecated</strong> since version %2$s with no alternative available."
 msgstr "%1$s er <strong>foreldet</strong> siden versjon %2$s med ingen alternativer tilgjengelig."
 
-#: wp-includes/functions.php:3706 wp-includes/functions.php:3830
-#: wp-includes/functions.php:3945
+#: wp-includes/functions.php:3707 wp-includes/functions.php:3831
+#: wp-includes/functions.php:3946
 msgid "%1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead."
 msgstr "%1$s er <strong>foreldet</strong> siden versjon %2$s! Bruk %3$s isteden."
 
@@ -8004,7 +8004,7 @@ msgid "Website"
 msgstr "Nettsted"
 
 #: wp-includes/admin-bar.php:736 wp-includes/class-wp-customize-widgets.php:418
-#: wp-includes/functions.php:3583
+#: wp-includes/functions.php:3584
 msgid "Widgets"
 msgstr "Widgeter"
 
@@ -8189,7 +8189,7 @@ msgid "Author"
 msgstr "Forfatter"
 
 #: wp-includes/class-wp-customize-nav-menus.php:784
-#: wp-includes/class-wp-editor.php:1422
+#: wp-includes/class-wp-editor.php:1430
 #: wp-includes/customize/class-wp-customize-nav-menu-item-control.php:91
 #: wp-includes/media-template.php:371 wp-includes/media-template.php:550
 #: wp-includes/media.php:3351
@@ -8278,7 +8278,7 @@ msgstr "Rediger lenkekategori"
 msgid "Update Category"
 msgstr "Oppdater kategori"
 
-#: wp-includes/class-wp-editor.php:1466 wp-includes/script-loader.php:421
+#: wp-includes/class-wp-editor.php:1474 wp-includes/script-loader.php:421
 msgid "Add Link"
 msgstr "Legg til lenke"
 
@@ -8338,7 +8338,7 @@ msgstr "RSS"
 msgid "Recent Comments"
 msgstr "Siste kommentarer"
 
-#: wp-includes/class-wp-editor.php:871 wp-includes/class-wp-editor.php:1463
+#: wp-includes/class-wp-editor.php:871 wp-includes/class-wp-editor.php:1471
 #: wp-includes/media.php:3355 wp-includes/script-loader.php:406
 #: wp-includes/script-loader.php:456 wp-includes/script-loader.php:531
 msgid "Cancel"
@@ -8492,7 +8492,7 @@ msgid "Users"
 msgstr "Brukere"
 
 #: wp-includes/admin-bar.php:810 wp-includes/admin-bar.php:811
-#: wp-includes/class-wp-editor.php:1438 wp-includes/media.php:3353
+#: wp-includes/class-wp-editor.php:1446 wp-includes/media.php:3353
 msgid "Search"
 msgstr "Søk"
 
@@ -8512,7 +8512,7 @@ msgstr "Lenker"
 msgid "Uncategorized"
 msgstr "Ukategorisert"
 
-#: wp-includes/class-wp-editor.php:872 wp-includes/class-wp-editor.php:1417
+#: wp-includes/class-wp-editor.php:872 wp-includes/class-wp-editor.php:1425
 #: wp-includes/script-loader.php:261 wp-includes/script-loader.php:342
 #: wp-includes/script-loader.php:457 wp-includes/script-loader.php:951
 msgid "Close"
@@ -8619,7 +8619,7 @@ msgstr "Venter på gjennomgang"
 msgid "Draft"
 msgstr "Kladd"
 
-#: wp-includes/class-wp-editor.php:1365
+#: wp-includes/class-wp-editor.php:1373
 msgid "Y/m/d"
 msgstr "d/m, Y"
 

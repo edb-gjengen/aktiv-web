@@ -978,7 +978,7 @@ class Ure_Lib extends URE_Base_Lib {
         if (!$this->multisite) {    // work for multisite only
             return false;
         }
-        if (!$ignore_super_admin && is_super_admin()) { // Do not block superadmin
+        if (!$ignore_super_admin && $this->is_super_admin()) { // Do not block superadmin
             return false;
         }
         $caps_access_restrict_for_simple_admin = $this->get_option('caps_access_restrict_for_simple_admin', 0);
@@ -1470,6 +1470,7 @@ class Ure_Lib extends URE_Base_Lib {
         }
         
         $this->capabilities_to_save = $this->remove_caps_not_allowed_for_single_admin($this->capabilities_to_save);
+        $this->roles[$this->current_role]['name'] = $this->current_role_name;
         $this->roles[$this->current_role]['capabilities'] = $this->capabilities_to_save;
         $option_name = $wpdb->prefix . 'user_roles';
 
@@ -1498,12 +1499,10 @@ class Ure_Lib extends URE_Base_Lib {
         if (!$this->last_check_before_update()) {
             return false;
         }
-        if (!empty($this->current_role)) {
-            if (!isset($this->roles[$this->current_role])) {
-                $this->roles[$this->current_role]['name'] = $this->current_role_name;
-            }
+        if (!empty($this->current_role)) {            
+            $this->roles[$this->current_role]['name'] = $this->current_role_name;
             $this->roles[$this->current_role]['capabilities'] = $this->capabilities_to_save;
-        }        
+        }
 
         $serialized_roles = serialize($this->roles);
         foreach ($this->blog_ids as $blog_id) {
@@ -1599,7 +1598,7 @@ class Ure_Lib extends URE_Base_Lib {
     protected function update_roles() {
         global $wp_roles;
         
-        if ($this->multisite && is_super_admin() && $this->apply_to_all) {  // update Role for the all blogs/sites in the network (permitted to superadmin only)
+        if ($this->multisite && $this->is_super_admin() && $this->apply_to_all) {  // update Role for the all blogs/sites in the network (permitted to superadmin only)
             if (!$this->multisite_update_roles()) {
                 return false;
             }
@@ -2200,11 +2199,47 @@ class Ure_Lib extends URE_Base_Lib {
                 
         return false;        
     }
-    // end of user_can()           
+    // end of user_can()               
     
     
-    // returns true if current user has $capability assigned through the roles or directly
-    // returns true if current user has role with name equal $cap
+    /**
+     * Wrapper for WordPress capabilities.php is_super_admin(). 
+     * Returns true if user has a real super administrator permissions
+     * It takes into account $this->raised_permissions value, in order do not count a user with temporally raised permissions a real superadmin
+     * @param int $user_id
+     * @global WP_User $current_user
+     * @return boolean
+     */
+    public function is_super_admin($user_id = false) {
+        
+        if (empty($user_id)) {
+            $user = wp_get_current_user();
+            $user_id = $user->ID;
+        } else {
+            $user = get_userdata($user_id);
+        }
+        if (!$user || !$user->exists()) {
+            return false;
+        }
+        
+        if ($this->multisite && $this->raised_permissions) {
+            return false;
+        }
+        
+        if (!$this->multisite && $this->user_has_capability($user, 'administrator')) {
+            return true;
+        }
+                
+        $result = is_super_admin($user_id);
+        
+        return $result;
+    }
+    // end of is_super_admin()
+    
+    
+    // Returns true if user is a real superadmin
+    // Returns true if user has $capability assigned through the roles or directly
+    // Returns true if user has role with name equal $cap
     public function user_has_capability($user, $cap) {
 
         global $wp_roles;
@@ -2212,7 +2247,7 @@ class Ure_Lib extends URE_Base_Lib {
         if (!is_object($user) || empty($user->ID)) {
             return false;
         }
-        if (is_multisite() && is_super_admin($user->ID)) {
+        if ($this->multisite && !$this->raised_permissions && is_super_admin($user->ID)) {  // do not replace with $this->is_super_admin() to exclude recursion
             return true;
         }
 
@@ -2262,7 +2297,7 @@ class Ure_Lib extends URE_Base_Lib {
     
     
     public function get_edit_user_caps_mode() {
-        if ($this->multisite && is_super_admin()) {
+        if ($this->multisite && $this->is_super_admin()) {
             return 1;
         }
         
