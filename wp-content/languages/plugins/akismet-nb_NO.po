@@ -1,5 +1,5 @@
-# Translation of Stable (latest release) in Norwegian (Bokmål)
-# This file is distributed under the same license as the Stable (latest release) package.
+# Translation of Plugins - Akismet - Stable (latest release) in Norwegian (Bokmål)
+# This file is distributed under the same license as the Plugins - Akismet - Stable (latest release) package.
 msgid ""
 msgstr ""
 "PO-Revision-Date: 2016-05-12 18:05:34+0000\n"
@@ -7,8 +7,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/2.1.0-alpha\n"
-"Project-Id-Version: Stable (latest release)\n"
+"X-Generator: GlotPress/2.3.0-alpha\n"
+"Language: nb_NO\n"
+"Project-Id-Version: Plugins - Akismet - Stable (latest release)\n"
 
 #: views/start.php:66
 msgid "Already have your key? Enter it here."
