@@ -41,7 +41,7 @@ function neuf_handle_upload_prefilter( $file ) {
         return $file;
     }
     $errors = array();
-    $minimum = array( 'width' => 640, 'height' => 480);
+    $minimum = array( 'width' => 512, 'height' => 480);
 
     $img = getimagesize( $file['tmp_name'] );
     $width = $img[0];
