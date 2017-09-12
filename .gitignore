@@ -1,5 +1,5 @@
 *.swp
-node_modules
-wp-content/uploads
+aktiv2014/node_modules
+wp/
 wp-config.php
 .idea

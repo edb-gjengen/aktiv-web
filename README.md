@@ -1,6 +1,18 @@
-# Requirements
+## Requirements
 
-  $ apt-get install php5-ldap
+    apt-get install php5-ldap
+  
+## Install
+    git submodule update --init
+    # install wp-cli
+    # install plugins
+    wp plugin install ...
+    # disqus-comment-system
+    # feed-key
+    # opengraph
+    # restricted-site-access
+    # user-role-editor
+
 
 # TODO
 
