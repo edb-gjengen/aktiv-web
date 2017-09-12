@@ -417,4 +417,8 @@ function restricted_description( $description ) {
 }
 add_filter('opengraph_description', 'restricted_description');
 
-?>
+/* Custom password reset URL */
+function neuf_lostpassword_url( $pwd ) {
+    return 'https://galtinn.neuf.no/auth/password_reset/';
+}
+add_filter( 'lostpassword_url' , 'neuf_lostpassword_url');
