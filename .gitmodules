@@ -1,6 +1,3 @@
-[submodule "wp-content/plugins/wpdirauth-posixgroup"]
-	path = wp-content/plugins/wpdirauth-posixgroup
-	url = https://git.neuf.no/edb/wpdirauth.git
 [submodule "plugins/wpdirauth-posixgroup"]
 	path = plugins/wpdirauth-posixgroup
 	url = https://git.neuf.no/edb/wpdirauth

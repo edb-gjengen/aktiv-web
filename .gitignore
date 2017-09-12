@@ -3,3 +3,4 @@ aktiv2014/node_modules
 wp/
 wp-config.php
 .idea
+*.pyc

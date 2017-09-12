@@ -6,14 +6,13 @@ var gulp = require('gulp');
 // load plugins
 var $ = require('gulp-load-plugins')();
 var autoprefixer = require('autoprefixer');
-var bowerFiles = require('main-bower-files');
 var browserSync = require('browser-sync');
 var cssnano = require('cssnano');
 
 gulp.task('styles', function () {
     return gulp.src('app/styles/main.scss')
         .pipe($.sass({
-            includePaths: ['app/bower_components/foundation/scss'],
+            includePaths: ['node_modules/foundation-sites/scss'],
             outputStyle: 'nested',
             precision: 10,
             onError: console.error.bind(console, 'Sass error:')
@@ -28,7 +27,7 @@ gulp.task('styles', function () {
 gulp.task('diststyles', function () {
     return gulp.src('app/styles/main.scss')
         .pipe($.sass({
-            includePaths: ['app/bower_components/foundation/scss'],
+            includePaths: ['node_modules/foundation-sites/scss'],
             precision: 10,
             onError: console.error.bind(console, 'Sass error:')
         }))
@@ -40,8 +39,15 @@ gulp.task('diststyles', function () {
 });
 
 gulp.task('vendorscripts', function () {
-    var wiredep = require('wiredep')();
-    return gulp.src(wiredep.js)
+    var vendorFiles = [
+        'node_modules/jquery/dist/jquery.min.js',
+        'node_modules/chosen-js/chosen.jquery.min.js',
+        'node_modules/list.js/dist/list.min.js',
+        'node_modules/moment/min/moment.min.js',
+        'node_modules/moment/locale/nb.js',
+        'node_modules/underscore/underscore-min.js'
+    ];
+    return gulp.src(vendorFiles)
         .pipe($.concat('vendor.js'))
         .pipe(gulp.dest('dist/scripts'));
 });
@@ -71,7 +77,7 @@ gulp.task('images', function () {
 });
 
 gulp.task('fonts', function () {
-    return gulp.src(bowerFiles().concat('app/fonts/**/*'))
+    return gulp.src('app/fonts/**/*')
         .pipe($.filter('**/*.{eot,svg,ttf,woff,woff2}'))
         .pipe($.flatten())
         .pipe(gulp.dest('dist/fonts'));
@@ -94,7 +100,7 @@ gulp.task('default', ['clean'], function () {
 
 gulp.task('watch', ['styles'], function () {
     browserSync.init({
-        proxy: "aktiv-www.dev"
+        proxy: "aktiv-web.dev"
     });
 
     // watch for changes
@@ -108,5 +114,5 @@ gulp.task('watch', ['styles'], function () {
     gulp.watch('app/styles/**/*.scss', ['styles']);
     gulp.watch('app/scripts/**/*.js', ['scripts']);
     gulp.watch('app/images/**/*', ['images']);
-    gulp.watch('bower.json', ['vendorscripts']);
+    gulp.watch('package.json', ['vendorscripts']);
 });

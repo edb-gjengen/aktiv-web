@@ -11,16 +11,9 @@
     <meta name="x-user-id" content="<?php echo $user->ID; ?>" />
 
     <meta name="x-siteurl" content="<?php echo get_option('siteurl'); ?>" />
-    <link rel="icon" type="image/png" href="favicon.ico" />
     <link rel="alternate" type="application/rss+xml" href="<?php echo get_feed_url(); ?>" title="aktiv.neuf.no - Nyheter" />
-
-    <link href="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/styles/main.css" rel="stylesheet" type="text/css" />
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,700,800,600' rel='stylesheet' type='text/css'>
     <?php wp_head(); ?>
-    <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/vendor.js"></script>
-
-    <script src="<?php bloginfo( 'stylesheet_directory' ); ?>/dist/scripts/main.js"></script>
-
     <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 </head>
 

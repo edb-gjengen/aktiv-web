@@ -1,4 +1,6 @@
 <?php
+$AKTIV2016_VERSION = '1.0.0';
+
 add_theme_support('menus');
 add_theme_support('post-thumbnails');
 add_theme_support('automatic-feed-links');
@@ -7,7 +9,7 @@ add_theme_support('title-tag');
 $content_width = 770;
 
 add_image_size( 'cover-photo' , 1440, 810, true );
-add_image_size( 'feed' , 770, 433, true, 'center', 'top' );
+add_image_size( 'feed' , 770, 433, array('center', 'top') );
 /**
  * Register navigation menus.
  */
@@ -18,17 +20,16 @@ function neuf_register_nav_menus() {
 }
 add_action( 'init' , 'neuf_register_nav_menus' );
 
-/**
- * Enqueue various scripts we use.
- */
+/** Enqueue various scripts we use. */
 function neuf_enqueue_scripts() {
-    // enqueue the scripts
-    wp_enqueue_script( 'jquery' );
-    wp_enqueue_script( 'underscore' );
-
+    global $AKTIV2016_VERSION;
+    wp_deregister_script( 'jquery' );
+    wp_register_script('vendor', get_template_directory_uri().'/dist/scripts/vendor.js', array(), $AKTIV2016_VERSION);
+    wp_register_script('app', get_template_directory_uri().'/dist/scripts/main.js', array('vendor'), $AKTIV2016_VERSION);
+    wp_enqueue_script( 'app' );
+    wp_enqueue_style( 'app', get_stylesheet_directory_uri().'/dist/styles/main.css', array(), $AKTIV2016_VERSION);
 }
 add_action( 'wp_enqueue_scripts' , 'neuf_enqueue_scripts' );
-
 /**
  * Force large uploaded images.
  * Denies uploads of images smaller (in pixels) than given width and height values.

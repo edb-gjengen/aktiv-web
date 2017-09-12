@@ -1,23 +1,41 @@
-## Requirements
-
-    apt-get install php5-ldap
-  
 ## Install
-    git submodule update --init
+    # Install LDAP PHP extension for testing wpdirauth-posixgroup
+    apt install php-ldap
+    
     # install wp-cli
-    # install plugins
+    wp core download --path=wp
+    cd wp
+    wp core config  # create db first
+    wp core install  # needs initial credentials
+    cd wp-content/themes
+    ln -s ../../../aktiv2014
+    
+    cd ../../../dns2015
+    yarn
+    
+    # Install public plugins listed below
+    cd ../wp
     wp plugin install ...
-    # disqus-comment-system
-    # feed-key
-    # opengraph
-    # restricted-site-access
-    # user-role-editor
+    
+    cd ../wp/wp-content/plugins
+    git submodule update --init
+    ln -s ../../plugins/wpdirauth-posixgroup
+    
+    wp core language install nb_NO
+    wp core language activate nb_NO
+    wp core language update
 
+## Plugins
+    # install plugins with 'wp plugin install'
+    disqus-comment-system
+    feed-key
+    opengraph
+    restricted-site-access
+    user-role-editor
 
-# TODO
-
- - [ ] calendar plugin (responsive calendar)
- - [ ] custom colors for popular categories 
- - [ ] blokk font for ajax loaded content
- - [ ] relative dates and times
- - [ ] profile-cards
+## Development tasks
+    fab build
+    fab watch
+    
+## Deployment
+    fab deploy
