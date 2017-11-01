@@ -7,9 +7,13 @@ function return_json($result) {
     die(json_encode($result));
 }
 
-if(!defined('EMAIL_API_USERNAME') || !defined('EMAIL_API_PASSWORD') || !defined('EMAIL_URL')
-    || !defined('MAILMAN_API_USERNAME') || !defined('MAILMAN_API_PASSWORD') || !defined('MAILMAN_URL')) {
-    return_json(array("error" => "Looks like you are missing 1 or more settings in wp-config.php"));
+$required_settings = ['EMAIL_API_USERNAME', 'EMAIL_API_PASSWORD', 'EMAIL_URL', 'MAILMAN_API_USERNAME',
+    'MAILMAN_API_PASSWORD', 'MAILMAN_URL'];
+
+foreach ($required_settings as $setting) {
+    if( !defined($setting) ) {
+        return_json(array("error" => "Looks like you are missing $setting or more settings in wp-config.php"));
+    }
 }
 
 $nonce_action = 'inside-api';
