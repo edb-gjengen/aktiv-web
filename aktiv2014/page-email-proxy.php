@@ -23,10 +23,10 @@ $args = array(
     'domain__name' => 'studentersamfundet.no',
 );
 if(isset($_GET['source'])) {
-    $args['source_regex'] = '^'.$_GET['source'].'$';
+    $args['source__iregex'] = '^'.$_GET['source'].'$';
 }
 if(isset($_GET['destination'])) {
-    $args['destination_regex'] = '^'.$_GET['destination'].'$';
+    $args['destination__iregex'] = '^'.$_GET['destination'].'$';
 }
 
 $ch = curl_init(EMAIL_URL."aliases/".'?'.http_build_query($args));
