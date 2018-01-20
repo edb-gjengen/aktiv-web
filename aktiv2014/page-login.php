@@ -46,7 +46,7 @@ $restricted_post = get_restricted_post();
     );
     wp_login_form( $args );
     ?>
-    <a href="https://brukerinfo.neuf.no/accounts/password/reset">Problemer med å logge inn?</a>
+    <a href="https://galtinn.neuf.no/auth/password_reset/">Problemer med å logge inn?</a>
     </div>
 
 </div> <!-- #content -->

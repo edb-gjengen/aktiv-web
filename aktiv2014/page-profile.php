@@ -39,7 +39,7 @@ get_header();
             <h5>Profilbilde</h5>
             <p><a href="https://nb.gravatar.com"><img src="<?php echo get_grav_url($user); ?>" title="Endre profilbildet ditt på gravatar.com" /> Endre profilbilde</a></p>
             <h5>Passord</h5>
-            <p>Endre passordet ditt via <a href="https://brukerinfo.neuf.no">Brukerinfo</a>.</p>
+            <p>Endre passordet ditt via <a href="https://galtinn.neuf.no/">Galtinn</a>.</p>
             <p></p>
             <h5>Annet</h5>
             <a href="<?php echo get_feed_url(); ?>">RSS-strøm - Nyheter</a>
